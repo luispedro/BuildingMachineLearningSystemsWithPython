@@ -1,0 +1,8 @@
+ap.tgz
+ap/
+enwiki-latest-pages-articles.xml.bz2
+wiki_en_output_bow.mm
+wiki_en_output_bow.mm.index
+wiki_en_output_tfidf.mm
+wiki_en_output_tfidf.mm.index
+wiki_en_output_wordids.txt
