@@ -1,3 +1,10 @@
+# This code is supporting material for the book
+# Building Machine Learning Systems with Python
+# by Willi Richert and Luis Pedro Coelho
+# published by PACKT Publishing
+#
+# It is made available under the MIT License
+
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov 30 15:50:11 2012

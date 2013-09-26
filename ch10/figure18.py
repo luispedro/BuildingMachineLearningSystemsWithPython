@@ -1,3 +1,10 @@
+# This code is supporting material for the book
+# Building Machine Learning Systems with Python
+# by Willi Richert and Luis Pedro Coelho
+# published by PACKT Publishing
+#
+# It is made available under the MIT License
+
 import mahotas as mh
 from sklearn import cross_validation
 from sklearn.linear_model.logistic import LogisticRegression
