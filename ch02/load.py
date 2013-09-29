@@ -1,4 +1,6 @@
 import numpy as np
+
+
 def load_dataset(dataset_name):
     '''
     data,labels = load_dataset(dataset_name)
@@ -20,4 +22,3 @@ def load_dataset(dataset_name):
     data = np.array(data)
     labels = np.array(labels)
     return data, labels
-

@@ -111,7 +111,8 @@ def plot_roc(auc_score, name, fpr, tpr):
     pylab.grid(True, linestyle='-', color='0.75')
     pylab.fill_between(tpr, fpr, alpha=0.5)
     pylab.plot(fpr, tpr, lw=1)
-    pylab.savefig(os.path.join(CHART_DIR, "roc_" + name.replace(" ", "_")+ ".png"))
+    pylab.savefig(
+        os.path.join(CHART_DIR, "roc_" + name.replace(" ", "_") + ".png"))
 
 
 def plot_pr(auc_score, name, precision, recall, label=None):
@@ -159,7 +160,7 @@ def plot_feat_importance(feature_names, clf, name):
 
 
 def plot_feat_hist(data_name_list, filename=None):
-    if len(data_name_list)>1:
+    if len(data_name_list) > 1:
         assert filename is not None
 
     pylab.figure(num=None, figsize=(8, 6))
@@ -203,7 +204,9 @@ def plot_bias_variance(data_sizes, train_errors, test_errors, name, title):
         data_sizes, test_errors, "--", data_sizes, train_errors, "b-", lw=1)
     pylab.legend(["train error", "test error"], loc="upper right")
     pylab.grid(True, linestyle='-', color='0.75')
-    pylab.savefig(os.path.join(CHART_DIR, "bv_" + name.replace(" ", "_") + ".png"), bbox_inches="tight")
+    pylab.savefig(
+        os.path.join(CHART_DIR, "bv_" + name.replace(" ", "_") + ".png"), bbox_inches="tight")
+
 
 def plot_k_complexity(ks, train_errors, test_errors):
     pylab.figure(num=None, figsize=(6, 5))
@@ -215,4 +218,5 @@ def plot_k_complexity(ks, train_errors, test_errors):
         ks, test_errors, "--", ks, train_errors, "-", lw=1)
     pylab.legend(["train error", "test error"], loc="upper right")
     pylab.grid(True, linestyle='-', color='0.75')
-    pylab.savefig(os.path.join(CHART_DIR, "kcomplexity.png"), bbox_inches="tight")
+    pylab.savefig(
+        os.path.join(CHART_DIR, "kcomplexity.png"), bbox_inches="tight")

@@ -24,4 +24,3 @@ print('''\
 Training error was {0:.1%}.
 Testing error was {1:.1%} (N = {2}).
 '''.format(train_error, test_error, testing.sum()))
-

@@ -8,21 +8,23 @@ from glob import glob
 
 basedir = 'AnimTransDistr'
 
+
 def features_for(images):
     fs = []
     for im in images:
-        im = mh.imread(im,as_grey=True).astype(np.uint8)
+        im = mh.imread(im, as_grey=True).astype(np.uint8)
         fs.append(mh.features.haralick(im).mean(0))
     return np.array(fs)
 
+
 def features_labels(groups):
-    labels = np.zeros(sum(map(len,groups)))
+    labels = np.zeros(sum(map(len, groups)))
     st = 0
-    for i,g in enumerate(groups):
-        labels[st:st+len(g)] = i
+    for i, g in enumerate(groups):
+        labels[st:st + len(g)] = i
         st += len(g)
     return np.vstack(groups), labels
-    
+
 classes = [
     'Anims',
     'Cars',
@@ -32,16 +34,18 @@ classes = [
 
 features = []
 labels = []
-for ci,cl in enumerate(classes):
-    images = glob('{}/{}/*.jpg'.format(basedir,cl))
+for ci, cl in enumerate(classes):
+    images = glob('{}/{}/*.jpg'.format(basedir, cl))
     features.extend(features_for(images))
     labels.extend([ci for _ in images])
 
 features = np.array(features)
 labels = np.array(labels)
 
-scores0 = cross_validation.cross_val_score(LogisticRegression(), features, labels, cv=10)
-print('Accuracy (5 fold x-val) with Logistic Regrssion [std features]: %s%%' % (0.1* round(1000*scores0.mean())))
+scores0 = cross_validation.cross_val_score(
+    LogisticRegression(), features, labels, cv=10)
+print('Accuracy (5 fold x-val) with Logistic Regrssion [std features]: %s%%' % (
+    0.1 * round(1000 * scores0.mean())))
 
 tfeatures = features
 
@@ -51,8 +55,8 @@ from mahotas.features import surf
 images = []
 labels = []
 
-for ci,cl in enumerate(classes):
-    curimages = glob('{}/{}/*.jpg'.format(basedir,cl))
+for ci, cl in enumerate(classes):
+    curimages = glob('{}/{}/*.jpg'.format(basedir, cl))
     images.extend(curimages)
     labels.extend([ci for _ in curimages])
 labels = np.array(labels)
@@ -78,23 +82,30 @@ for d in alldescriptors:
     c = km.predict(d)
     features.append(
         np.array([np.sum(c == i) for i in xrange(k)])
-        )
+    )
 features = np.array(features)
 print('predicting...')
-scoreSURFlr = cross_validation.cross_val_score(LogisticRegression(), features, labels, cv=5).mean()
-print('Accuracy (5 fold x-val) with Log. Reg [SURF features]: %s%%' % (0.1* round(1000*scoreSURFlr.mean())))
+scoreSURFlr = cross_validation.cross_val_score(
+    LogisticRegression(), features, labels, cv=5).mean()
+print('Accuracy (5 fold x-val) with Log. Reg [SURF features]: %s%%' % (
+    0.1 * round(1000 * scoreSURFlr.mean())))
 
 print('combined...')
 allfeatures = np.hstack([features, tfeatures])
-scoreSURFplr = cross_validation.cross_val_score(LogisticRegression(), allfeatures, labels, cv=5).mean()
+scoreSURFplr = cross_validation.cross_val_score(
+    LogisticRegression(), allfeatures, labels, cv=5).mean()
 
-print('Accuracy (5 fold x-val) with Log. Reg [All features]: %s%%' % (0.1* round(1000*scoreSURFplr.mean())))
+print('Accuracy (5 fold x-val) with Log. Reg [All features]: %s%%' % (
+    0.1 * round(1000 * scoreSURFplr.mean())))
 
 style.use('ggplot')
-plt.plot([0,1,2],100*np.array([scores0.mean(), scoreSURFlr, scoreSURFplr]), 'k-', lw=8)
-plt.plot([0,1,2],100*np.array([scores0.mean(), scoreSURFlr, scoreSURFplr]), 'o', mec='#cccccc', mew=12, mfc='white')
-plt.xlim(-.5,2.5)
-plt.ylim(scores0.mean()*90., scoreSURFplr*110)
-plt.xticks([0,1,2], ["baseline", "SURF", "combined"])
+plt.plot([0, 1, 2], 100 *
+         np.array([scores0.mean(), scoreSURFlr, scoreSURFplr]), 'k-', lw=8)
+plt.plot(
+    [0, 1, 2], 100 * np.array([scores0.mean(), scoreSURFlr, scoreSURFplr]),
+    'o', mec='#cccccc', mew=12, mfc='white')
+plt.xlim(-.5, 2.5)
+plt.ylim(scores0.mean() * 90., scoreSURFplr * 110)
+plt.xticks([0, 1, 2], ["baseline", "SURF", "combined"])
 plt.ylabel('Accuracy (%)')
 plt.savefig('../1400OS_10_18+.png')

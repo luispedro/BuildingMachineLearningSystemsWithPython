@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov 30 15:50:11 2012
-
-@author: wilrich
-"""
-
 import scipy as sp
 
 

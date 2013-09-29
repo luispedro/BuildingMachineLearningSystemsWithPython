@@ -2,7 +2,7 @@ from load import load_dataset
 import numpy as np
 from threshold import learn_model, apply_model, accuracy
 
-features,labels = load_dataset('seeds')
+features, labels = load_dataset('seeds')
 labels = labels == 'Canadian'
 
 error = 0.0
@@ -17,4 +17,3 @@ for fold in range(10):
 error /= 10.0
 
 print('Ten fold cross-validated error was {0:.1%}.'.format(error))
-

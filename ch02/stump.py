@@ -13,13 +13,14 @@ virginica = (labels == 'virginica')
 
 best_acc = -1.0
 for fi in range(features.shape[1]):
-    thresh = features[:,fi].copy()
+    thresh = features[:, fi].copy()
     thresh.sort()
     for t in thresh:
-        pred = (features[:,fi] > t)
+        pred = (features[:, fi] > t)
         acc = (pred == virginica).mean()
         if acc > best_acc:
             best_acc = acc
             best_fi = fi
             best_t = t
-print('Best cut is {0} on feature {1}, which achieves accuracy of {2:.1%}.'.format(best_t,best_fi,best_acc))
+print('Best cut is {0} on feature {1}, which achieves accuracy of {2:.1%}.'.format(
+    best_t, best_fi, best_acc))

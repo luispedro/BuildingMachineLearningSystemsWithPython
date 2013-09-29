@@ -48,6 +48,7 @@ feature_names = np.array((
 ))
 """
 
+
 def prepare_sent_features():
     for pid, text in fetch_posts(chosen, with_index=True):
         if not text:
@@ -146,7 +147,8 @@ def measure(clf_class, parameters, name, data_size=None, plot=False):
 
     if plot:
         #plot_roc(roc_scores[medium], name, fprs[medium], tprs[medium])
-        plot_pr(pr_scores[medium], name, precisions[medium], recalls[medium], classifying_answer + " answers")
+        plot_pr(pr_scores[medium], name, precisions[medium],
+                recalls[medium], classifying_answer + " answers")
 
         if hasattr(clf, 'coef_'):
             plot_feat_importance(feature_names, clf, name)
@@ -180,7 +182,9 @@ def bias_variance_analysis(clf_class, parameters, name):
         train_errors.append(train_error)
         test_errors.append(test_error)
 
-    plot_bias_variance(data_sizes, train_errors, test_errors, name, "Bias-Variance for '%s'" % name)
+    plot_bias_variance(data_sizes, train_errors,
+                       test_errors, name, "Bias-Variance for '%s'" % name)
+
 
 def k_complexity_analysis(clf_class, parameters):
     ks = np.hstack((np.arange(1, 20), np.arange(21, 100, 5)))
@@ -197,17 +201,18 @@ def k_complexity_analysis(clf_class, parameters):
 
     plot_k_complexity(ks, train_errors, test_errors)
 
-for k in [5]: #[5, 10, 40, 90]:
-    bias_variance_analysis(neighbors.KNeighborsClassifier, {'n_neighbors':k, 'warn_on_equidistant':False}, "%iNN"%k)
-    k_complexity_analysis(neighbors.KNeighborsClassifier, {'n_neighbors':k,
-     'warn_on_equidistant':False})
-    #measure(neighbors.KNeighborsClassifier, {'n_neighbors': k, 'p': 2,
+for k in [5]:  # [5, 10, 40, 90]:
+    bias_variance_analysis(neighbors.KNeighborsClassifier, {
+                           'n_neighbors': k, 'warn_on_equidistant': False}, "%iNN" % k)
+    k_complexity_analysis(neighbors.KNeighborsClassifier, {'n_neighbors': k,
+                                                           'warn_on_equidistant': False})
+    # measure(neighbors.KNeighborsClassifier, {'n_neighbors': k, 'p': 2,
             #'warn_on_equidistant': False}, "%iNN" % k)
 
 from sklearn.linear_model import LogisticRegression
-for C in [0.1]: #[0.01, 0.1, 1.0, 10.0]:
+for C in [0.1]:  # [0.01, 0.1, 1.0, 10.0]:
     name = "LogReg C=%.2f" % C
-    bias_variance_analysis(LogisticRegression, {'penalty':'l2', 'C':C}, name)
+    bias_variance_analysis(LogisticRegression, {'penalty': 'l2', 'C': C}, name)
     measure(LogisticRegression, {'penalty': 'l2', 'C': C}, name, plot=True)
 
 print("=" * 50)

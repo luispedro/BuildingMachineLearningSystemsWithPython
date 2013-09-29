@@ -1,5 +1,7 @@
 import numpy as np
 import mahotas as mh
+
+
 def edginess_sobel(image):
     '''
     edgi = edginess_sobel(image)

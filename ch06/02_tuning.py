@@ -23,6 +23,7 @@ from sklearn.naive_bayes import MultinomialNB
 
 phase = "02"
 
+
 def create_ngram_model(params=None):
     tfidf_ngrams = TfidfVectorizer(ngram_range=(1, 3),
                                    analyzer="word", binary=False)
@@ -121,6 +122,7 @@ def print_incorrect(clf, X, Y):
         print "clf.predict('%s')=%i instead of %i" %\
             (X_wrong[idx], Y_hat_wrong[idx], Y_wrong[idx])
 
+
 def get_best_model():
     best_params = dict(vect__ngram_range=(1, 2),
                        vect__min_df=1,
@@ -161,12 +163,12 @@ if __name__ == "__main__":
     X = X_orig
     Y = tweak_labels(Y_orig, ["positive"])
     train_model(get_best_model(), X, Y, name="pos vs rest",
-    plot=True)
+                plot=True)
 
     print "== Neg vs. rest =="
     X = X_orig
     Y = tweak_labels(Y_orig, ["negative"])
     train_model(get_best_model(), X, Y, name="neg vs rest",
-    plot=True)
+                plot=True)
 
     print "time spent:", time.time() - start_time

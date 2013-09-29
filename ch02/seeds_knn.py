@@ -2,7 +2,8 @@ from load import load_dataset
 import numpy as np
 from knn import learn_model, apply_model, accuracy
 
-features,labels = load_dataset('seeds')
+features, labels = load_dataset('seeds')
+
 
 def cross_validate(features, labels):
     error = 0.0
@@ -14,7 +15,7 @@ def cross_validate(features, labels):
         test_error = accuracy(features[testing], labels[testing], model)
         error += test_error
 
-    return error/ 10.0
+    return error / 10.0
 
 error = cross_validate(features, labels)
 print('Ten fold cross-validated error was {0:.1%}.'.format(error))
@@ -22,5 +23,5 @@ print('Ten fold cross-validated error was {0:.1%}.'.format(error))
 features -= features.mean(0)
 features /= features.std(0)
 error = cross_validate(features, labels)
-print('Ten fold cross-validated error after z-scoring was {0:.1%}.'.format(error))
-
+print(
+    'Ten fold cross-validated error after z-scoring was {0:.1%}.'.format(error))

@@ -9,6 +9,7 @@ CHART_DIR = os.path.join("..", "charts")
 GENRE_DIR = "/media/sf_P/pymlbook-data/09-genre-class/genres"
 GENRE_LIST = ["classical", "jazz", "country", "pop", "rock", "metal"]
 
+
 def plot_confusion_matrix(cm, genre_list, name, title):
     pylab.clf()
     pylab.matshow(cm, fignum=False, cmap='Blues', vmin=0, vmax=1.0)
@@ -25,7 +26,8 @@ def plot_confusion_matrix(cm, genre_list, name, title):
     pylab.xlabel('Predicted class')
     pylab.ylabel('True class')
     pylab.grid(False)
-    pylab.savefig(os.path.join(CHART_DIR, "confusion_matrix_%s.png"%name), bbox_inches="tight")
+    pylab.savefig(
+        os.path.join(CHART_DIR, "confusion_matrix_%s.png" % name), bbox_inches="tight")
 
 
 def plot_pr(auc_score, name, precision, recall, label=None):
@@ -40,7 +42,8 @@ def plot_pr(auc_score, name, precision, recall, label=None):
     pylab.ylabel('Precision')
     pylab.title('P/R curve (AUC = %0.2f) / %s' % (auc_score, label))
     filename = name.replace(" ", "_")
-    pylab.savefig(os.path.join(CHART_DIR, "pr_" + filename + ".png"), bbox_inches="tight")
+    pylab.savefig(
+        os.path.join(CHART_DIR, "pr_" + filename + ".png"), bbox_inches="tight")
 
 
 def plot_roc(auc_score, name, tpr, fpr, label=None):
@@ -54,10 +57,12 @@ def plot_roc(auc_score, name, tpr, fpr, label=None):
     pylab.ylim([0.0, 1.0])
     pylab.xlabel('False Positive Rate')
     pylab.ylabel('True Positive Rate')
-    pylab.title('ROC curve (AUC = %0.2f) / %s' % (auc_score, label), verticalalignment="bottom")
+    pylab.title('ROC curve (AUC = %0.2f) / %s' %
+                (auc_score, label), verticalalignment="bottom")
     pylab.legend(loc="lower right")
     filename = name.replace(" ", "_")
-    pylab.savefig(os.path.join(CHART_DIR, "roc_" + filename + ".png"), bbox_inches="tight")
+    pylab.savefig(
+        os.path.join(CHART_DIR, "roc_" + filename + ".png"), bbox_inches="tight")
 
 
 def show_most_informative_features(vectorizer, clf, n=20):
@@ -149,4 +154,3 @@ def plot_bias_variance(data_sizes, train_errors, test_errors, name):
     pylab.legend(["train error", "test error"], loc="upper right")
     pylab.grid(True)
     pylab.savefig(os.path.join(CHART_DIR, "bv_" + name + ".png"))
-

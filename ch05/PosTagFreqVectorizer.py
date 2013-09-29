@@ -20,6 +20,7 @@ poscache_filename = "poscache.json"
 
 
 class PosCounter(Counter):
+
     def __init__(self, iterable=(), normalize=True, poscache=None, **kwargs):
         self.n_sents = 0
         self.normalize = normalize
@@ -58,6 +59,7 @@ class PosCounter(Counter):
 
 
 class PosTagFreqVectorizer(BaseEstimator):
+
     """
     Convert a collection of raw documents to a matrix Pos tag frequencies
     """

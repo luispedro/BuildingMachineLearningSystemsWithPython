@@ -30,8 +30,8 @@ phase = "03"
 emo_repl = {
     # positive emoticons
     "&lt;3": " good ",
-    ":d": " good ", # :D in lower case
-    ":dd": " good ", # :DD in lower case
+    ":d": " good ",  # :D in lower case
+    ":dd": " good ",  # :DD in lower case
     "8)": " good ",
     ":-)": " good ",
     ":)": " good ",
@@ -47,9 +47,10 @@ emo_repl = {
     ":(": " bad ",
     ":S": " bad ",
     ":-S": " bad ",
-    }
+}
 
-emo_repl_order = [k for (k_len,k) in reversed(sorted([(len(k),k) for k in emo_repl.keys()]))]
+emo_repl_order = [k for (k_len, k) in reversed(
+    sorted([(len(k), k) for k in emo_repl.keys()]))]
 
 re_repl = {
     r"\br\b": "are",
@@ -66,7 +67,8 @@ re_repl = {
     r"\bwouldn't\b": "would not",
     r"\bcan't\b": "can not",
     r"\bcannot\b": "can not",
-    }
+}
+
 
 def create_ngram_model(params=None):
     def preprocessor(tweet):
@@ -103,7 +105,7 @@ def train_model(clf, X, Y, name="NB ngram", plot=False):
     pr_scores = []
     precisions, recalls, thresholds = [], [], []
 
-    clfs = [] # just to later get the median
+    clfs = []  # just to later get the median
 
     for train, test in cv:
         X_train, y_train = X[train], Y[train]
@@ -156,6 +158,7 @@ def print_incorrect(clf, X, Y):
         print "clf.predict('%s')=%i instead of %i" %\
             (X_wrong[idx], Y_hat_wrong[idx], Y_wrong[idx])
 
+
 def get_best_model():
     best_params = dict(tfidf__ngram_range=(1, 2),
                        tfidf__min_df=1,
@@ -196,12 +199,12 @@ if __name__ == "__main__":
     X = X_orig
     Y = tweak_labels(Y_orig, ["positive"])
     train_model(get_best_model(), X, Y, name="pos vs rest",
-    plot=True)
+                plot=True)
 
     print "== Neg vs. rest =="
     X = X_orig
     Y = tweak_labels(Y_orig, ["negative"])
     train_model(get_best_model(), X, Y, name="neg vs rest",
-    plot=True)
+                plot=True)
 
     print "time spent:", time.time() - start_time

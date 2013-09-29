@@ -40,11 +40,13 @@ try:
 except IOError:
     poscache = {}
 
+
 class LinguisticVectorizer(BaseEstimator):
+
     def get_feature_names(self):
         return np.array(['sent_neut', 'sent_pos', 'sent_neg',
-         'nouns', 'adjectives', 'verbs', 'adverbs',
-         'allcaps', 'exclamation', 'question'])
+                         'nouns', 'adjectives', 'verbs', 'adverbs',
+                         'allcaps', 'exclamation', 'question'])
 
     def fit(self, documents, y=None):
         return self
@@ -69,8 +71,8 @@ class LinguisticVectorizer(BaseEstimator):
         verbs = 0.
         adverbs = 0.
 
-        for w,t in tagged:
-            p, n = 0,0
+        for w, t in tagged:
+            p, n = 0, 0
             sent_pos_type = None
             if t.startswith("NN"):
                 sent_pos_type = "n"
@@ -86,10 +88,10 @@ class LinguisticVectorizer(BaseEstimator):
                 adverbs += 1
 
             if sent_pos_type is not None:
-                sent_word = "%s/%s"%(sent_pos_type, w)
+                sent_word = "%s/%s" % (sent_pos_type, w)
 
                 if sent_word in sent_word_net:
-                    p,n = sent_word_net[sent_word]
+                    p, n = sent_word_net[sent_word]
 
             pos_vals.append(p)
             neg_vals.append(n)
@@ -98,33 +100,35 @@ class LinguisticVectorizer(BaseEstimator):
         avg_pos_val = np.mean(pos_vals)
         avg_neg_val = np.mean(neg_vals)
         #import pdb;pdb.set_trace()
-        return [1-avg_pos_val-avg_neg_val, avg_pos_val, avg_neg_val,
-                nouns/l, adjectives/l, verbs/l, adverbs/l]
-
+        return [1 - avg_pos_val - avg_neg_val, avg_pos_val, avg_neg_val,
+                nouns / l, adjectives / l, verbs / l, adverbs / l]
 
     def transform(self, documents):
-        obj_val, pos_val, neg_val, nouns, adjectives, verbs, adverbs = np.array([self._get_sentiments(d) for d in documents]).T
+        obj_val, pos_val, neg_val, nouns, adjectives, verbs, adverbs = np.array(
+            [self._get_sentiments(d) for d in documents]).T
 
         allcaps = []
         exclamation = []
         question = []
 
         for d in documents:
-            allcaps.append(np.sum([t.isupper() for t in d.split() if len(t)>2]))
+            allcaps.append(
+                np.sum([t.isupper() for t in d.split() if len(t) > 2]))
 
             exclamation.append(d.count("!"))
             question.append(d.count("?"))
 
-        result = np.array([obj_val, pos_val, neg_val, nouns, adjectives, verbs, adverbs, allcaps,
-            exclamation, question]).T
+        result = np.array(
+            [obj_val, pos_val, neg_val, nouns, adjectives, verbs, adverbs, allcaps,
+             exclamation, question]).T
 
         return result
 
 emo_repl = {
     # positive emoticons
     "&lt;3": " good ",
-    ":d": " good ", # :D in lower case
-    ":dd": " good ", # :DD in lower case
+    ":d": " good ",  # :D in lower case
+    ":dd": " good ",  # :DD in lower case
     "8)": " good ",
     ":-)": " good ",
     ":)": " good ",
@@ -140,9 +144,10 @@ emo_repl = {
     ":(": " bad ",
     ":S": " bad ",
     ":-S": " bad ",
-    }
+}
 
-emo_repl_order = [k for (k_len,k) in reversed(sorted([(len(k),k) for k in emo_repl.keys()]))]
+emo_repl_order = [k for (k_len, k) in reversed(
+    sorted([(len(k), k) for k in emo_repl.keys()]))]
 
 re_repl = {
     r"\br\b": "are",
@@ -159,7 +164,7 @@ re_repl = {
     r"\bwouldn't\b": "would not",
     r"\bcan't\b": "can not",
     r"\bcannot\b": "can not",
-    }
+}
 
 
 def create_union_model(params=None):
@@ -176,7 +181,8 @@ def create_union_model(params=None):
     tfidf_ngrams = TfidfVectorizer(preprocessor=preprocessor,
                                    analyzer="word")
     ling_stats = LinguisticVectorizer()
-    all_features = FeatureUnion([('ling', ling_stats), ('tfidf', tfidf_ngrams)])
+    all_features = FeatureUnion(
+        [('ling', ling_stats), ('tfidf', tfidf_ngrams)])
     #all_features = FeatureUnion([('tfidf', tfidf_ngrams)])
     #all_features = FeatureUnion([('ling', ling_stats)])
     clf = MultinomialNB()
@@ -225,7 +231,7 @@ def train_model(clf, X, Y, name="NB ngram", plot=False):
     pr_scores = []
     precisions, recalls, thresholds = [], [], []
 
-    clfs = [] # just to later get the median
+    clfs = []  # just to later get the median
 
     for train, test in cv:
         X_train, y_train = X[train], Y[train]
@@ -278,6 +284,7 @@ def print_incorrect(clf, X, Y):
         print "clf.predict('%s')=%i instead of %i" %\
             (X_wrong[idx], Y_hat_wrong[idx], Y_wrong[idx])
 
+
 def get_best_model():
     best_params = dict(all__tfidf__ngram_range=(1, 2),
                        all__tfidf__min_df=1,
@@ -296,7 +303,7 @@ def get_best_model():
 if __name__ == "__main__":
     X_orig, Y_orig = load_sanders_data()
     #from sklearn.utils import shuffle
-    #print "shuffle, sample"
+    # print "shuffle, sample"
     #X_orig, Y_orig = shuffle(X_orig, Y_orig)
     #X_orig = X_orig[:100,]
     #Y_orig = Y_orig[:100,]
@@ -323,13 +330,13 @@ if __name__ == "__main__":
     X = X_orig
     Y = tweak_labels(Y_orig, ["positive"])
     train_model(get_best_model(), X, Y, name="pos vs rest",
-    plot=True)
+                plot=True)
 
     print "== Neg vs. rest =="
     X = X_orig
     Y = tweak_labels(Y_orig, ["negative"])
     train_model(get_best_model(), X, Y, name="neg vs rest",
-    plot=True)
+                plot=True)
 
     print "time spent:", time.time() - start_time
 
