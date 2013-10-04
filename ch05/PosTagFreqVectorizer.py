@@ -46,7 +46,6 @@ class PosCounter(Counter):
             for sent in other:
                 self.n_sents += 1
 
-                # import pdb;pdb.set_trace()
                 if self.poscache is not None:
                     if sent in self.poscache:
                         tags = self.poscache[sent]

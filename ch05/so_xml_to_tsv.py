@@ -96,10 +96,6 @@ def parsexml(filename):
         if elem.tag == 'row':
             creation_date = dateparser.parse(elem.get('CreationDate'))
 
-            # import pdb;pdb.set_trace()
-            # if creation_date.year < 2011:
-            #    continue
-
             Id = int(elem.get('Id'))
             PostTypeId = int(elem.get('PostTypeId'))
             Score = int(elem.get('Score'))

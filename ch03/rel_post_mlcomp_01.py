@@ -77,8 +77,6 @@ for i in similar_indices:
     similar.append((dist, dataset.data[i]))
 
 similar = sorted(similar)
-import pdb
-pdb.set_trace()
 
 show_at_1 = similar[0]
 show_at_2 = similar[len(similar) / 2]

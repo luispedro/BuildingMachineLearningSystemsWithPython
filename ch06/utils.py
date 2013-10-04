@@ -46,7 +46,6 @@ def load_sanders_data(dirname=".", line_count=-1):
 
             topic, label, tweet_id = line
 
-            # import vimpdb;vimpdb.set_trace()
             tweet_fn = os.path.join(
                 DATA_DIR, dirname, 'rawdata', '%s.json' % tweet_id)
             tweet = json.load(open(tweet_fn, "r"))
@@ -157,7 +156,6 @@ def plot_feat_importance(feature_names, clf, name):
 
 def plot_feat_hist(data_name_list, filename=None):
     pylab.clf()
-    # import pdb;pdb.set_trace()
     num_rows = 1 + (len(data_name_list) - 1) / 2
     num_cols = 1 if len(data_name_list) == 1 else 2
     pylab.figure(figsize=(5 * num_cols, 4 * num_rows))

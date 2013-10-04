@@ -60,7 +60,6 @@ class LinguisticVectorizer(BaseEstimator):
 
     def _get_sentiments(self, d):
         # http://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
-        #import pdb;pdb.set_trace()
         sent = tuple(nltk.word_tokenize(d))
         if poscache is not None:
             if d in poscache:
@@ -106,7 +105,7 @@ class LinguisticVectorizer(BaseEstimator):
         l = len(sent)
         avg_pos_val = np.mean(pos_vals)
         avg_neg_val = np.mean(neg_vals)
-        #import pdb;pdb.set_trace()
+
         return [1 - avg_pos_val - avg_neg_val, avg_pos_val, avg_neg_val,
                 nouns / l, adjectives / l, verbs / l, adverbs / l]
 

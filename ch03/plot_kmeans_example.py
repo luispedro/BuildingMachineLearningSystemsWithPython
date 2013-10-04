@@ -102,7 +102,7 @@ pylab.imshow(Z, interpolation='nearest',
 c2a, c2b, c2c = km.cluster_centers_
 pylab.scatter(km.cluster_centers_[:, 0], km.cluster_centers_[:, 1],
               marker='x', linewidth=2, s=100, color='black')
-# import pdb;pdb.set_trace()
+
 pylab.gca().add_patch(
     pylab.Arrow(c1a[0], c1a[1], c2a[0] - c1a[0], c2a[1] - c1a[1], width=0.1))
 pylab.gca().add_patch(
