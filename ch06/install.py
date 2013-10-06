@@ -26,12 +26,22 @@
 # Excuse the ugly code.  I threw this together as quickly as possible and I
 # don't normally code in Python.
 #
+
+# In Sanders' original form, the code was using Twitter API 1.0.
+# Now that Twitter moved to 1.1, we had to make a few changes.
+# Cf. twitterauth.py for the details.
+
 import csv
-import getpass
 import json
 import os
 import time
 import urllib
+
+from twitterauth import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET
+
+import twitter
+api = twitter.Api(consumer_key=CONSUMER_KEY, consumer_secret=CONSUMER_SECRET,
+                  access_token_key=ACCESS_TOKEN_KEY, access_token_secret=ACCESS_TOKEN_SECRET)
 
 
 def get_user_params(data_path):
@@ -124,7 +134,6 @@ def download_tweets(fetch_list, raw_dir):
 
     # download tweets
     for idx in range(0, len(fetch_list)):
-
         # current item
         item = fetch_list[idx]
 
@@ -133,9 +142,16 @@ def download_tweets(fetch_list, raw_dir):
         print '--> downloading tweet #%s (%d of %d) (%s left)' % \
               (item[2], idx + 1, len(fetch_list), trem)
 
+        # Old Twitter API 1.0
         # pull data
-        url = 'http://api.twitter.com/1/statuses/show.json?id=' + item[2]
-        urllib.urlretrieve(url, raw_dir + item[2] + '.json')
+        # url = 'https://api.twitter.com/1/statuses/show.json?id=' + item[2]
+        # print url
+        # urllib.urlretrieve(url, raw_dir + item[2] + '.json')
+
+        # New Twitter API 1.1
+        json_data = api.GetStatus(item[2]).AsJsonString()
+        with open(raw_dir + item[2] + '.json', "w") as f:
+            f.write(json_data + "\n")
 
         # stay in Twitter API rate limits
         print '    pausing %d sec to obey Twitter API rate limits' % \
@@ -236,8 +252,6 @@ def main(data_path):
     build_output_corpus(user_params['outList'], user_params['rawDir'],
                         total_list)
 
-    return
-
 
 if __name__ == '__main__':
-    main(os.path.join("..", "data"))
+    main("data")

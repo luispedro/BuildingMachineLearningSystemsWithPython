@@ -7,15 +7,21 @@
 
 import os
 import collections
+import csv
+import json
 
 from matplotlib import pylab
 import numpy as np
 
-DATA_DIR = os.path.join("..", "data")
-CHART_DIR = os.path.join("..", "charts")
 
-import csv
-import json
+DATA_DIR = "data"
+CHART_DIR = "charts"
+
+if not os.path.exists(DATA_DIR):
+    raise RuntimeError("Expecting directory 'data' in current path")
+
+if not os.path.exists(CHART_DIR):
+    os.mkdir(CHART_DIR)
 
 
 def tweak_labels(Y, pos_sent_list):
@@ -58,38 +64,7 @@ def load_sanders_data(dirname=".", line_count=-1):
     tweets = np.asarray(tweets)
     labels = np.asarray(labels)
 
-    # return topics, tweets, labels
     return tweets, labels
-
-
-def load_kaggle_data(filename="kaggle/training.txt", line_count=-1):
-    count = 0
-
-    labels = []
-    texts = []
-
-    read_texts = set([])
-
-    for line in open(os.path.join(DATA_DIR, filename), "r"):
-        count += 1
-        if line_count > 0 and count > line_count:
-            break
-
-        label, text = line.split("\t")
-
-        # Some tweets occur multiple times, so we have to
-        # remove them to not bias the training set.
-        if text in read_texts:
-            continue
-        read_texts.add(text)
-
-        labels.append(label)
-        texts.append(text)
-
-    texts = np.asarray(texts)
-    labels = np.asarray(labels, dtype=np.int)
-
-    return texts, labels
 
 
 def plot_pr(auc_score, name, phase, precision, recall, label=None):
