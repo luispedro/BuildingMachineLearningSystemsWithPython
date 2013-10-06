@@ -31,15 +31,25 @@
 # Now that Twitter moved to 1.1, we had to make a few changes.
 # Cf. twitterauth.py for the details.
 
+import sys
 import csv
 import json
 import os
 import time
-import urllib
+
+try:
+    import twitter
+except ImportError:
+    print("""\
+You need to install python-twitter.
+On Linux:
+    sudo pip install python-twitter
+On Windows:
+    Follow instructions at http://code.google.com/p/python-twitter/ """)
+
+    sys.exit(1)
 
 from twitterauth import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET
-
-import twitter
 api = twitter.Api(consumer_key=CONSUMER_KEY, consumer_secret=CONSUMER_SECRET,
                   access_token_key=ACCESS_TOKEN_KEY, access_token_secret=ACCESS_TOKEN_SECRET)
 
