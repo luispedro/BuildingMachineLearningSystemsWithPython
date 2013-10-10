@@ -30,8 +30,8 @@ filename_filtered = os.path.join(DATA_DIR, "filtered.tsv")
 q_creation = {}  # creation datetimes of questions
 q_accepted = {}  # id of accepted answer
 
-meta = defaultdict(
-    list)  # question -> [(answer Id, IsAccepted, TimeToAnswer, Score), ...]
+# question -> [(answer Id, IsAccepted, TimeToAnswer, Score), ...]
+meta = defaultdict(list)
 
 # regegx to find code snippets
 code_match = re.compile('<pre>(.*?)</pre>', re.MULTILINE | re.DOTALL)
@@ -77,14 +77,16 @@ years = defaultdict(int)
 num_questions = 0
 num_answers = 0
 
+from itertools import imap
 
 def parsexml(filename):
     global num_questions, num_answers
 
     counter = 0
 
-    it = map(itemgetter(1),
+    it = imap(itemgetter(1),
              iter(etree.iterparse(filename, events=('start',))))
+
     root = next(it)  # get posts element
 
     for elem in it:
@@ -138,7 +140,7 @@ def parsexml(filename):
             values = (Id, ParentId,
                       IsAccepted,
                       TimeToAnswer, Score,
-                      Text,
+                      Text.encode("utf-8"),
                       NumTextTokens, NumCodeLines, LinkCount, NumImages)
 
             yield values
@@ -146,9 +148,9 @@ def parsexml(filename):
             root.clear()  # preserve memory
 
 with open(os.path.join(DATA_DIR, filename_filtered), "w") as f:
-    for item in parsexml(filename):
-        line = "\t".join(map(str, item))
-        f.write(line.encode("utf-8") + "\n")
+    for values in parsexml(filename):
+        line = "\t".join(map(str, values))
+        f.write(line + "\n")
 
 with open(os.path.join(DATA_DIR, "filtered-meta.json"), "w") as f:
     json.dump(meta, f)
