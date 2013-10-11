@@ -15,16 +15,25 @@ from collections import defaultdict
 
 try:
     import enchant
+    speller = enchant.Dict("en_US")
+
 except:
-    print(
-        "Enchant is not installed. You can get it from http://packages.python.org/pyenchant/. Exitting...")
-    sys.exit(1)
+    print("""\
+Enchant is not installed, which is not a problem since spell correction features
+will not be used in the chapter. If, however, you want to experiment with them
+(highly encouraged!), you can get the library from http://packages.python.org/pyenchant/.
+""")
+    class EnchantMock:
+        def __init__(self):
+            pass
+        def speck(self, word):
+            return True
+    speller = EnchantMock()
 
 from data import chosen, chosen_meta, filtered, filtered_meta
 
 filtered_meta = json.load(open(filtered_meta, "r"))
 
-speller = enchant.Dict("en_US")
 
 
 def misspelled_fraction(p):
