@@ -41,11 +41,11 @@ try:
     import twitter
 except ImportError:
     print("""\
-You need to install python-twitter.
-On Linux:
-    sudo pip install python-twitter
-On Windows:
-    Follow instructions at http://code.google.com/p/python-twitter/ """)
+You need to install python-twitter:
+    pip install python-twitter
+If pip is not found you might have to install it using easy_install.
+If it does not work on your system, you might want to follow instructions 
+at http://code.google.com/p/python-twitter/ """)
 
     sys.exit(1)
 
