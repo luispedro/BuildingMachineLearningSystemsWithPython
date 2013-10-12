@@ -26,7 +26,7 @@ will not be used in the chapter. If, however, you want to experiment with them
     class EnchantMock:
         def __init__(self):
             pass
-        def speck(self, word):
+        def check(self, word):
             return True
     speller = EnchantMock()
 
