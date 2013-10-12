@@ -15,6 +15,8 @@ from scipy.stats import norm
 from matplotlib import pylab
 from sklearn.cluster import KMeans
 
+from utils import DATA_DIR, CHART_DIR
+
 seed = 2
 sp.random.seed(seed)  # to reproduce the data later on
 
@@ -55,7 +57,7 @@ y = sp.append(sp.append(yw1, yw2), yw3)
 
 i = 1
 plot_clustering(x, y, "Vectors")
-pylab.savefig(os.path.join("..", "1400_03_0%i.png" % i))
+pylab.savefig(os.path.join(CHART_DIR, "1400_03_0%i.png" % i))
 pylab.clf()
 
 i += 1
@@ -80,7 +82,7 @@ pylab.imshow(Z, interpolation='nearest',
 c1a, c1b, c1c = km.cluster_centers_
 pylab.scatter(km.cluster_centers_[:, 0], km.cluster_centers_[:, 1],
               marker='x', linewidth=2, s=100, color='black')
-pylab.savefig(os.path.join("..", "1400_03_0%i.png" % i))
+pylab.savefig(os.path.join(CHART_DIR, "1400_03_0%i.png" % i))
 pylab.clf()
 
 i += 1
@@ -110,7 +112,7 @@ pylab.gca().add_patch(
 pylab.gca().add_patch(
     pylab.Arrow(c1c[0], c1c[1], c2c[0] - c1c[0], c2c[1] - c1c[1], width=0.1))
 
-pylab.savefig(os.path.join("..", "1400_03_0%i.png" % i))
+pylab.savefig(os.path.join(CHART_DIR, "1400_03_0%i.png" % i))
 pylab.clf()
 
 i += 1
@@ -131,7 +133,7 @@ pylab.imshow(Z, interpolation='nearest',
 
 pylab.scatter(km.cluster_centers_[:, 0], km.cluster_centers_[:, 1],
               marker='x', linewidth=2, s=100, color='black')
-pylab.savefig(os.path.join("..", "1400_03_0%i.png" % i))
+pylab.savefig(os.path.join(CHART_DIR, "1400_03_0%i.png" % i))
 pylab.clf()
 
 i += 1

@@ -5,8 +5,18 @@
 #
 # It is made available under the MIT License
 
+import os
+import sys
 import sklearn.datasets
 import scipy as sp
+
+from utils import DATA_DIR
+
+if not os.path.exists(DATA_DIR):
+    print("""\
+It seems that you have not yet downloaded the MLCOMP data set.
+Please do so and place it into %s."""%DATA_DIR)
+    sys.exit(1)
 
 new_post = \
     """Disk drive problems. Hi, I have a problem with my hard disk.
@@ -15,12 +25,11 @@ I tried to format it, but now it doesn't boot any more.
 Any ideas? Thanks.
 """
 
-MLCOMP_DIR = r"P:\Dropbox\pymlbook\data"
 groups = [
     'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware',
     'comp.sys.ma c.hardware', 'comp.windows.x', 'sci.space']
 dataset = sklearn.datasets.load_mlcomp("20news-18828", "train",
-                                       mlcomp_root=MLCOMP_DIR,
+                                       mlcomp_root=DATA_DIR,
                                        categories=groups)
 print("Number of posts:", len(dataset.filenames))
 
@@ -82,6 +91,13 @@ show_at_1 = similar[0]
 show_at_2 = similar[len(similar) / 2]
 show_at_3 = similar[-1]
 
+print("=== #1 ===")
 print(show_at_1)
+print()
+
+print("=== #2 ===")
 print(show_at_2)
+print()
+
+print("=== #3 ===")
 print(show_at_3)

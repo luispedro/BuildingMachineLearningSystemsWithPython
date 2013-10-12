@@ -12,8 +12,10 @@ import scipy as sp
 
 from sklearn.feature_extraction.text import CountVectorizer
 
-DIR = r"../data/toy"
-posts = [open(os.path.join(DIR, f)).read() for f in os.listdir(DIR)]
+from utils import DATA_DIR
+
+TOY_DIR = os.path.join(DATA_DIR, "toy")
+posts = [open(os.path.join(TOY_DIR, f)).read() for f in os.listdir(TOY_DIR)]
 
 new_post = "imaging databases"
 
