@@ -6,15 +6,32 @@
 # It is made available under the MIT License
 
 import os
+import sys
 
 from matplotlib import pylab
 import numpy as np
 
-DATA_DIR = os.path.join("..", "data")
-CHART_DIR = os.path.join("..", "charts")
+DATA_DIR = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), "data")
 
-GENRE_DIR = "/media/sf_P/pymlbook-data/09-genre-class/genres"
+CHART_DIR = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), "charts")
+
+for d in [DATA_DIR, CHART_DIR]:
+    if not os.path.exists(d):
+        os.mkdir(d)
+
+# Put your directory to the different music genres here
+GENRE_DIR = None
 GENRE_LIST = ["classical", "jazz", "country", "pop", "rock", "metal"]
+
+# Put your directory to the test dir here
+TEST_DIR = None
+
+if GENRE_DIR is None or TEST_DIR is None:
+    print("Please set GENRE_DIR and TEST_DIR in utils.py") 
+    sys.exit(1)
+
 
 
 def plot_confusion_matrix(cm, genre_list, name, title):

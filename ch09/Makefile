@@ -1,17 +1,4 @@
-CHART_DIR = ../charts
-TARGET_DIR = /media/sf_P/Dropbox/pymlbook/pmle/ch09
-
-copy: rocs_fft.png rocs_ceps.png fft_demo 
-	#cp $(CHART_DIR)/Spectrogram_Genres.png $(TARGET_DIR)/1400_09_01.png
-	cp $(CHART_DIR)/confusion_matrix_fft.png $(TARGET_DIR)/1400_09_02.png
-	cp $(CHART_DIR)/rocs_fft.png $(TARGET_DIR)/1400_09_03.png
-	cp $(CHART_DIR)/rocs_ceps.png $(TARGET_DIR)/1400_09_04.png
-	cp fft_demo.png $(TARGET_DIR)/1400_09_05.png
-	cp fft_example.png $(TARGET_DIR)/1400_09_06.png
-	cp $(CHART_DIR)/confusion_matrix_ceps.png $(TARGET_DIR)/1400_09_07.png
-	cp roc_pr.png $(TARGET_DIR)/1400_09_08.png
-	cp *.py $(TARGET_DIR)/code
-	cp Makefile $(TARGET_DIR)/code
+CHART_DIR = charts
 
 fft:
 	python 01_fft_based_classifier.py

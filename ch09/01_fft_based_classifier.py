@@ -14,11 +14,9 @@ from sklearn.cross_validation import ShuffleSplit
 
 from sklearn.metrics import confusion_matrix
 
-from utils import plot_pr, plot_roc, plot_confusion_matrix, GENRE_LIST
+from utils import plot_pr, plot_roc, plot_confusion_matrix, GENRE_LIST, TEST_DIR
 
 from fft import read_fft
-
-TEST_DIR = "/media/sf_P/pymlbook-data/09-genre-class/private"
 
 genre_list = GENRE_LIST
 
@@ -83,7 +81,7 @@ def train_model(clf_factory, X, Y, name, plot=False):
 
     if plot:
         for label in labels:
-            print "Plotting", genre_list[label]
+            print("Plotting %s"%genre_list[label])
             scores_to_sort = roc_scores[label]
             median = np.argsort(scores_to_sort)[len(scores_to_sort) / 2]
 
@@ -96,7 +94,7 @@ def train_model(clf_factory, X, Y, name, plot=False):
     all_pr_scores = np.asarray(pr_scores.values()).flatten()
     summary = (np.mean(scores), np.std(scores),
                np.mean(all_pr_scores), np.std(all_pr_scores))
-    print "%.3f\t%.3f\t%.3f\t%.3f\t" % summary
+    print("%.3f\t%.3f\t%.3f\t%.3f\t" % summary)
 
     return np.mean(train_errors), np.mean(test_errors), np.asarray(cms)
 
@@ -116,8 +114,6 @@ if __name__ == "__main__":
 
     cm_avg = np.mean(cms, axis=0)
     cm_norm = cm_avg / np.sum(cm_avg, axis=0)
-
-    print cm_norm
 
     plot_confusion_matrix(cm_norm, genre_list, "fft",
                           "Confusion matrix of an FFT based classifier")
