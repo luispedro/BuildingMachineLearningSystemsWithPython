@@ -13,6 +13,8 @@ import scipy as sp
 from scipy.stats import gamma
 import matplotlib.pyplot as plt
 
+from utils import DATA_DIR, CHART_DIR
+
 sp.random.seed(3)  # to reproduce the data later on
 
 x = sp.arange(1, 31 * 24)
@@ -31,12 +33,10 @@ plt.xticks([w * 7 * 24 for w in [0, 1, 2, 3, 4]], ['week %i' % (w + 1) for w in 
 
 plt.autoscale(tight=True)
 plt.grid()
-plt.savefig(os.path.join("..", "1400_01_01.png"))
-
-data_dir = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), "..", "data")
+plt.savefig(os.path.join(CHART_DIR, "1400_01_01.png"))
 
 # sp.savetxt(os.path.join("..", "web_traffic.tsv"),
 # zip(x[~y.mask],y[~y.mask]), delimiter="\t", fmt="%i")
+
 sp.savetxt(os.path.join(
-    data_dir, "web_traffic.tsv"), list(zip(x, y)), delimiter="\t", fmt="%s")
+    DATA_DIR, "web_traffic.tsv"), list(zip(x, y)), delimiter="\t", fmt="%s")

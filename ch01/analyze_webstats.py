@@ -9,9 +9,9 @@ import os
 import scipy as sp
 import matplotlib.pyplot as plt
 
-data_dir = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), "..", "data")
-data = sp.genfromtxt(os.path.join(data_dir, "web_traffic.tsv"), delimiter="\t")
+from utils import DATA_DIR, CHART_DIR
+
+data = sp.genfromtxt(os.path.join(DATA_DIR, "web_traffic.tsv"), delimiter="\t")
 print(data[:10])
 
 # all examples will have three classes in this file
@@ -56,7 +56,7 @@ def plot_models(x, y, models, fname, mx=None, ymax=None, xmin=None):
     plt.savefig(fname)
 
 # first look at the data
-plot_models(x, y, None, os.path.join("..", "1400_01_01.png"))
+plot_models(x, y, None, os.path.join(CHART_DIR, "1400_01_01.png"))
 
 # create and plot models
 fp1, res, rank, sv, rcond = sp.polyfit(x, y, 1, full=True)
@@ -68,10 +68,10 @@ f3 = sp.poly1d(sp.polyfit(x, y, 3))
 f10 = sp.poly1d(sp.polyfit(x, y, 10))
 f100 = sp.poly1d(sp.polyfit(x, y, 100))
 
-plot_models(x, y, [f1], os.path.join("..", "1400_01_02.png"))
-plot_models(x, y, [f1, f2], os.path.join("..", "1400_01_03.png"))
+plot_models(x, y, [f1], os.path.join(CHART_DIR, "1400_01_02.png"))
+plot_models(x, y, [f1, f2], os.path.join(CHART_DIR, "1400_01_03.png"))
 plot_models(
-    x, y, [f1, f2, f3, f10, f100], os.path.join("..", "1400_01_04.png"))
+    x, y, [f1, f2, f3, f10, f100], os.path.join(CHART_DIR, "1400_01_04.png"))
 
 # fit and plot a model using the knowledge about inflection point
 inflection = 3.5 * 7 * 24
@@ -83,7 +83,7 @@ yb = y[inflection:]
 fa = sp.poly1d(sp.polyfit(xa, ya, 1))
 fb = sp.poly1d(sp.polyfit(xb, yb, 1))
 
-plot_models(x, y, [fa, fb], os.path.join("..", "1400_01_05.png"))
+plot_models(x, y, [fa, fb], os.path.join(CHART_DIR, "1400_01_05.png"))
 
 
 def error(f, x, y):
@@ -102,7 +102,7 @@ print("Error inflection=%f" % (error(fa, xa, ya) + error(fb, xb, yb)))
 
 # extrapolating into the future
 plot_models(
-    x, y, [f1, f2, f3, f10, f100], os.path.join("..", "1400_01_06.png"),
+    x, y, [f1, f2, f3, f10, f100], os.path.join(CHART_DIR, "1400_01_06.png"),
     mx=sp.linspace(0 * 7 * 24, 6 * 7 * 24, 100),
     ymax=10000, xmin=0 * 7 * 24)
 
@@ -118,7 +118,7 @@ for f in [fb1, fb2, fb3, fb10, fb100]:
     print("Error d=%i: %f" % (f.order, error(f, xb, yb)))
 
 plot_models(
-    x, y, [fb1, fb2, fb3, fb10, fb100], os.path.join("..", "1400_01_07.png"),
+    x, y, [fb1, fb2, fb3, fb10, fb100], os.path.join(CHART_DIR, "1400_01_07.png"),
     mx=sp.linspace(0 * 7 * 24, 6 * 7 * 24, 100),
     ymax=10000, xmin=0 * 7 * 24)
 
@@ -139,7 +139,7 @@ for f in [fbt1, fbt2, fbt3, fbt10, fbt100]:
     print("Error d=%i: %f" % (f.order, error(f, xb[test], yb[test])))
 
 plot_models(
-    x, y, [fbt1, fbt2, fbt3, fbt10, fbt100], os.path.join("..",
+    x, y, [fbt1, fbt2, fbt3, fbt10, fbt100], os.path.join(CHART_DIR,
                                                           "1400_01_08.png"),
     mx=sp.linspace(0 * 7 * 24, 6 * 7 * 24, 100),
     ymax=10000, xmin=0 * 7 * 24)
