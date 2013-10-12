@@ -14,9 +14,6 @@
 # Right now we use unauthenticated requests, which are rate-limited to 150/hr.
 # We use 125/hr to stay safe.
 #
-# We could more than double the download speed by using authentication with
-# OAuth logins.  But for now, this is too much of a PITA to implement.  Just let
-# the script run over a weekend and you'll have all the data.
 #
 #   - Niek Sanders
 #     njs@sananalytics.com
@@ -139,7 +136,7 @@ def download_tweets(fetch_list, raw_dir):
         os.mkdir(raw_dir)
 
     # stay within rate limits
-    max_tweets_per_hr = 125
+    max_tweets_per_hr = 10000
     download_pause_sec = 3600 / max_tweets_per_hr
 
     # download tweets
@@ -159,7 +156,22 @@ def download_tweets(fetch_list, raw_dir):
         # urllib.urlretrieve(url, raw_dir + item[2] + '.json')
 
         # New Twitter API 1.1
-        json_data = api.GetStatus(item[2]).AsJsonString()
+        try:
+            json_data = api.GetStatus(item[2]).AsJsonString()
+        except twitter.TwitterError, e:
+            fatal = False
+            for m in e.message:
+                if m['code'] == 34:
+                    print "Tweet missing: ",item
+                    # [{u'message': u'Sorry, that page does not exist', u'code': 34}]
+                    fatal = False
+                    break
+
+            if fatal:
+                raise
+            else:
+                continue
+
         with open(raw_dir + item[2] + '.json', "w") as f:
             f.write(json_data + "\n")
 

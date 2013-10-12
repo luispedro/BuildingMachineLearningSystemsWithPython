@@ -54,9 +54,13 @@ def load_sanders_data(dirname=".", line_count=-1):
 
             tweet_fn = os.path.join(
                 DATA_DIR, dirname, 'rawdata', '%s.json' % tweet_id)
-            tweet = json.load(open(tweet_fn, "r"))
-            if 'text' in tweet and tweet['user']['lang'] == "en":
+            try:
+                tweet = json.load(open(tweet_fn, "r"))
+            except IOError:
+                print("Tweet '%s' not found. Skip."%tweet_fn)
+                continue
 
+            if 'text' in tweet and tweet['user']['lang'] == "en":
                 topics.append(topic)
                 labels.append(label)
                 tweets.append(tweet['text'])
