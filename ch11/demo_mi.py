@@ -11,8 +11,7 @@ from matplotlib import pylab
 import numpy as np
 from scipy.stats import norm, entropy
 
-DATA_DIR = os.path.join("..", "data")
-CHART_DIR = os.path.join("..", "charts")
+from utils import CHART_DIR
 
 
 def mutual_info(x, y, bins=10):
@@ -73,19 +72,19 @@ def plot_mi_demo():
     x = np.arange(0, 10, 0.2)
 
     pylab.subplot(221)
-    y = 0.5 * x + norm.rvs(1, loc=0, scale=.01, size=len(x))
+    y = 0.5 * x + norm.rvs(1, scale=.01, size=len(x))
     _plot_mi_func(x, y)
 
     pylab.subplot(222)
-    y = 0.5 * x + norm.rvs(1, loc=0, scale=.1, size=len(x))
+    y = 0.5 * x + norm.rvs(1, scale=.1, size=len(x))
     _plot_mi_func(x, y)
 
     pylab.subplot(223)
-    y = 0.5 * x + norm.rvs(1, loc=0, scale=1, size=len(x))
+    y = 0.5 * x + norm.rvs(1, scale=1, size=len(x))
     _plot_mi_func(x, y)
 
     pylab.subplot(224)
-    y = norm.rvs(1, loc=0, scale=10, size=len(x))
+    y = norm.rvs(1, scale=10, size=len(x))
     _plot_mi_func(x, y)
 
     pylab.autoscale(tight=True)
@@ -100,19 +99,19 @@ def plot_mi_demo():
     x = np.arange(-5, 5, 0.2)
 
     pylab.subplot(221)
-    y = 0.5 * x ** 2 + norm.rvs(1, loc=0, scale=.01, size=len(x))
+    y = 0.5 * x ** 2 + norm.rvs(1, scale=.01, size=len(x))
     _plot_mi_func(x, y)
 
     pylab.subplot(222)
-    y = 0.5 * x ** 2 + norm.rvs(1, loc=0, scale=.1, size=len(x))
+    y = 0.5 * x ** 2 + norm.rvs(1, scale=.1, size=len(x))
     _plot_mi_func(x, y)
 
     pylab.subplot(223)
-    y = 0.5 * x ** 2 + norm.rvs(1, loc=0, scale=1, size=len(x))
+    y = 0.5 * x ** 2 + norm.rvs(1, scale=1, size=len(x))
     _plot_mi_func(x, y)
 
     pylab.subplot(224)
-    y = 0.5 * x ** 2 + norm.rvs(1, loc=0, scale=10, size=len(x))
+    y = 0.5 * x ** 2 + norm.rvs(1, scale=10, size=len(x))
     _plot_mi_func(x, y)
 
     pylab.autoscale(tight=True)

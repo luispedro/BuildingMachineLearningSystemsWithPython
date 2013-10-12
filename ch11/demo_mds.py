@@ -14,8 +14,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn import linear_model, manifold, decomposition, datasets
 logistic = linear_model.LogisticRegression()
 
-
-CHART_DIR = os.path.join("..", "charts")
+from utils import CHART_DIR
 
 np.random.seed(3)
 

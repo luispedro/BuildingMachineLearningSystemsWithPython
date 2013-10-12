@@ -16,12 +16,12 @@ from sklearn import lda
 logistic = linear_model.LogisticRegression()
 
 
-CHART_DIR = os.path.join("..", "charts")
+from utils import CHART_DIR
 
 np.random.seed(3)
 
 x1 = np.arange(0, 10, .2)
-x2 = x1 + np.random.normal(loc=0, scale=1, size=len(x1))
+x2 = x1 + np.random.normal(scale=1, size=len(x1))
 
 
 def plot_simple_demo_1():
@@ -35,7 +35,7 @@ def plot_simple_demo_1():
     pylab.ylabel("$X_2$")
 
     x1 = np.arange(0, 10, .2)
-    x2 = x1 + np.random.normal(loc=0, scale=1, size=len(x1))
+    x2 = x1 + np.random.normal(scale=1, size=len(x1))
 
     good = (x1 > 5) | (x2 > 5)
     bad = ~good
@@ -89,7 +89,7 @@ def plot_simple_demo_2():
     pylab.ylabel("$X_2$")
 
     x1 = np.arange(0, 10, .2)
-    x2 = x1 + np.random.normal(loc=0, scale=1, size=len(x1))
+    x2 = x1 + np.random.normal(scale=1, size=len(x1))
 
     good = x1 > x2
     bad = ~good
