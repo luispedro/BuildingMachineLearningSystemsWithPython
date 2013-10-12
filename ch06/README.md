@@ -5,8 +5,8 @@ When doing last code sanity checks for the book, Twitter
 was using the API 1.0, which did not require authentication.
 With its switch to version 1.1, this has now changed.
 
-It seems that you don't have already created your personal Twitter
-access keys and tokens. Please do so at
+If you don't have already created your personal Twitter
+access keys and tokens, you might want to do so at
 [https://dev.twitter.com/docs/auth/tokens-devtwittercom](https://dev.twitter.com/docs/auth/tokens-devtwittercom) and paste the keys/secrets into twitterauth.py
 
 Note that some tweets might be missing when you are running install.py. 
