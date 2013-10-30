@@ -6,15 +6,27 @@
 # It is made available under the MIT License
 
 from __future__ import print_function
-from gensim import corpora, models, similarities
-from mpltools import style
+try:
+    from gensim import corpora, models, similarities
+except:
+    print("import gensim failed.")
+    print()
+    print("Please install it")
+    raise
+
+try:
+    from mpltools import style
+    style.use('ggplot')
+except:
+    print("Could not import mpltools: plots will not be styled correctly")
+
 import matplotlib.pyplot as plt
 import numpy as np
 from os import path
-style.use('ggplot')
 
 if not path.exists('./data/ap/ap.dat'):
     print('Error: Expected data to be present at data/ap/')
+    print('Please cd into ./data & run ./download_ap.sh')
 
 corpus = corpora.BleiCorpus('./data/ap/ap.dat', './data/ap/vocab.txt')
 model = models.ldamodel.LdaModel(
