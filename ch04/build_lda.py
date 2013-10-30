@@ -4,9 +4,15 @@
 # published by PACKT Publishing
 #
 # It is made available under the MIT License
+from __future__ import print_function
 
-import nltk.corpus
-import milk
+try:
+    import nltk.corpus
+except ImportError:
+    print("nltk not found")
+    print("please install it")
+    raise
+from scipy.spatial import distance
 import numpy as np
 import string
 from gensim import corpora, models, similarities
@@ -26,8 +32,17 @@ class DirectText(corpora.textcorpus.TextCorpus):
 
     def __len__(self):
         return len(self.input)
-dataset = sklearn.datasets.load_mlcomp("20news-18828", "train",
-                                       mlcomp_root='../data')
+try:
+    dataset = sklearn.datasets.load_mlcomp("20news-18828", "train",
+                                       mlcomp_root='./data')
+except:
+    print("Newsgroup data not found.")
+    print("Please download from http://mlcomp.org/datasets/379")
+    print("And expand the zip into the subdirectory data/")
+    print()
+    print()
+    raise
+
 otexts = dataset.data
 texts = dataset.data
 
@@ -62,13 +77,14 @@ thetas = np.zeros((len(texts), 100))
 for i, c in enumerate(corpus):
     for ti, v in model[c]:
         thetas[i, ti] += v
-distances = milk.unsupervised.pdist(thetas)
+
+distances = distance.squareform(distance.pdist(thetas))
 large = distances.max() + 1
 for i in xrange(len(distances)):
     distances[i, i] = large
 
-print otexts[1]
-print
-print
-print
-print otexts[distances[1].argmin()]
+print(otexts[1])
+print()
+print()
+print()
+print(otexts[distances[1].argmin()])
