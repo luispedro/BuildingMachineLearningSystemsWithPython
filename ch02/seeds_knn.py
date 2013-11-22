@@ -13,6 +13,7 @@ features, labels = load_dataset('seeds')
 
 
 def cross_validate(features, labels):
+    '''Compute cross-validation errors'''
     error = 0.0
     for fold in range(10):
         training = np.ones(len(features), bool)
@@ -27,6 +28,7 @@ def cross_validate(features, labels):
 error = cross_validate(features, labels)
 print('Ten fold cross-validated error was {0:.1%}.'.format(error))
 
+# Z-score (whiten) the features
 features -= features.mean(0)
 features /= features.std(0)
 error = cross_validate(features, labels)

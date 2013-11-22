@@ -10,13 +10,20 @@ import numpy as np
 from threshold import learn_model, apply_model, accuracy
 
 features, labels = load_dataset('seeds')
-labels = labels == 'Canadian'
+
+# Turn the labels into a binary array
+labels = (labels == 'Canadian')
 
 error = 0.0
 for fold in range(10):
     training = np.ones(len(features), bool)
+
+    # numpy magic to make an array with 10% of 0s starting at fold
     training[fold::10] = 0
+
+    # whatever is not training is for testing
     testing = ~training
+
     model = learn_model(features[training], labels[training])
     test_error = accuracy(features[testing], labels[testing], model)
     error += test_error

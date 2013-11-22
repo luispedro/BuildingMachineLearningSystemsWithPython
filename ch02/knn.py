@@ -9,10 +9,13 @@ import numpy as np
 
 
 def learn_model(k, features, labels):
+    '''Learn a k-nn model'''
+    # There is no model in k-nn, just a copy of the inputs
     return k, features.copy(), labels.copy()
 
 
 def plurality(xs):
+    '''Find the most common element in a collection'''
     from collections import defaultdict
     counts = defaultdict(int)
     for x in xs:
@@ -24,10 +27,12 @@ def plurality(xs):
 
 
 def apply_model(features, model):
+    '''Apply k-nn model'''
     k, train_feats, labels = model
     results = []
     for f in features:
         label_dist = []
+        # Compute all distances:
         for t, ell in zip(train_feats, labels):
             label_dist.append((np.linalg.norm(f - t), ell))
         label_dist.sort(key=lambda d_ell: d_ell[0])

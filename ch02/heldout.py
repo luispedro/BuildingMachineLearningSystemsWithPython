@@ -5,6 +5,9 @@
 #
 # It is made available under the MIT License
 
+# This script demonstrates the difference between the training error and
+# testing (held-out) error.
+
 from matplotlib import pyplot as plt
 import numpy as np
 from sklearn.datasets import load_iris
@@ -14,13 +17,16 @@ data = load_iris()
 features = data['data']
 labels = data['target_names'][data['target']]
 
-
+# We are going to remove the setosa examples as they are too easy:
 setosa = (labels == 'setosa')
 features = features[~setosa]
 labels = labels[~setosa]
+
+# Now we classify virginica vs non-virginica
 virginica = (labels == 'virginica')
 
-testing = np.tile([True, False], 50)
+# Split the data in two: testing and training
+testing = np.tile([True, False], 50) # testing = [True,False,True,False,True,False...]
 training = ~testing
 
 model = learn_model(features[training], virginica[training])

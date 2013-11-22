@@ -9,25 +9,34 @@ import numpy as np
 
 
 def learn_model(features, labels):
+    '''Learn a simple threshold model'''
     best_acc = -1.0
+    # Loop over all the features:
     for fi in range(features.shape[1]):
         thresh = features[:, fi].copy()
+        # test all feature values in order:
         thresh.sort()
         for t in thresh:
             pred = (features[:, fi] > t)
+
+            # Measure the accuracy of this 
             acc = (pred == labels).mean()
             if acc > best_acc:
                 best_acc = acc
                 best_fi = fi
                 best_t = t
+
+    # A model is a threshold and an index
     return best_t, best_fi
 
 
 def apply_model(features, model):
+    '''Apply a learned model'''
+    # A model is a pair as returned by learn_model
     t, fi = model
     return features[:, fi] > t
 
-
 def accuracy(features, labels, model):
+    '''Compute the accuracy of the model'''
     preds = apply_model(features, model)
     return np.mean(preds == labels)
