@@ -10,10 +10,12 @@ import mahotas as mh
 
 
 def edginess_sobel(image):
-    '''
-    edgi = edginess_sobel(image)
+    '''Measure the "edginess" of an image
 
-    Measure the "edginess" of an image
+    image should be a 2d numpy array (an image)
+
+    Returns a floating point value which is higher the "edgier" the image is.
+
     '''
     edges = mh.sobel(image, just_filter=True)
     edges = edges.ravel()

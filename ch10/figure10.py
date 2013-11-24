@@ -8,6 +8,8 @@
 import numpy as np
 import mahotas as mh
 
+# This little script just builds an image with two examples, side-by-side:
+
 text = mh.imread("simple-dataset/text21.jpg")
 scene = mh.imread("simple-dataset/scene00.jpg")
 h, w, _ = text.shape
