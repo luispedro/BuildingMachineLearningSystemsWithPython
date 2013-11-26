@@ -9,11 +9,18 @@ import mahotas as mh
 from mahotas.colors import rgb2grey
 import numpy as np
 
+# Adds a little salt-n-pepper noise to an image
+
 im = mh.imread('lenna.jpg')
 im = rgb2grey(im)
 
+# Salt & pepper arrays
 salt = np.random.random(im.shape) > .975
 pepper = np.random.random(im.shape) > .975
+
+# salt is 170 & pepper is 30
+# Some playing around showed that setting these to more extreme values looks
+# very artificial. These look nicer
 
 im = np.maximum(salt * 170, mh.stretch(im))
 im = np.minimum(pepper * 30 + im * (~pepper), im)
