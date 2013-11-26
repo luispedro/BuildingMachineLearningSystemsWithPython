@@ -41,7 +41,7 @@ except ImportError:
 You need to install python-twitter:
     pip install python-twitter
 If pip is not found you might have to install it using easy_install.
-If it does not work on your system, you might want to follow instructions 
+If it does not work on your system, you might want to follow instructions
 at http://code.google.com/p/python-twitter/ """)
 
     sys.exit(1)
@@ -97,22 +97,25 @@ def purge_already_fetched(fetch_list, raw_dir):
 
     # list of tweet ids that still need downloading
     rem_list = []
+    count_done = 0
 
     # check each tweet to see if we have it
     for item in fetch_list:
 
         # check if json file exists
-        tweet_file = raw_dir + item[2] + '.json'
+        tweet_file = os.path.join(raw_dir, item[2] + '.json')
         if os.path.exists(tweet_file):
 
             # attempt to parse json file
             try:
                 parse_tweet_json(tweet_file)
                 print '--> already downloaded #' + item[2]
+                count_done += 1
             except RuntimeError:
                 rem_list.append(item)
         else:
             rem_list.append(item)
+    print "done=",count_done
 
     return rem_list
 
@@ -158,13 +161,18 @@ def download_tweets(fetch_list, raw_dir):
         # New Twitter API 1.1
         try:
             json_data = api.GetStatus(item[2]).AsJsonString()
+
         except twitter.TwitterError, e:
-            fatal = False
+            fatal = True
             for m in e.message:
                 if m['code'] == 34:
                     print "Tweet missing: ",item
                     # [{u'message': u'Sorry, that page does not exist', u'code': 34}]
                     fatal = False
+                    break
+                elif m['code'] == 88:
+                    print "Rate limit exceeded. Please lower max_tweets_per_hr."
+                    fatal = True
                     break
 
             if fatal:
@@ -256,11 +264,13 @@ def main(data_path):
 
     # get user parameters
     user_params = get_user_params(data_path)
+    print user_params
     dump_user_params(user_params)
 
     # get fetch list
     total_list = read_total_list(user_params['inList'])
     fetch_list = purge_already_fetched(total_list, user_params['rawDir'])
+    print "Fetching %i tweets"%len(fetch_list)
 
     # start fetching data from twitter
     download_tweets(fetch_list, user_params['rawDir'])
