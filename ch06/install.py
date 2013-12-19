@@ -51,14 +51,23 @@ api = twitter.Api(consumer_key=CONSUMER_KEY, consumer_secret=CONSUMER_SECRET,
                   access_token_key=ACCESS_TOKEN_KEY, access_token_secret=ACCESS_TOKEN_SECRET)
 
 
-def get_user_params(data_path):
+MAX_TWEETS_PER_HR = 350
+
+DATA_PATH = "data"
+
+# for some reasons TWeets disappear. In this file we collect those
+MISSING_ID_FILE = os.path.join(DATA_PATH, "missing.tsv")
+NOT_AUTHORIZED_ID_FILE = os.path.join(DATA_PATH, "not_authorized.tsv")
+
+
+def get_user_params(DATA_PATH):
 
     user_params = {}
 
     # get user input params
-    user_params['inList'] = os.path.join(data_path, 'corpus.csv')
-    user_params['outList'] = os.path.join(data_path, 'full-corpus.csv')
-    user_params['rawDir'] = os.path.join(data_path, 'rawdata/')
+    user_params['inList'] = os.path.join(DATA_PATH, 'corpus.csv')
+    user_params['outList'] = os.path.join(DATA_PATH, 'full-corpus.csv')
+    user_params['rawDir'] = os.path.join(DATA_PATH, 'rawdata/')
 
     # apply defaults
     if user_params['inList'] == '':
@@ -86,9 +95,25 @@ def read_total_list(in_filename):
     fp = open(in_filename, 'rb')
     reader = csv.reader(fp, delimiter=',', quotechar='"')
 
+    if os.path.exists(MISSING_ID_FILE):
+        missing_ids = [line.strip()
+                       for line in open(MISSING_ID_FILE, "r").readlines()]
+    else:
+        missing_ids = []
+
+    if os.path.exists(NOT_AUTHORIZED_ID_FILE):
+        not_authed_ids = [line.strip()
+                          for line in open(NOT_AUTHORIZED_ID_FILE, "r").readlines()]
+    else:
+        not_authed_ids = []
+
+    print "We will skip %i tweets that are not available/visible any more on twitter" % (len(missing_ids) + len(not_authed_ids))
+
+    ignore_ids = set(missing_ids + not_authed_ids)
     total_list = []
     for row in reader:
-        total_list.append(row)
+        if row[2] not in ignore_ids:
+            total_list.append(row)
 
     return total_list
 
@@ -109,27 +134,16 @@ def purge_already_fetched(fetch_list, raw_dir):
             # attempt to parse json file
             try:
                 parse_tweet_json(tweet_file)
-                print '--> already downloaded #' + item[2]
                 count_done += 1
             except RuntimeError:
+                print "Error parsing", item
                 rem_list.append(item)
         else:
             rem_list.append(item)
-    print "done=",count_done
+
+    print "We have already downloaded %i tweets." % count_done
 
     return rem_list
-
-
-def get_time_left_str(cur_idx, fetch_list, download_pause):
-
-    tweets_left = len(fetch_list) - cur_idx
-    total_seconds = tweets_left * download_pause
-
-    str_hr = int(total_seconds / 3600)
-    str_min = int((total_seconds - str_hr * 3600) / 60)
-    str_sec = total_seconds - str_hr * 3600 - str_min * 60
-
-    return '%dh %dm %ds' % (str_hr, str_min, str_sec)
 
 
 def download_tweets(fetch_list, raw_dir):
@@ -139,18 +153,22 @@ def download_tweets(fetch_list, raw_dir):
         os.mkdir(raw_dir)
 
     # stay within rate limits
-    max_tweets_per_hr = 10000
-    download_pause_sec = 3600 / max_tweets_per_hr
+    download_pause_sec = 3600 / MAX_TWEETS_PER_HR
 
     # download tweets
     for idx in range(0, len(fetch_list)):
+        # stay in Twitter API rate limits
+        print 'Pausing %d sec to obey Twitter API rate limits' % \
+              (download_pause_sec)
+        time.sleep(download_pause_sec)
+
         # current item
         item = fetch_list[idx]
+        print item
 
         # print status
-        trem = get_time_left_str(idx, fetch_list, download_pause_sec)
-        print '--> downloading tweet #%s (%d of %d) (%s left)' % \
-              (item[2], idx + 1, len(fetch_list), trem)
+        print '--> downloading tweet #%s (%d of %d)' % \
+              (item[2], idx + 1, len(fetch_list))
 
         # Old Twitter API 1.0
         # pull data
@@ -160,19 +178,42 @@ def download_tweets(fetch_list, raw_dir):
 
         # New Twitter API 1.1
         try:
-            json_data = api.GetStatus(item[2]).AsJsonString()
+            sec = api.GetSleepTime('/statuses/show/:id')
+            if sec > 0:
+                print "Sleeping %i seconds to conform to Twitter's rate limiting" % sec
+                time.sleep(sec)
+
+            result = api.GetStatus(item[2])
+            json_data = result.AsJsonString()
 
         except twitter.TwitterError, e:
             fatal = True
             for m in e.message:
                 if m['code'] == 34:
-                    print "Tweet missing: ",item
+                    print "Tweet missing: ", item
                     # [{u'message': u'Sorry, that page does not exist', u'code': 34}]
+                    with open(MISSING_ID_FILE, "a") as f:
+                        f.write(item[2] + "\n")
+
+                    fatal = False
+                    break
+                elif m['code'] == 63:
+                    print "User of tweet '%s' has been suspended." % item
+                    # [{u'message': u'Sorry, that page does not exist', u'code': 34}]
+                    with open(MISSING_ID_FILE, "a") as f:
+                        f.write(item[2] + "\n")
+
                     fatal = False
                     break
                 elif m['code'] == 88:
                     print "Rate limit exceeded. Please lower max_tweets_per_hr."
                     fatal = True
+                    break
+                elif m['code'] == 179:
+                    print "Not authorized to view this tweet."
+                    with open(NOT_AUTHORIZED_ID_FILE, "a") as f:
+                        f.write(item[2] + "\n")
+                    fatal = False
                     break
 
             if fatal:
@@ -183,18 +224,12 @@ def download_tweets(fetch_list, raw_dir):
         with open(raw_dir + item[2] + '.json', "w") as f:
             f.write(json_data + "\n")
 
-        # stay in Twitter API rate limits
-        print '    pausing %d sec to obey Twitter API rate limits' % \
-              (download_pause_sec)
-        time.sleep(download_pause_sec)
-
     return
 
 
 def parse_tweet_json(filename):
 
     # read tweet
-    print 'opening: ' + filename
     fp = open(filename, 'rb')
 
     # parse json
@@ -260,25 +295,30 @@ def build_output_corpus(out_filename, raw_dir, total_list):
     return
 
 
-def main(data_path):
-
+def main():
     # get user parameters
-    user_params = get_user_params(data_path)
+    user_params = get_user_params(DATA_PATH)
     print user_params
     dump_user_params(user_params)
 
     # get fetch list
     total_list = read_total_list(user_params['inList'])
-    fetch_list = purge_already_fetched(total_list, user_params['rawDir'])
-    print "Fetching %i tweets"%len(fetch_list)
 
-    # start fetching data from twitter
-    download_tweets(fetch_list, user_params['rawDir'])
-
-    # second pass for any failed downloads
-    print '\nStarting second pass to retry any failed downloads'
+    # remove already fetched or missing tweets
     fetch_list = purge_already_fetched(total_list, user_params['rawDir'])
-    download_tweets(fetch_list, user_params['rawDir'])
+    print "Fetching %i tweets..." % len(fetch_list)
+
+    if fetch_list:
+        # start fetching data from twitter
+        download_tweets(fetch_list, user_params['rawDir'])
+
+        # second pass for any failed downloads
+        fetch_list = purge_already_fetched(total_list, user_params['rawDir'])
+        if fetch_list:
+            print '\nStarting second pass to retry %i failed downloads...' % len(fetch_list)
+            download_tweets(fetch_list, user_params['rawDir'])
+    else:
+        print "Nothing to fetch any more."
 
     # build output corpus
     build_output_corpus(user_params['outList'], user_params['rawDir'],
@@ -286,4 +326,4 @@ def main(data_path):
 
 
 if __name__ == '__main__':
-    main("data")
+    main()

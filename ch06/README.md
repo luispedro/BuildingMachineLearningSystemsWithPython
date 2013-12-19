@@ -9,6 +9,6 @@ If you don't have already created your personal Twitter
 access keys and tokens, you might want to do so at
 [https://dev.twitter.com/docs/auth/tokens-devtwittercom](https://dev.twitter.com/docs/auth/tokens-devtwittercom) and paste the keys/secrets into twitterauth.py
 
-Note that some tweets might be missing when you are running install.py. 
-We experimented a bit with with the tweet-fetch-rate and found that
-max_tweets_per_hr=10000 works just fine, now that we are using OAuth. If you experience issues you might want to lower this value.
+According to [https://dev.twitter.com/docs/rate-limiting/1](https://dev.twitter.com/docs/rate-limiting/1) Twitter has a rate limit of fetching 350 tweets/h for authorized users.
+
+Note that some tweets might be missing when you are running install.py (user got suspended, changed authorization, or tweet deleted) and thus you might get different results. We keep track of those tweet IDs in data/{missing,not_authorized}.tsv, so that they are not fetched when you run install.py.
