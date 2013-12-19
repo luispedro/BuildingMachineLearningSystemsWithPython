@@ -11,10 +11,10 @@ from sklearn.cross_validation import KFold
 from sklearn.linear_model import ElasticNet, LinearRegression
 
 data, target = load_svmlight_file('data/E2006.train')
-lr = LinearRegression(fit_intercept=True)
-en = ElasticNet(fit_intercept=True, alpha=.1)
 
-met = en
+# Edit the lines below if you want to switch method:
+# met = LinearRegression(fit_intercept=True)
+met = ElasticNet(fit_intercept=True, alpha=.1)
 
 kf = KFold(len(target), n_folds=10)
 err = 0

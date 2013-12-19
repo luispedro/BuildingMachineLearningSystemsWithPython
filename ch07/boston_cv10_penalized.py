@@ -5,6 +5,8 @@
 #
 # It is made available under the MIT License
 
+# This script fits several forms of penalized regression
+
 from __future__ import print_function
 from sklearn.cross_validation import KFold
 from sklearn.linear_model import ElasticNet, Lasso, Ridge
@@ -20,12 +22,18 @@ for name, met in [
         ('lasso(.5)', Lasso(fit_intercept=True, alpha=0.5)),
         ('ridge(.5)', Ridge(fit_intercept=True, alpha=0.5)),
 ]:
+    # Fit on the whole data:
     met.fit(x, y)
+
+    # Predict on the whole data:
     p = np.array([met.predict(xi) for xi in x])
+
     e = p - y
+    # np.dot(e, e) == sum(ei**2 for ei in e) but faster
     total_error = np.dot(e, e)
     rmse_train = np.sqrt(total_error / len(p))
 
+    # Now, we use 10 fold cross-validation to estimate generalization error
     kf = KFold(len(x), n_folds=10)
     err = 0
     for train, test in kf:

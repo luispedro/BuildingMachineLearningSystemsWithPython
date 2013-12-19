@@ -22,7 +22,9 @@ reg = ElasticNetCV(fit_intercept=True, alphas=[
 
 
 def movie_norm(xc):
+    '''Normalize per movie'''
     xc = xc.copy().toarray()
+    # x1 is the mean of the positive items
     x1 = np.array([xi[xi > 0].mean() for xi in xc])
     x1 = np.nan_to_num(x1)
 

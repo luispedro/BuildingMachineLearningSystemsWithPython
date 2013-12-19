@@ -5,8 +5,8 @@
 #
 # It is made available under the MIT License
 
-# This script demonstrates the difference between the training error and
-# testing (held-out) error.
+# This script demonstrates the difference between the training accuracy and
+# testing (held-out) accuracy.
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -30,10 +30,10 @@ testing = np.tile([True, False], 50) # testing = [True,False,True,False,True,Fal
 training = ~testing
 
 model = learn_model(features[training], virginica[training])
-train_error = accuracy(features[training], virginica[training], model)
-test_error = accuracy(features[testing], virginica[testing], model)
+train_accuracy = accuracy(features[training], virginica[training], model)
+test_accuracy = accuracy(features[testing], virginica[testing], model)
 
 print('''\
-Training error was {0:.1%}.
-Testing error was {1:.1%} (N = {2}).
-'''.format(train_error, test_error, testing.sum()))
+Training accuracy was {0:.1%}.
+Testing accuracy was {1:.1%} (N = {2}).
+'''.format(train_accuracy, test_accuracy, testing.sum()))
