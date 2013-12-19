@@ -42,7 +42,11 @@ You need to install python-twitter:
     pip install python-twitter
 If pip is not found you might have to install it using easy_install.
 If it does not work on your system, you might want to follow instructions
-at http://code.google.com/p/python-twitter/ """)
+at https://github.com/bear/python-twitter, most likely:
+  $ git clone https://github.com/bear/python-twitter
+  $ cd python-twitter
+  $ sudo python setup.py install
+""")
 
     sys.exit(1)
 
