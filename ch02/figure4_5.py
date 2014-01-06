@@ -57,9 +57,9 @@ names = sorted(set(labels))
 labels = np.array([names.index(ell) for ell in labels])
 
 train_plot(features, labels)
-plt.savefig('../1400_02_04.png')
+plt.savefig('figure4.png')
 
 features -= features.mean(0)
 features /= features.std(0)
 train_plot(features, labels)
-plt.savefig('../1400_02_05.png')
+plt.savefig('figure5.png')
