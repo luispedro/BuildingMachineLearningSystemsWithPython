@@ -12,7 +12,7 @@ import numpy as np
 from glob import glob
 from edginess import edginess_sobel
 
-basedir = 'simple-dataset'
+basedir = '../SimpleImageDataset/'
 
 
 def features_for(im):
