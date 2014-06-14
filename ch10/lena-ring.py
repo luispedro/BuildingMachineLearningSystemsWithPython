@@ -9,7 +9,7 @@ import mahotas as mh
 import numpy as np
 
 # Read in the image
-im = mh.imread('lenna.jpg')
+im = mh.demos.load('lena')
 
 # This breaks up the image into RGB channels
 r, g, b = im.transpose(2, 0, 1)
@@ -38,4 +38,4 @@ C = C[:, :, None]
 
 # The final result is sharp in the centre and smooths out to the borders:
 ring = mh.stretch(im * C + (1 - C) * im12)
-mh.imsave('lenna-ring.jpg', ring)
+mh.imsave('lena-ring.jpg', ring)

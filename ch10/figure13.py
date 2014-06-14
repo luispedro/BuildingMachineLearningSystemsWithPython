@@ -11,7 +11,7 @@ import numpy as np
 
 # Adds a little salt-n-pepper noise to an image
 
-im = mh.imread('lenna.jpg')
+im = mh.demos.load('lena')
 im = rgb2grey(im)
 
 # Salt & pepper arrays
