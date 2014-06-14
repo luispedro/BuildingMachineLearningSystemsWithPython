@@ -15,14 +15,15 @@ feature_names = data['feature_names']
 target = data['target']
 
 
+fig,axes = plt.subplots(2, 3)
 pairs = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
 for i, (p0, p1) in enumerate(pairs):
-    plt.subplot(2, 3, i + 1)
+    ax = axes.flat[i]
     for t, marker, c in zip(range(3), ">ox", "rgb"):
-        plt.scatter(features[target == t, p0], features[
+        ax.scatter(features[target == t, p0], features[
                     target == t, p1], marker=marker, c=c)
-    plt.xlabel(feature_names[p0])
-    plt.ylabel(feature_names[p1])
-    plt.xticks([])
-    plt.yticks([])
-plt.savefig('figure1.png')
+    ax.set_xlabel(feature_names[p0])
+    ax.set_ylabel(feature_names[p1])
+    ax.set_xticks([])
+    ax.set_yticks([])
+fig.savefig('figure1.png')
