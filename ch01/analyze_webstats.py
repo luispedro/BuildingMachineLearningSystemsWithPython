@@ -6,10 +6,10 @@
 # It is made available under the MIT License
 
 import os
+from utils import DATA_DIR, CHART_DIR
 import scipy as sp
 import matplotlib.pyplot as plt
 
-from utils import DATA_DIR, CHART_DIR
 
 data = sp.genfromtxt(os.path.join(DATA_DIR, "web_traffic.tsv"), delimiter="\t")
 print(data[:10])
@@ -118,7 +118,8 @@ for f in [fb1, fb2, fb3, fb10, fb100]:
     print("Error d=%i: %f" % (f.order, error(f, xb, yb)))
 
 plot_models(
-    x, y, [fb1, fb2, fb3, fb10, fb100], os.path.join(CHART_DIR, "1400_01_07.png"),
+    x, y, [fb1, fb2, fb3, fb10, fb100], os.path.join(
+        CHART_DIR, "1400_01_07.png"),
     mx=sp.linspace(0 * 7 * 24, 6 * 7 * 24, 100),
     ymax=10000, xmin=0 * 7 * 24)
 

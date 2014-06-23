@@ -28,8 +28,8 @@ plt.scatter(x, y)
 plt.title("Web traffic over the last month")
 plt.xlabel("Time")
 plt.ylabel("Hits/hour")
-plt.xticks([w * 7 * 24 for w in [0, 1, 2, 3, 4]], ['week %i' % (w + 1) for w in [
-           0, 1, 2, 3, 4]])
+plt.xticks([w * 7 * 24 for w in [0, 1, 2, 3, 4]], ['week %i' % (w + 1) for w in
+                                                   [0, 1, 2, 3, 4]])
 
 plt.autoscale(tight=True)
 plt.grid()
