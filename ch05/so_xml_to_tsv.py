@@ -62,15 +62,14 @@ def filter_html(s):
 
     link_count -= link_count_in_code
 
-    html_free_s = re.sub(
+    link_free_s = re.sub(
         " +", " ", tag_match.sub('', code_free_s)).replace("\n", "")
 
-    link_free_s = html_free_s
     for link in links:
         if link.lower().startswith("http://"):
             link_free_s = link_free_s.replace(link, '')
 
-    num_text_tokens = html_free_s.count(" ")
+    num_text_tokens = link_free_s.count(" ")
 
     return link_free_s, num_text_tokens, num_code_lines, link_count, num_images
 
