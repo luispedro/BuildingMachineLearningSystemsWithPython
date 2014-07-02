@@ -26,6 +26,7 @@ from data import DATA_DIR
 
 filename = os.path.join(DATA_DIR, "posts-2011-12.xml")
 filename_filtered = os.path.join(DATA_DIR, "filtered.tsv")
+filename_filtered_meta = os.path.join(DATA_DIR, "filtered-meta.json")
 
 q_creation = {}  # creation datetimes of questions
 q_accepted = {}  # id of accepted answer
@@ -56,8 +57,8 @@ def filter_html(s):
         # sometimes source code contain links, which we don't want to count
         link_count_in_code += len(link_match.findall(match_str))
 
-    anchors = link_match.findall(s)
-    link_count = len(anchors)
+    links = link_match.findall(s)
+    link_count = len(links)
 
     link_count -= link_count_in_code
 
@@ -65,9 +66,9 @@ def filter_html(s):
         " +", " ", tag_match.sub('', code_free_s)).replace("\n", "")
 
     link_free_s = html_free_s
-    for anchor in anchors:
-        if anchor.lower().startswith("http://"):
-            link_free_s = link_free_s.replace(anchor, '')
+    for link in links:
+        if link.lower().startswith("http://"):
+            link_free_s = link_free_s.replace(link, '')
 
     num_text_tokens = html_free_s.count(" ")
 
@@ -79,13 +80,14 @@ num_answers = 0
 
 from itertools import imap
 
+
 def parsexml(filename):
     global num_questions, num_answers
 
     counter = 0
 
     it = imap(itemgetter(1),
-             iter(etree.iterparse(filename, events=('start',))))
+              iter(etree.iterparse(filename, events=('start',))))
 
     root = next(it)  # get posts element
 
@@ -147,12 +149,12 @@ def parsexml(filename):
 
             root.clear()  # preserve memory
 
-with open(os.path.join(DATA_DIR, filename_filtered), "w") as f:
+with open(filename_filtered, "w") as f:
     for values in parsexml(filename):
         line = "\t".join(map(str, values))
         f.write(line + "\n")
 
-with open(os.path.join(DATA_DIR, "filtered-meta.json"), "w") as f:
+with open(filename_filtered_meta, "w") as f:
     json.dump(meta, f)
 
 print("years:", years)
