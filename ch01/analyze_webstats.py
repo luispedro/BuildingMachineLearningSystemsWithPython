@@ -10,9 +10,11 @@ from utils import DATA_DIR, CHART_DIR
 import scipy as sp
 import matplotlib.pyplot as plt
 
+sp.random.seed(3)  # to reproduce the data later on
 
 data = sp.genfromtxt(os.path.join(DATA_DIR, "web_traffic.tsv"), delimiter="\t")
 print(data[:10])
+print(data.shape)
 
 # all examples will have three classes in this file
 colors = ['g', 'k', 'b', 'm', 'r']
@@ -25,9 +27,9 @@ x = x[~sp.isnan(y)]
 y = y[~sp.isnan(y)]
 
 # plot input data
-
-
 def plot_models(x, y, models, fname, mx=None, ymax=None, xmin=None):
+
+    plt.figure(num=None, figsize=(8, 6))
     plt.clf()
     plt.scatter(x, y, s=10)
     plt.title("Web traffic over the last month")
@@ -59,11 +61,15 @@ def plot_models(x, y, models, fname, mx=None, ymax=None, xmin=None):
 plot_models(x, y, None, os.path.join(CHART_DIR, "1400_01_01.png"))
 
 # create and plot models
-fp1, res, rank, sv, rcond = sp.polyfit(x, y, 1, full=True)
-print("Model parameters: %s" % fp1)
-print("Error of the model:", res)
+fp1, res1, rank1, sv1, rcond1 = sp.polyfit(x, y, 1, full=True)
+print("Model parameters of fp1: %s" % fp1)
+print("Error of the model of fp1:", res1)
 f1 = sp.poly1d(fp1)
-f2 = sp.poly1d(sp.polyfit(x, y, 2))
+
+fp2, res2, rank2, sv2, rcond2 = sp.polyfit(x, y, 2, full=True)
+print("Model parameters of fp2: %s" % fp2)
+print("Error of the model of fp2:", res2)
+f2 = sp.poly1d(fp2)
 f3 = sp.poly1d(sp.polyfit(x, y, 3))
 f10 = sp.poly1d(sp.polyfit(x, y, 10))
 f100 = sp.poly1d(sp.polyfit(x, y, 100))
@@ -102,7 +108,8 @@ print("Error inflection=%f" % (error(fa, xa, ya) + error(fb, xb, yb)))
 
 # extrapolating into the future
 plot_models(
-    x, y, [f1, f2, f3, f10, f100], os.path.join(CHART_DIR, "1400_01_06.png"),
+    x, y, [f1, f2, f3, f10, f100],
+    os.path.join(CHART_DIR, "1400_01_06.png"),
     mx=sp.linspace(0 * 7 * 24, 6 * 7 * 24, 100),
     ymax=10000, xmin=0 * 7 * 24)
 
@@ -118,8 +125,8 @@ for f in [fb1, fb2, fb3, fb10, fb100]:
     print("Error d=%i: %f" % (f.order, error(f, xb, yb)))
 
 plot_models(
-    x, y, [fb1, fb2, fb3, fb10, fb100], os.path.join(
-        CHART_DIR, "1400_01_07.png"),
+    x, y, [fb1, fb2, fb3, fb10, fb100],
+    os.path.join(CHART_DIR, "1400_01_07.png"),
     mx=sp.linspace(0 * 7 * 24, 6 * 7 * 24, 100),
     ymax=10000, xmin=0 * 7 * 24)
 
@@ -131,6 +138,8 @@ test = sorted(shuffled[:split_idx])
 train = sorted(shuffled[split_idx:])
 fbt1 = sp.poly1d(sp.polyfit(xb[train], yb[train], 1))
 fbt2 = sp.poly1d(sp.polyfit(xb[train], yb[train], 2))
+print("fbt2(x)= \n%s"%fbt2)
+print("fbt2(x)-100,000= \n%s"%(fbt2-100000))
 fbt3 = sp.poly1d(sp.polyfit(xb[train], yb[train], 3))
 fbt10 = sp.poly1d(sp.polyfit(xb[train], yb[train], 10))
 fbt100 = sp.poly1d(sp.polyfit(xb[train], yb[train], 100))
@@ -140,13 +149,13 @@ for f in [fbt1, fbt2, fbt3, fbt10, fbt100]:
     print("Error d=%i: %f" % (f.order, error(f, xb[test], yb[test])))
 
 plot_models(
-    x, y, [fbt1, fbt2, fbt3, fbt10, fbt100], os.path.join(CHART_DIR,
-                                                          "1400_01_08.png"),
+    x, y, [fbt1, fbt2, fbt3, fbt10, fbt100],
+    os.path.join(CHART_DIR, "1400_01_08.png"),
     mx=sp.linspace(0 * 7 * 24, 6 * 7 * 24, 100),
     ymax=10000, xmin=0 * 7 * 24)
 
 from scipy.optimize import fsolve
 print(fbt2)
 print(fbt2 - 100000)
-reached_max = fsolve(fbt2 - 100000, 800) / (7 * 24)
+reached_max = fsolve(fbt2 - 100000, x0=800) / (7 * 24)
 print("100,000 hits/hour expected at week %f" % reached_max[0])
