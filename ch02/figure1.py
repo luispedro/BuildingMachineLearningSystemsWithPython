@@ -10,10 +10,10 @@ from sklearn.datasets import load_iris
 from matplotlib import pyplot as plt
 
 data = load_iris()
-features = data['data']
-feature_names = data['feature_names']
-target = data['target']
-
+features = data.data
+feature_names = data.feature_names
+target = data.target
+target_names = data.target_names
 
 fig,axes = plt.subplots(2, 3)
 pairs = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
