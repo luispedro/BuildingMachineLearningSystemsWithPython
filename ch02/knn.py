@@ -7,8 +7,8 @@
 
 import numpy as np
 
-
-def learn_model(k, features, labels):
+# This function was called ``learn_model`` in the first edition
+def fit_model(k, features, labels):
     '''Learn a k-nn model'''
     # There is no model in k-nn, just a copy of the inputs
     return k, features.copy(), labels.copy()
@@ -25,8 +25,8 @@ def plurality(xs):
         if v == maxv:
             return k
 
-
-def apply_model(features, model):
+# This function was called ``apply_model`` in the first edition
+def predict(features, model):
     '''Apply k-nn model'''
     k, train_feats, labels = model
     results = []
@@ -42,5 +42,5 @@ def apply_model(features, model):
 
 
 def accuracy(features, labels, model):
-    preds = apply_model(features, model)
+    preds = predict(features, model)
     return np.mean(preds == labels)

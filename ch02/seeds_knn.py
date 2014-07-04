@@ -7,7 +7,7 @@
 
 from load import load_dataset
 import numpy as np
-from knn import learn_model, apply_model, accuracy
+from knn import fit_model, accuracy
 
 features, labels = load_dataset('seeds')
 
@@ -19,7 +19,7 @@ def cross_validate(features, labels):
         training = np.ones(len(features), bool)
         training[fold::10] = 0
         testing = ~training
-        model = learn_model(1, features[training], labels[training])
+        model = fit_model(1, features[training], labels[training])
         test_error = accuracy(features[testing], labels[testing], model)
         error += test_error
 

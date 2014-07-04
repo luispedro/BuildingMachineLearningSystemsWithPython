@@ -11,7 +11,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 from sklearn.datasets import load_iris
-from threshold import learn_model, apply_model, accuracy
+from threshold import fit_model, accuracy
 
 data = load_iris()
 features = data['data']
@@ -29,7 +29,7 @@ virginica = (labels == 'virginica')
 testing = np.tile([True, False], 50) # testing = [True,False,True,False,True,False...]
 training = ~testing
 
-model = learn_model(features[training], virginica[training])
+model = fit_model(features[training], virginica[training])
 train_accuracy = accuracy(features[training], virginica[training], model)
 test_accuracy = accuracy(features[testing], virginica[testing], model)
 

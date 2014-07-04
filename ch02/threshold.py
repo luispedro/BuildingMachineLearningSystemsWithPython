@@ -8,7 +8,8 @@
 import numpy as np
 
 
-def learn_model(features, labels):
+# This function was called ``learn_model`` in the first edition
+def fit_model(features, labels):
     '''Learn a simple threshold model'''
     best_acc = -1.0
     # Loop over all the features:
@@ -30,13 +31,14 @@ def learn_model(features, labels):
     return best_t, best_fi
 
 
-def apply_model(features, model):
+# This function was called ``apply_model`` in the first edition
+def predict(features, model):
     '''Apply a learned model'''
-    # A model is a pair as returned by learn_model
+    # A model is a pair as returned by fit_model
     t, fi = model
     return features[:, fi] > t
 
 def accuracy(features, labels, model):
     '''Compute the accuracy of the model'''
-    preds = apply_model(features, model)
+    preds = predict(features, model)
     return np.mean(preds == labels)
