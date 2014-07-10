@@ -7,7 +7,7 @@
 
 from load import load_dataset
 import numpy as np
-from threshold import learn_model, apply_model, accuracy
+from threshold import fit_model, accuracy
 
 features, labels = load_dataset('seeds')
 
@@ -24,7 +24,7 @@ for fold in range(10):
     # whatever is not training is for testing
     testing = ~training
 
-    model = learn_model(features[training], labels[training])
+    model = fit_model(features[training], labels[training])
     test_error = accuracy(features[testing], labels[testing], model)
     error += test_error
 

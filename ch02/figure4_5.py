@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 from load import load_dataset
 import numpy as np
-from knn import learn_model, apply_model, accuracy
+from knn import fit_model, predict, accuracy
 
 feature_names = [
     'area',
@@ -31,8 +31,8 @@ def train_plot(features, labels):
     Y = np.linspace(y0, y1, 100)
     X, Y = np.meshgrid(X, Y)
 
-    model = learn_model(1, features[:, (0, 2)], np.array(labels))
-    C = apply_model(
+    model = fit_model(1, features[:, (0, 2)], np.array(labels))
+    C = predict(
         np.vstack([X.ravel(), Y.ravel()]).T, model).reshape(X.shape)
     if COLOUR_FIGURE:
         cmap = ListedColormap([(1., .6, .6), (.6, 1., .6), (.6, .6, 1.)])
