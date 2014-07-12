@@ -15,7 +15,7 @@ from scipy.stats import norm
 from matplotlib import pylab
 from sklearn.cluster import KMeans
 
-from utils import DATA_DIR, CHART_DIR
+from utils import CHART_DIR
 
 seed = 2
 sp.random.seed(seed)  # to reproduce the data later on
@@ -33,7 +33,6 @@ def plot_clustering(x, y, title, mx=None, ymax=None, xmin=None, km=None):
     pylab.title(title)
     pylab.xlabel("Occurrence word 1")
     pylab.ylabel("Occurrence word 2")
-    # pylab.xticks([w*7*24 for w in range(10)], ['week %i'%w for w in range(10)])
 
     pylab.autoscale(tight=True)
     pylab.ylim(ymin=0, ymax=1)

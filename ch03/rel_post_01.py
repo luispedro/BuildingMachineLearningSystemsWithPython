@@ -43,8 +43,7 @@ class StemmedTfidfVectorizer(TfidfVectorizer):
         return lambda doc: (english_stemmer.stem(w) for w in analyzer(doc))
 
 vectorizer = StemmedTfidfVectorizer(
-    min_df=1, stop_words='english', charset_error='ignore')
-print(vectorizer)
+    min_df=1, stop_words='english', decode_error='ignore')
 
 X_train = vectorizer.fit_transform(posts)
 
