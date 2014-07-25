@@ -14,7 +14,7 @@ from sklearn.cross_validation import ShuffleSplit
 
 from sklearn.metrics import confusion_matrix
 
-from utils import plot_roc, plot_confusion_matrix, GENRE_LIST, TEST_DIR
+from utils import plot_roc, plot_confusion_matrix, GENRE_LIST
 
 from ceps import read_ceps
 
@@ -82,7 +82,7 @@ def train_model(clf_factory, X, Y, name, plot=False):
 
     if plot:
         for label in labels:
-            print("Plotting %s"%genre_list[label])
+            print("Plotting %s" % genre_list[label])
             scores_to_sort = roc_scores[label]
             median = np.argsort(scores_to_sort)[len(scores_to_sort) / 2]
 

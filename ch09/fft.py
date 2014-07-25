@@ -27,7 +27,7 @@ def write_fft(fft_features, fn):
     data_fn = base_fn + ".fft"
 
     np.save(data_fn, fft_features)
-    print "Written", data_fn
+    print("Written "%data_fn)
 
 
 def create_fft(fn):

@@ -24,7 +24,7 @@ def write_ceps(ceps, fn):
     base_fn, ext = os.path.splitext(fn)
     data_fn = base_fn + ".ceps"
     np.save(data_fn, ceps)
-    print "Written", data_fn
+    print("Written %s"%data_fn)
 
 
 def create_ceps(fn):
@@ -51,6 +51,6 @@ def read_ceps(genre_list, base_dir=GENRE_DIR):
 if __name__ == "__main__":
     os.chdir(GENRE_DIR)
     glob_wav = os.path.join(sys.argv[1], "*.wav")
-    print glob_wav
+    print(glob_wav)
     for fn in glob.glob(glob_wav):
         create_ceps(fn)
