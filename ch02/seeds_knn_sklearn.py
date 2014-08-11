@@ -6,6 +6,7 @@
 # It is made available under the MIT License
 
 # Basic imports
+from __future__ import print_function
 import numpy as np
 from load import load_dataset
 
@@ -26,7 +27,7 @@ for ei in range(n):
     classifier.fit(features[training], labels[training])
     pred = classifier.predict(features[ei])
     correct += (pred == labels[ei])
-print(correct/n)
+print('Result of leave-one-out: {}'.format(correct/n))
 
 # Import KFold object
 from sklearn.cross_validation import KFold
@@ -47,10 +48,22 @@ for training,testing in kf:
     # for this fold:
     curmean = np.mean(prediction == labels[testing])
     means.append(curmean)
-print(means)
+print('Result of cross-validation using KFold: {}'.format(means))
 
 # The function cross_val_score does the same thing as the loop above with a
 # single function call
 
 from sklearn.cross_validation import cross_val_score
-print(cross_val_score(classifier, features, labels))
+crossed = cross_val_score(classifier, features, labels)
+print('Result of cross-validation using cross_val_score: {}'.format(crossed))
+
+# The results above use the features as is, which we learned was not optimal
+# except if the features happen to all be in the same scale. We can pre-scale
+# the features as explained in the main text:
+
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+classifier = Pipeline([('norm', StandardScaler()), ('knn', classifier)])
+crossed = cross_val_score(classifier, features, labels)
+print('Result with prescaling: {}'.format(crossed))
+
