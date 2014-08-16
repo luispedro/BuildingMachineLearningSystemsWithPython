@@ -7,27 +7,22 @@
 
 # This script shows an example of simple (ordinary) linear regression
 
-# The first edition of the book NumPy functions only for this operation. See
-# the file boston1numpy.py for that version.
-
 import numpy as np
 from sklearn.datasets import load_boston
-from sklearn.linear_model import LinearRegression
-from matplotlib import pyplot as plt
+import pylab as plt
 
 boston = load_boston()
-x = boston.data
+x = np.array([np.concatenate((v, [1])) for v in boston.data])
 y = boston.target
 
-lr = LinearRegression()
-lr.fit(x, y)
+# np.linal.lstsq implements least-squares linear regression
+s, total_error, _, _ = np.linalg.lstsq(x, y)
 
-# The instance member `residues_` contains the sum of the squared residues
-rmse = np.sqrt(lr.residues_/len(x))
-print('RMSE: {}'.format(rmse))
+rmse = np.sqrt(total_error[0] / len(x))
+print('Residual: {}'.format(rmse))
 
 # Plot the prediction versus real:
-plt.plot(lr.predict(x), boston.target, 'ro')
+plt.plot(np.dot(x, s), boston.target, 'ro')
 
 # Plot a diagonal (for reference):
 plt.plot([0, 50], [0, 50], 'g-')
