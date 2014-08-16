@@ -43,10 +43,9 @@ ti = 0
 for ti in xrange(model.num_topics):
     words = model.show_topic(ti, 64)
     tf = sum(f for f, w in words)
-    print('\n'.join('{}:{}'.format(w, int(1000. * f / tf)) for f, w in words))
-    print()
-    print()
-    print()
+    with open('topics.txt', 'w') as output:
+        output.write('\n'.join('{}:{}'.format(w, int(1000. * f / tf)) for f, w in words))
+        output.write("\n\n\n")
 
 try:
     from pytagcloud import create_tag_image, make_tags
