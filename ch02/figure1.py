@@ -5,7 +5,6 @@
 #
 # It is made available under the MIT License
 
-import numpy as np
 from sklearn.datasets import load_iris
 from matplotlib import pyplot as plt
 
@@ -19,6 +18,8 @@ fig,axes = plt.subplots(2, 3)
 pairs = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
 for i, (p0, p1) in enumerate(pairs):
     ax = axes.flat[i]
+
+    # Use a different marker/color for each class `t`
     for t, marker, c in zip(range(3), ">ox", "rgb"):
         ax.scatter(features[target == t, p0], features[
                     target == t, p1], marker=marker, c=c)
@@ -26,4 +27,5 @@ for i, (p0, p1) in enumerate(pairs):
     ax.set_ylabel(feature_names[p1])
     ax.set_xticks([])
     ax.set_yticks([])
+fig.tight_layout()
 fig.savefig('figure1.png')

@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 from load import load_dataset
 import numpy as np
-from knn import fit_model, predict, accuracy
+from knn import fit_model, predict
 
 feature_names = [
     'area',
@@ -24,7 +24,19 @@ feature_names = [
 ]
 
 
-def train_plot(features, labels):
+def plot_decision(features, labels):
+    '''Plots decision boundary for KNN
+
+    Parameters
+    ----------
+    features : ndarray
+    labels : sequence
+
+    Returns
+    -------
+    fig : Matplotlib Figure
+    ax  : Matplotlib Axes
+    '''
     y0, y1 = features[:, 2].min() * .9, features[:, 2].max() * 1.1
     x0, x1 = features[:, 0].min() * .9, features[:, 0].max() * 1.1
     X = np.linspace(x0, x1, 100)
@@ -38,28 +50,30 @@ def train_plot(features, labels):
         cmap = ListedColormap([(1., .6, .6), (.6, 1., .6), (.6, .6, 1.)])
     else:
         cmap = ListedColormap([(1., 1., 1.), (.2, .2, .2), (.6, .6, .6)])
-    plt.xlim(x0, x1)
-    plt.ylim(y0, y1)
-    plt.xlabel(feature_names[0])
-    plt.ylabel(feature_names[2])
-    plt.pcolormesh(X, Y, C, cmap=cmap)
+    fig,ax = plt.subplots()
+    ax.set_xlim(x0, x1)
+    ax.set_ylim(y0, y1)
+    ax.set_xlabel(feature_names[0])
+    ax.set_ylabel(feature_names[2])
+    ax.pcolormesh(X, Y, C, cmap=cmap)
     if COLOUR_FIGURE:
         cmap = ListedColormap([(1., .0, .0), (.0, 1., .0), (.0, .0, 1.)])
-        plt.scatter(features[:, 0], features[:, 2], c=labels, cmap=cmap)
+        ax.scatter(features[:, 0], features[:, 2], c=labels, cmap=cmap)
     else:
         for lab, ma in zip(range(3), "Do^"):
-            plt.plot(features[labels == lab, 0], features[
+            ax.plot(features[labels == lab, 0], features[
                      labels == lab, 2], ma, c=(1., 1., 1.))
+    return fig,ax
 
 
 features, labels = load_dataset('seeds')
 names = sorted(set(labels))
 labels = np.array([names.index(ell) for ell in labels])
 
-train_plot(features, labels)
-plt.savefig('figure4.png')
+fig,ax = plot_decision(features, labels)
+fig.savefig('figure4.png')
 
 features -= features.mean(0)
 features /= features.std(0)
-train_plot(features, labels)
-plt.savefig('figure5.png')
+fig,ax = plot_decision(features, labels)
+fig.savefig('figure5.png')
