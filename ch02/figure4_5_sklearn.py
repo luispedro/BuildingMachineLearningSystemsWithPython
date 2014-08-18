@@ -12,7 +12,6 @@ from matplotlib.colors import ListedColormap
 from load import load_dataset
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
-from knn import fit_model, predict
 
 feature_names = [
     'area',
@@ -40,8 +39,8 @@ def plot_decision(features, labels):
     '''
     y0, y1 = features[:, 2].min() * .9, features[:, 2].max() * 1.1
     x0, x1 = features[:, 0].min() * .9, features[:, 0].max() * 1.1
-    X = np.linspace(x0, x1, 100)
-    Y = np.linspace(y0, y1, 100)
+    X = np.linspace(x0, x1, 1000)
+    Y = np.linspace(y0, y1, 1000)
     X, Y = np.meshgrid(X, Y)
 
     model = KNeighborsClassifier(1)
@@ -72,9 +71,11 @@ names = sorted(set(labels))
 labels = np.array([names.index(ell) for ell in labels])
 
 fig,ax = plot_decision(features, labels)
+fig.tight_layout()
 fig.savefig('figure4sklearn.png')
 
 features -= features.mean(0)
 features /= features.std(0)
 fig,ax = plot_decision(features, labels)
+fig.tight_layout()
 fig.savefig('figure5sklearn.png')
