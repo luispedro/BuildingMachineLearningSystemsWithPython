@@ -8,7 +8,6 @@
 # This script demonstrates the difference between the training accuracy and
 # testing (held-out) accuracy.
 
-from matplotlib import pyplot as plt
 import numpy as np
 from sklearn.datasets import load_iris
 from threshold import fit_model, accuracy
@@ -18,20 +17,20 @@ features = data['data']
 labels = data['target_names'][data['target']]
 
 # We are going to remove the setosa examples as they are too easy:
-setosa = (labels == 'setosa')
-features = features[~setosa]
-labels = labels[~setosa]
+is_setosa = (labels == 'setosa')
+features = features[~is_setosa]
+labels = labels[~is_setosa]
 
 # Now we classify virginica vs non-virginica
-virginica = (labels == 'virginica')
+is_virginica = (labels == 'virginica')
 
 # Split the data in two: testing and training
 testing = np.tile([True, False], 50) # testing = [True,False,True,False,True,False...]
 training = ~testing
 
-model = fit_model(features[training], virginica[training])
-train_accuracy = accuracy(features[training], virginica[training], model)
-test_accuracy = accuracy(features[testing], virginica[testing], model)
+model = fit_model(features[training], is_virginica[training])
+train_accuracy = accuracy(features[training], is_virginica[training], model)
+test_accuracy = accuracy(features[testing], is_virginica[testing], model)
 
 print('''\
 Training accuracy was {0:.1%}.
