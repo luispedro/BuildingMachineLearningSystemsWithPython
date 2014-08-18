@@ -26,6 +26,9 @@ is_virginica = (labels == 'virginica')
 
 # Split the data in two: testing and training
 testing = np.tile([True, False], 50) # testing = [True,False,True,False,True,False...]
+
+# Training is the negation of testing: i.e., datapoints not used for testing,
+# will be used for training
 training = ~testing
 
 model = fit_model(features[training], is_virginica[training])
