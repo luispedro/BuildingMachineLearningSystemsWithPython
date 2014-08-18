@@ -12,12 +12,14 @@ figure1.py
 figure2.py
     Figure 2 in the book: threshold & decision area
 
-figure4_5.py
-    Figures 4 and 5 in the book: Knn decision borders before and after feature
-    normalization
-
 figure4_5_sklearn.py
-    Alternative code for Figures 4 and 5 using scikit-learn
+    Figures 4 and 5 in the book: Knn decision borders before and after feature
+    normalization. This also produces a version of the figure using 11
+    neighbors (not in the book), which shows that the result is smoother, not
+    as sensitive to exact positions of each datapoint.
+
+figure4_5_no_sklearn.py
+    Alternative code for Figures 4 and 5 without using scikit-learn
     
 load.py
     Code to load the seeds data

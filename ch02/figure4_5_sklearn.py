@@ -24,7 +24,7 @@ feature_names = [
 ]
 
 
-def plot_decision(features, labels):
+def plot_decision(features, labels, num_neighbors=1):
     '''Plots decision boundary for KNN
 
     Parameters
@@ -43,7 +43,7 @@ def plot_decision(features, labels):
     Y = np.linspace(y0, y1, 1000)
     X, Y = np.meshgrid(X, Y)
 
-    model = KNeighborsClassifier(1)
+    model = KNeighborsClassifier(num_neighbors)
     model.fit(features[:, (0,2)], labels)
     C = model.predict(np.vstack([X.ravel(), Y.ravel()]).T).reshape(X.shape)
     if COLOUR_FIGURE:
@@ -79,3 +79,7 @@ features /= features.std(0)
 fig,ax = plot_decision(features, labels)
 fig.tight_layout()
 fig.savefig('figure5sklearn.png')
+
+fig,ax = plot_decision(features, labels, 11)
+fig.tight_layout()
+fig.savefig('figure5sklearn_with_11_neighbors.png')
