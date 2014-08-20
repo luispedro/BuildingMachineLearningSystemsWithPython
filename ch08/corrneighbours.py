@@ -8,11 +8,7 @@
 from __future__ import print_function
 from all_correlations import all_correlations
 import numpy as np
-from scipy import sparse
 from load_ml100k import load
-reviews = load()
-
-
 def estimate_user(user, rest):
     bu = user > 0
     br = rest > 0
@@ -34,7 +30,17 @@ def train_test(user, rest):
     return np.dot(err, err), np.dot(nerr, nerr)
 
 
-def cross_validate_all():
+def all_estimates(reviews):
+    reviews = reviews.toarray()
+    estimates = np.zeros_like(reviews)
+    for i in xrange(reviews.shape[0]):
+        estimates[i] = estimate_user(reviews[i], np.delete(reviews, i, 0))
+    return estimates
+
+def main():
+    reviews = load()
+    reviews = reviews.toarray()
+
     err = []
     for i in xrange(reviews.shape[0]):
         err.append(
@@ -46,10 +52,5 @@ def cross_validate_all():
     print(np.mean(rmse, 0))
     print(np.mean(rmse[revs > 60], 0))
 
-
-def all_estimates(reviews):
-    reviews = reviews.toarray()
-    estimates = np.zeros_like(reviews)
-    for i in xrange(reviews.shape[0]):
-        estimates[i] = estimate_user(reviews[i], np.delete(reviews, i, 0))
-    return estimates
+if __name__ == '__main__':
+    main()
