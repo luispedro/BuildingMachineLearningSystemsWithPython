@@ -10,7 +10,7 @@ import numpy as np
 # This is the version in the book:
 
 
-def all_correlations(bait, target):
+def all_correlations_book_version(bait, target):
     '''
     corrs = all_correlations(bait, target)
 

@@ -8,13 +8,12 @@
 # This script fits several forms of penalized regression
 
 from __future__ import print_function
+import numpy as np
 from sklearn.cross_validation import KFold
 from sklearn.linear_model import ElasticNet, Lasso, Ridge
-from sklearn.linear_model import ElasticNetCV, LassoCV, RidgeCV
-import numpy as np
 from sklearn.datasets import load_boston
 boston = load_boston()
-x = np.array([np.concatenate((v, [1])) for v in boston.data])
+x = boston.data
 y = boston.target
 
 for name, met in [
@@ -26,7 +25,7 @@ for name, met in [
     met.fit(x, y)
 
     # Predict on the whole data:
-    p = np.array([met.predict(xi) for xi in x])
+    p = met.predict(x)
 
     e = p - y
     # np.dot(e, e) == sum(ei**2 for ei in e) but faster
@@ -38,7 +37,7 @@ for name, met in [
     err = 0
     for train, test in kf:
         met.fit(x[train], y[train])
-        p = np.array([met.predict(xi) for xi in x[test]])
+        p = met.predict(x[test])
         e = p - y[test]
         err += np.dot(e, e)
 

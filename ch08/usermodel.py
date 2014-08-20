@@ -27,7 +27,7 @@ def learn_for(reviews, i):
         x1 = np.array([xi[xi > 0].mean() for xi in xc])
         x1 = np.nan_to_num(x1)
 
-        for i in xrange(xc.shape[0]):
+        for i in range(xc.shape[0]):
             xc[i] -= (xc[i] > 0) * x1[i]
 
         reg.fit(xc, y[train] - x1)
@@ -36,7 +36,7 @@ def learn_for(reviews, i):
         x1 = np.array([xi[xi > 0].mean() for xi in xc])
         x1 = np.nan_to_num(x1)
 
-        for i in xrange(xc.shape[0]):
+        for i in range(xc.shape[0]):
             xc[i] -= (xc[i] > 0) * x1[i]
 
         p = np.array(map(reg.predict, xc)).ravel()
@@ -46,7 +46,7 @@ def learn_for(reviews, i):
 
 def all_estimates(reviews):
     whole_data = []
-    for i in xrange(reviews.shape[0]):
+    for i in range(reviews.shape[0]):
         s = learn_for(reviews, i)
         whole_data.append(s)
     return np.array(whole_data)

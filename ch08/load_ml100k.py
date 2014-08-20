@@ -5,13 +5,14 @@
 #
 # It is made available under the MIT License
 
-import numpy as np
-from scipy import sparse
-
-
 def load():
-    data = np.array([[int(t) for t in line.split('\t')[:3]]
-                    for line in open('data/ml-100k/u.data')])
+
+    '''Load ML-100k data
+
+    Returns a sparse matrix'''
+    import numpy as np
+    from scipy import sparse
+    data = np.loadtxt('data/ml-100k/u.data')
     ij = data[:, :2]
     ij -= 1  # original data is in 1-based system
     values = data[:, 2]

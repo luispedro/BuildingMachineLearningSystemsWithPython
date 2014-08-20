@@ -47,7 +47,7 @@ def learn_for(i):
         reg.fit(xc, y[train] - x1)
 
         xc, x1 = movie_norm(x[test])
-        p = np.array([reg.predict(xi) for xi in xc]).ravel()
+        p = reg.predict(xc).ravel()
         e = (p + x1) - y[test]
         err += np.sum(e * e)
         eb += np.sum((y[train].mean() - y[test]) ** 2)

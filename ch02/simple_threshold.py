@@ -5,7 +5,6 @@
 #
 # It is made available under the MIT License
 
-import numpy as np
 from sklearn.datasets import load_iris
 
 data = load_iris()
