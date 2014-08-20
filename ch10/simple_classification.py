@@ -35,12 +35,17 @@ haralicks = []
 sobels = []
 labels = []
 
+print('Computing features...')
 # Use glob to get all the images
 images = glob('{}/*.jpg'.format(basedir))
 for fname in images:
     haralicks.append(features_for(fname))
     sobels.append(edginess_sobel(mh.imread(fname, as_grey=True)))
-    labels.append(fname[:-len('00.jpg')])
+
+    # Files are named like building00.jpg, scene23.jpg...
+    labels.append(fname[:-len('xx.jpg')])
+
+print('Finished computing features.')
 
 haralicks = np.array(haralicks)
 sobels = np.array(sobels)
@@ -58,3 +63,12 @@ scores = cross_validation.cross_val_score(
     LogisticRegression(), haralick_plus_sobel, labels, cv=5).mean()
 print('Accuracy (5 fold x-val) with Logistic Regrssion [std features + sobel]: {}%'.format(
     0.1 * round(1000 * scores.mean())))
+
+
+# We can try to just use the sobel feature. The result is almost completely
+# random.
+scores = cross_validation.cross_val_score(
+    LogisticRegression(), np.atleast_2d(sobels).T, labels, cv=5).mean()
+print('Accuracy (5 fold x-val) with Logistic Regrssion [only using sobel feature]: {}%'.format(
+    0.1 * round(1000 * scores.mean())))
+
