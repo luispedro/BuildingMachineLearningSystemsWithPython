@@ -8,7 +8,6 @@
 from __future__ import print_function
 import numpy as np
 from load_ml100k import load
-from all_correlations import all_correlations
 
 
 def nn_movie(ureviews, reviews, uid, mid, k=1):
