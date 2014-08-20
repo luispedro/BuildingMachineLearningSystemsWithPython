@@ -7,10 +7,26 @@
 
 from __future__ import print_function
 import numpy as np
-from load_ml100k import load
 
 
 def nn_movie(ureviews, reviews, uid, mid, k=1):
+    '''Movie neighbor based classifier
+
+    Parameters
+    ----------
+    ureviews : ndarray
+    reviews : ndarray
+    uid : int
+        index of user
+    mid : int
+        index of movie
+    k : int
+        index of neighbor to return
+
+    Returns
+    -------
+    pred : float
+    '''
     X = ureviews
     y = ureviews[mid].copy()
     y -= y.mean()
@@ -32,21 +48,24 @@ def nn_movie(ureviews, reviews, uid, mid, k=1):
 
 
 def all_estimates(reviews, k=1):
+    '''Estimate all review ratings
+    '''
     reviews = reviews.astype(float)
     k -= 1
     nusers, nmovies = reviews.shape
     estimates = np.zeros_like(reviews)
     for u in range(nusers):
-        ureviews = np.delete(reviews, u, 0)
+        ureviews = np.delete(reviews, u, axis=0)
         ureviews -= ureviews.mean(0)
-        ureviews /= (ureviews.std(0) + 1e-4)
+        ureviews /= (ureviews.std(0) + 1e-5)
         ureviews = ureviews.T.copy()
         for m in np.where(reviews[u] > 0)[0]:
             estimates[u, m] = nn_movie(ureviews, reviews, u, m, k)
     return estimates
 
 if __name__ == '__main__':
-    reviews = load().toarray()
+    from load_ml100k import load
+    reviews = load().torarray()
     estimates = all_estimates(reviews)
     error = (estimates - reviews)
     error **= 2
