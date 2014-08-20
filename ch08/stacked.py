@@ -18,7 +18,7 @@ reg = LinearRegression()
 es = np.array([
     usermodel.all_estimates(reviews),
     corrneighbours.all_estimates(reviews),
-    similar_movies.all_estimates(reviews),
+    similar_movie.all_estimates(reviews),
 ])
 
 reviews = reviews.toarray()
