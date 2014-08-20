@@ -38,7 +38,8 @@ pyplot.scatter(X, y, c=y)
 pyplot.xlabel("feature value")
 pyplot.ylabel("class")
 pyplot.grid(True, linestyle='-', color='0.75')
-pyplot.savefig(os.path.join(CHART_DIR, "log_reg_example_data.png"), bbox_inches="tight")
+pyplot.savefig(
+    os.path.join(CHART_DIR, "log_reg_example_data.png"), bbox_inches="tight")
 
 
 def lin_model(clf, X):
@@ -69,7 +70,8 @@ pyplot.xlabel("feature value")
 pyplot.ylabel("class")
 pyplot.title("linear fit on additional data")
 pyplot.grid(True, linestyle='-', color='0.75')
-pyplot.savefig(os.path.join(CHART_DIR, "log_reg_log_linear_fit.png"), bbox_inches="tight")
+pyplot.savefig(
+    os.path.join(CHART_DIR, "log_reg_log_linear_fit.png"), bbox_inches="tight")
 
 pyplot.figure(figsize=(10, 4))
 pyplot.xlim((-5, 20))
@@ -79,7 +81,8 @@ pyplot.plot(X_test, np.ones(X_test.shape[0]) * 0.5, "--")
 pyplot.xlabel("feature value")
 pyplot.ylabel("class")
 pyplot.grid(True, linestyle='-', color='0.75')
-pyplot.savefig(os.path.join(CHART_DIR, "log_reg_example_fitted.png"), bbox_inches="tight")
+pyplot.savefig(
+    os.path.join(CHART_DIR, "log_reg_example_fitted.png"), bbox_inches="tight")
 
 X = np.arange(0, 1, 0.001)
 pyplot.figure(figsize=(10, 4))
@@ -97,4 +100,5 @@ pyplot.plot(X, np.log(X / (1 - X)))
 pyplot.xlabel("P")
 pyplot.ylabel("log(odds) = log(P / (1-P))")
 pyplot.grid(True, linestyle='-', color='0.75')
-pyplot.savefig(os.path.join(CHART_DIR, "log_reg_log_odds.png"), bbox_inches="tight")
+pyplot.savefig(
+    os.path.join(CHART_DIR, "log_reg_log_odds.png"), bbox_inches="tight")

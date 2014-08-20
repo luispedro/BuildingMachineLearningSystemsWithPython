@@ -23,9 +23,12 @@ Enchant is not installed, which is not a problem since spell correction features
 will not be used in the chapter. If, however, you want to experiment with them
 (highly encouraged!), you can get the library from http://packages.python.org/pyenchant/.
 """)
+
     class EnchantMock:
+
         def __init__(self):
             pass
+
         def check(self, word):
             return True
     speller = EnchantMock()
@@ -33,7 +36,6 @@ will not be used in the chapter. If, however, you want to experiment with them
 from data import chosen, chosen_meta, filtered, filtered_meta
 
 filtered_meta = json.load(open(filtered_meta, "r"))
-
 
 
 def misspelled_fraction(p):
