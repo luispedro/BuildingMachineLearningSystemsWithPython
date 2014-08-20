@@ -16,7 +16,7 @@ from sklearn.cross_validation import KFold
 from sklearn import neighbors
 
 from data import chosen, chosen_meta
-from utils import plot_roc, plot_pr
+from utils import plot_pr
 from utils import plot_feat_importance
 from utils import load_meta
 from utils import fetch_posts
@@ -210,11 +210,8 @@ def k_complexity_analysis(clf_class, parameters):
 
 for k in [5]:  # [5, 10, 40, 90]:
     bias_variance_analysis(neighbors.KNeighborsClassifier, {
-                           'n_neighbors': k, 'warn_on_equidistant': False}, "%iNN" % k)
-    k_complexity_analysis(neighbors.KNeighborsClassifier, {'n_neighbors': k,
-                                                           'warn_on_equidistant': False})
-    # measure(neighbors.KNeighborsClassifier, {'n_neighbors': k, 'p': 2,
-            #'warn_on_equidistant': False}, "%iNN" % k)
+                           'n_neighbors': k}, "%iNN" % k)
+    k_complexity_analysis(neighbors.KNeighborsClassifier, {'n_neighbors': k})
 
 from sklearn.linear_model import LogisticRegression
 for C in [0.1]:  # [0.01, 0.1, 1.0, 10.0]:
