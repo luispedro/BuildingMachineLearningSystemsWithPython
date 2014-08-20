@@ -10,7 +10,6 @@ from load_ml100k import load
 import numpy as np
 import similar_movie
 import usermodel
-import corrneighbours
 
 sreviews = load()
 reviews = sreviews.toarray()
@@ -26,7 +25,7 @@ es = np.array([
 
 total_error = 0.0
 coefficients = []
-for u in xrange(reviews.shape[0]):
+for u in range(reviews.shape[0]):
     es0 = np.delete(es, u, 1)
     r0 = np.delete(reviews, u, 0)
     X, Y = np.where(r0 > 0)

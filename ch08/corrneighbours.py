@@ -33,7 +33,7 @@ def train_test(user, rest):
 def all_estimates(reviews):
     reviews = reviews.toarray()
     estimates = np.zeros_like(reviews)
-    for i in xrange(reviews.shape[0]):
+    for i in range(reviews.shape[0]):
         estimates[i] = estimate_user(reviews[i], np.delete(reviews, i, 0))
     return estimates
 
@@ -42,7 +42,7 @@ def main():
     reviews = reviews.toarray()
 
     err = []
-    for i in xrange(reviews.shape[0]):
+    for i in range(reviews.shape[0]):
         err.append(
             train_test(reviews[i], np.delete(reviews, i, 0))
         )
