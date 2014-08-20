@@ -13,7 +13,7 @@ import usermodel
 
 sreviews = load()
 reviews = sreviews.toarray()
-reg = LinearRegression()
+# Collect several estimates
 es = np.array([
     usermodel.all_estimates(sreviews),
     similar_movie.all_estimates(reviews, k=1),
@@ -25,9 +25,12 @@ es = np.array([
 
 total_error = 0.0
 coefficients = []
+
+reg = LinearRegression()
+# Iterate over all users
 for u in range(reviews.shape[0]):
-    es0 = np.delete(es, u, 1)
-    r0 = np.delete(reviews, u, 0)
+    es0 = np.delete(es, u, axis=1)
+    r0 = np.delete(reviews, u, axis=0)
     X, Y = np.where(r0 > 0)
     X = es[:, X, Y]
     y = r0[r0 > 0]
