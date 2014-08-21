@@ -7,7 +7,7 @@
 
 import numpy as np
 import mahotas as mh
-image = mh.imread('../1400OS_10_01.jpeg')
+image = mh.imread('../SimpleImageDataset/building05.jpg')
 image = mh.colors.rgb2gray(image, dtype=np.uint8)
 thresh = mh.thresholding.otsu(image)
 print(thresh)

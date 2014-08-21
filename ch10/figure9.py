@@ -5,10 +5,9 @@
 #
 # It is made available under the MIT License
 
-from matplotlib import pyplot as plt
 import numpy as np
 import mahotas as mh
-image = mh.imread('../1400OS_10_01.jpeg')
+image = mh.imread('../SimpleImageDataset/building05.jpg')
 image = mh.colors.rgb2gray(image, dtype=np.uint8)
 image = image[::4, ::4]
 thresh = mh.sobel(image)
