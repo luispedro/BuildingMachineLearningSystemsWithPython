@@ -70,4 +70,5 @@ if __name__ == '__main__':
     error = (estimates - reviews)
     error **= 2
     error = error[reviews > 0]
-    print(np.sqrt(error).mean())
+    rmse = np.sqrt(error).mean()
+    print("RMSE is {0}.".format(rmse))
