@@ -49,7 +49,6 @@ def train_test(user, rest):
 
 
 def all_estimates(reviews):
-    reviews = reviews.toarray()
     estimates = np.zeros_like(reviews)
     for i in range(reviews.shape[0]):
         estimates[i] = estimate_user(reviews[i], np.delete(reviews, i, 0))
@@ -57,7 +56,6 @@ def all_estimates(reviews):
 
 def main():
     reviews = load()
-    reviews = reviews.toarray()
 
     err = []
     for i in range(reviews.shape[0]):
@@ -67,11 +65,16 @@ def main():
     revs = (reviews > 0).sum(1)
     err = np.array(err)
     rmse = np.sqrt(err / revs[:, None])
+
+    rmse_model, rmse_null = np.mean(rmse, 0)
+
     print("Average of RMSE / Null-model RMSE")
-    print(np.mean(rmse, 0))
+    print("{:.2}\t{:.2} (improvement: {:.1%}".format(rmse_model, rmse_null, (rmse_null-rmse_model)/rmse_null))
     print()
+
+    rmse_model, rmse_null = np.mean(rmse[revs > 60], 0)
     print("Average of RMSE / Null-model RMSE (users with more than 60 reviewed movies)")
-    print(np.mean(rmse[revs > 60], 0))
+    print("{:.2}\t{:.2} (improvement: {:.1%}".format(rmse_model, rmse_null, (rmse_null-rmse_model)/rmse_null))
 
 if __name__ == '__main__':
     main()

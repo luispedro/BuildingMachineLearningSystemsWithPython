@@ -21,9 +21,6 @@ es = np.array([
     similar_movie.all_estimates(reviews),
 ])
 
-reviews = reviews.toarray()
-
-
 total_error = 0.0
 coefficients = []
 for u in range(reviews.shape[0]):

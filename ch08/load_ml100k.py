@@ -17,4 +17,4 @@ def load():
     ij -= 1  # original data is in 1-based system
     values = data[:, 2]
     reviews = sparse.csc_matrix((values, ij.T)).astype(float)
-    return reviews
+    return reviews.toarray()

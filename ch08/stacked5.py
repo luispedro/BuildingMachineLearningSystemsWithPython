@@ -11,11 +11,10 @@ import numpy as np
 import similar_movie
 import usermodel
 
-sreviews = load()
-reviews = sreviews.toarray()
+reviews = load()
 # Collect several estimates
 es = np.array([
-    usermodel.all_estimates(sreviews),
+    usermodel.all_estimates(reviews),
     similar_movie.all_estimates(reviews, k=1),
     similar_movie.all_estimates(reviews, k=2),
     similar_movie.all_estimates(reviews, k=3),

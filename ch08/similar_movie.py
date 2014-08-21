@@ -65,7 +65,7 @@ def all_estimates(reviews, k=1):
 
 if __name__ == '__main__':
     from load_ml100k import load
-    reviews = load().torarray()
+    reviews = load()
     estimates = all_estimates(reviews)
     error = (estimates - reviews)
     error **= 2
