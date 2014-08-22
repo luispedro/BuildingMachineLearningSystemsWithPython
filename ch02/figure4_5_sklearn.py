@@ -47,7 +47,7 @@ def plot_decision(features, labels, num_neighbors=1):
     model.fit(features[:, (0,2)], labels)
     C = model.predict(np.vstack([X.ravel(), Y.ravel()]).T).reshape(X.shape)
     if COLOUR_FIGURE:
-        cmap = ListedColormap([(1., .6, .6), (.6, 1., .6), (.6, .6, 1.)])
+        cmap = ListedColormap([(1., .7, .7), (.7, 1., .7), (.7, .7, 1.)])
     else:
         cmap = ListedColormap([(1., 1., 1.), (.2, .2, .2), (.6, .6, .6)])
     fig,ax = plt.subplots()
@@ -57,12 +57,12 @@ def plot_decision(features, labels, num_neighbors=1):
     ax.set_ylabel(feature_names[2])
     ax.pcolormesh(X, Y, C, cmap=cmap)
     if COLOUR_FIGURE:
-        cmap = ListedColormap([(1., .0, .0), (.0, 1., .0), (.0, .0, 1.)])
-        ax.scatter(features[:, 0], features[:, 2], c=labels, cmap=cmap)
+        cmap = ListedColormap([(1., .0, .0), (.1, .6, .1), (.0, .0, 1.)])
+        ax.scatter(features[:, 0], features[:, 2], c=labels, cmap=cmap, s=40)
     else:
         for lab, ma in zip(range(3), "Do^"):
             ax.plot(features[labels == lab, 0], features[
-                     labels == lab, 2], ma, c=(1., 1., 1.))
+                     labels == lab, 2], ma, c=(1., 1., 1.), ms=8)
     return fig,ax
 
 
