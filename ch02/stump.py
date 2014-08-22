@@ -7,8 +7,8 @@
 
 from sklearn.datasets import load_iris
 data = load_iris()
-features = data['data']
-labels = data['target_names'][data['target']]
+features = data.data
+labels = data.target_names[data.target]
 
 
 is_setosa = (labels == 'setosa')
@@ -41,5 +41,5 @@ for fi in range(features.shape[1]):
             best_acc = acc
             best_fi = fi
             best_t = t
-print('Best threshold is {0} on feature {1}, which achieves accuracy of {2:.1%}.'.format(
-    best_t, best_fi, best_acc))
+print('Best threshold is {0} on feature {1} ({2}), which achieves accuracy of {3:.1%}.'.format(
+    best_t, best_fi, data.feature_names[best_fi], best_acc))
