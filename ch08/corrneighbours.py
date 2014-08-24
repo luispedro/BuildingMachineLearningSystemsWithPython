@@ -10,7 +10,7 @@ from all_correlations import all_correlations
 import numpy as np
 from load_ml100k import load
 
-def estimate_user(user, rest, num_neigbors=100):
+def estimate_user(user, rest, num_neighbors=100):
     '''Estimate ratings for user based on the binary rating matrix
 
     Returns
@@ -24,8 +24,8 @@ def estimate_user(user, rest, num_neigbors=100):
     br = rest > 0
     ws = all_correlations(bu, br)
 
-    # Select top `num_neigbors`:
-    selected = ws.argsort()[-num_neigbors:]
+    # Select top `num_neighbors`:
+    selected = ws.argsort()[-num_neighbors:]
 
     # Use these to compute estimates:
     estimates = rest[selected].mean(0)
