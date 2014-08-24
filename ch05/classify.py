@@ -30,11 +30,12 @@ meta, id_to_idx, idx_to_id = load_meta(chosen_meta)
 
 import nltk
 
-# splitting questions into train (70%) and test(30%) and then take their
-# answers
-all_posts = list(meta.keys())
-all_questions = [q for q, v in meta.items() if v['ParentId'] == -1]
-all_answers = [q for q, v in meta.items() if v['ParentId'] != -1]  # [:500]
+# The sorting below is only to ensure reproducable numbers. Further down
+# we will occasionally skip a fold when it contains instances of only
+# one label. The two lines below ensure that the behavior is exactly the
+# same for different runs.
+all_questions = sorted([q for q, v in meta.items() if v['ParentId'] == -1])
+all_answers = sorted([q for q, v in meta.items() if v['ParentId'] != -1])
 
 feature_names = np.array((
     'NumTextTokens',
@@ -46,14 +47,6 @@ feature_names = np.array((
     'NumExclams',
     'NumImages'
 ))
-
-# activate the following for reduced feature space
-"""
-feature_names = np.array((
-    'NumTextTokens',
-    'LinkCount',
-))
-"""
 
 
 def prepare_sent_features():
@@ -80,17 +73,26 @@ def get_features(aid):
     return tuple(meta[aid][fn] for fn in feature_names)
 
 qa_X = np.asarray([get_features(aid) for aid in all_answers])
-# Score > 0 tests => positive class is good answer
-# Score <= 0 tests => positive class is poor answer
-qa_Y = np.asarray([meta[aid]['Score'] > 0 for aid in all_answers])
+
 classifying_answer = "good"
+#classifying_answer = "poor"
+
+if classifying_answer == "good":
+    # Score > 0 tests => positive class is good answer
+    qa_Y = np.asarray([meta[aid]['Score'] > 0 for aid in all_answers])
+elif classifying_answer == "poor":
+    # Score <= 0 tests => positive class is poor answer
+    qa_Y = np.asarray([meta[aid]['Score'] <= 0 for aid in all_answers])
+else:
+    raise Exception("classifying_answer='%s' is not supported" %
+                    classifying_answer)
 
 for idx, feat in enumerate(feature_names):
     plot_feat_hist([(qa_X[:, idx], feat)])
-"""
-plot_feat_hist([(qa_X[:, idx], feature_names[idx]) for idx in [1,0]], 'feat_hist_two.png')
-plot_feat_hist([(qa_X[:, idx], feature_names[idx]) for idx in [3,4,5,6]], 'feat_hist_four.png')
-"""
+
+#plot_feat_hist([(qa_X[:, idx], feature_names[idx]) for idx in [1,0]], 'feat_hist_two.png')
+#plot_feat_hist([(qa_X[:, idx], feature_names[idx]) for idx in [3,4,5,6]], 'feat_hist_four.png')
+
 avg_scores_summary = []
 
 
@@ -115,9 +117,15 @@ def measure(clf_class, parameters, name, data_size=None, plot=False):
     pr_scores = []
     precisions, recalls, thresholds = [], [], []
 
-    for train, test in cv:
+    for fold_idx, (train, test) in enumerate(cv):
         X_train, y_train = X[train], Y[train]
         X_test, y_test = X[test], Y[test]
+
+        only_one_class_in_train = len(set(y_train)) == 1
+        only_one_class_in_test = len(set(y_test)) == 1
+        if only_one_class_in_train or only_one_class_in_test:
+            # this would pose problems later on
+            continue
 
         clf = clf_class(**parameters)
 
@@ -145,12 +153,20 @@ def measure(clf_class, parameters, name, data_size=None, plot=False):
         precisions.append(precision)
         recalls.append(recall)
         thresholds.append(pr_thresholds)
+
+        # This threshold is determined at the end of the chapter 5,
+        # where we find conditions such that precision is in the area of
+        # about 80%. With it we trade off recall for precision.
+        threshold_for_detecting_good_answers = 0.59
+
+        print("Clone #%i" % fold_idx)
         print(classification_report(y_test, proba[:, label_idx] >
-              0.63, target_names=['not accepted', 'accepted']))
+              threshold_for_detecting_good_answers, target_names=['not accepted', 'accepted']))
 
     # get medium clone
     scores_to_sort = pr_scores  # roc_scores
     medium = np.argsort(scores_to_sort)[len(scores_to_sort) / 2]
+    print("Medium clone is #%i" % medium)
 
     if plot:
         #plot_roc(roc_scores[medium], name, fprs[medium], tprs[medium])
@@ -178,6 +194,7 @@ def measure(clf_class, parameters, name, data_size=None, plot=False):
 
 
 def bias_variance_analysis(clf_class, parameters, name):
+    #import ipdb;ipdb.set_trace()
     data_sizes = np.arange(60, 2000, 4)
 
     train_errors = []
@@ -208,13 +225,16 @@ def k_complexity_analysis(clf_class, parameters):
 
     plot_k_complexity(ks, train_errors, test_errors)
 
-for k in [5]:  # [5, 10, 40, 90]:
+for k in [5]:
+# for k in [5, 10, 40]:
+    #measure(neighbors.KNeighborsClassifier, {'n_neighbors': k}, "%iNN" % k)
     bias_variance_analysis(neighbors.KNeighborsClassifier, {
                            'n_neighbors': k}, "%iNN" % k)
     k_complexity_analysis(neighbors.KNeighborsClassifier, {'n_neighbors': k})
 
 from sklearn.linear_model import LogisticRegression
-for C in [0.1]:  # [0.01, 0.1, 1.0, 10.0]:
+for C in [0.1]:
+# for C in [0.01, 0.1, 1.0, 10.0]:
     name = "LogReg C=%.2f" % C
     bias_variance_analysis(LogisticRegression, {'penalty': 'l2', 'C': C}, name)
     measure(LogisticRegression, {'penalty': 'l2', 'C': C}, name, plot=True)

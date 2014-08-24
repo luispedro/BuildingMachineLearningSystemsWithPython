@@ -10,6 +10,7 @@
 # to a question that has been asked in 2011 or 2012.
 #
 
+import sys
 import os
 import re
 try:
@@ -24,9 +25,13 @@ from collections import defaultdict
 
 from data import DATA_DIR
 
-filename = os.path.join(DATA_DIR, "posts-2011-12.xml")
+#filename = os.path.join(DATA_DIR, "posts-2011-12.xml")
+filename = os.path.join(DATA_DIR, "posts-2012.xml")
+print("Reading from xml %s" % filename)
 filename_filtered = os.path.join(DATA_DIR, "filtered.tsv")
+print("Filtered: %s" % filename_filtered)
 filename_filtered_meta = os.path.join(DATA_DIR, "filtered-meta.json")
+print("Meta: %s" % filename_filtered_meta)
 
 q_creation = {}  # creation datetimes of questions
 q_accepted = {}  # id of accepted answer
@@ -77,7 +82,11 @@ years = defaultdict(int)
 num_questions = 0
 num_answers = 0
 
-from itertools import imap
+if sys.version_info.major < 3:
+    # Python 2, map() returns a list, which will lead to out of memory errors.
+    # The following import ensures that the script behaves like being executed
+    # with Python 3.
+    from itertools import imap as map
 
 
 def parsexml(filename):
@@ -85,14 +94,14 @@ def parsexml(filename):
 
     counter = 0
 
-    it = imap(itemgetter(1),
-              iter(etree.iterparse(filename, events=('start',))))
+    it = map(itemgetter(1),
+             iter(etree.iterparse(filename, events=('start',))))
 
     root = next(it)  # get posts element
 
     for elem in it:
         if counter % 100000 == 0:
-            print(counter)
+            print("Processed %i <row/> elements" % counter)
 
         counter += 1
 

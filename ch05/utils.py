@@ -171,8 +171,8 @@ def plot_feat_hist(data_name_list, filename=None):
         assert filename is not None
 
     pylab.figure(num=None, figsize=(8, 6))
-    num_rows = 1 + (len(data_name_list) - 1) / 2
-    num_cols = 1 if len(data_name_list) == 1 else 2
+    num_rows = int(1 + (len(data_name_list) - 1) / 2)
+    num_cols = int(1 if len(data_name_list) == 1 else 2)
     pylab.figure(figsize=(5 * num_cols, 4 * num_rows))
 
     for i in range(num_rows):
@@ -191,7 +191,7 @@ def plot_feat_hist(data_name_list, filename=None):
             else:
                 bins = max_val
             n, bins, patches = pylab.hist(
-                x, bins=bins, normed=1, facecolor='blue', alpha=0.75)
+                x, bins=bins, normed=1, alpha=0.75)
 
             pylab.grid(True)
 
@@ -209,7 +209,7 @@ def plot_bias_variance(data_sizes, train_errors, test_errors, name, title):
     pylab.title("Bias-Variance for '%s'" % name)
     pylab.plot(
         data_sizes, test_errors, "--", data_sizes, train_errors, "b-", lw=1)
-    pylab.legend(["train error", "test error"], loc="upper right")
+    pylab.legend(["test error", "train error"], loc="upper right")
     pylab.grid(True, linestyle='-', color='0.75')
     pylab.savefig(
         os.path.join(CHART_DIR, "bv_" + name.replace(" ", "_") + ".png"), bbox_inches="tight")
@@ -220,10 +220,10 @@ def plot_k_complexity(ks, train_errors, test_errors):
     pylab.ylim([0.0, 1.0])
     pylab.xlabel('k')
     pylab.ylabel('Error')
-    pylab.title('Errors for for different values of k')
+    pylab.title('Errors for for different values of $k$')
     pylab.plot(
         ks, test_errors, "--", ks, train_errors, "-", lw=1)
-    pylab.legend(["train error", "test error"], loc="upper right")
+    pylab.legend(["test error", "train error"], loc="upper right")
     pylab.grid(True, linestyle='-', color='0.75')
     pylab.savefig(
         os.path.join(CHART_DIR, "kcomplexity.png"), bbox_inches="tight")
