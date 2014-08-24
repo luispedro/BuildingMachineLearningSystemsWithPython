@@ -67,3 +67,24 @@ classifier = Pipeline([('norm', StandardScaler()), ('knn', classifier)])
 crossed = cross_val_score(classifier, features, labels)
 print('Result with prescaling: {}'.format(crossed))
 
+
+# Now, generate & print a cross-validated confusion matrix for the same result
+from sklearn.metrics import confusion_matrix
+names = list(set(labels))
+labels = np.array([names.index(ell) for ell in labels])
+preds = labels.copy()
+preds[:] = -1
+for train, test in kf:
+    classifier.fit(features[train], labels[train])
+    preds[test] = classifier.predict(features[test])
+
+cmat = confusion_matrix(labels, preds)
+print()
+print('Confusion matrix: [rows represent true outcome, columns predicted outcome]')
+print(cmat)
+
+# The explicit float() conversion is necessary in Python 2
+# (Otherwise, result is rounded to 0)
+acc = cmat.trace()/float(cmat.sum())
+print('Accuracy: {0:.1%}'.format(acc))
+

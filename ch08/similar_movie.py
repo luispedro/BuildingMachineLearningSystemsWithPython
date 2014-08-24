@@ -65,9 +65,10 @@ def all_estimates(reviews, k=1):
 
 if __name__ == '__main__':
     from load_ml100k import load
-    reviews = load().torarray()
+    reviews = load()
     estimates = all_estimates(reviews)
     error = (estimates - reviews)
     error **= 2
     error = error[reviews > 0]
-    print(np.sqrt(error).mean())
+    rmse = np.sqrt(error.mean())
+    print("RMSE is {0}.".format(rmse))

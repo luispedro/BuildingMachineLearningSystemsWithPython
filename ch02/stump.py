@@ -7,8 +7,8 @@
 
 from sklearn.datasets import load_iris
 data = load_iris()
-features = data['data']
-labels = data['target_names'][data['target']]
+features = data.data
+labels = data.target_names[data.target]
 
 
 is_setosa = (labels == 'setosa')
@@ -35,11 +35,21 @@ for fi in range(features.shape[1]):
         # Accuracy is the fraction of predictions that match reality
         acc = (pred == is_virginica).mean()
 
+        # We test whether negating the test is a better threshold:
+        acc_neg = ((~pred) == is_virginica).mean()
+        if acc_neg > acc:
+            acc = acc_neg
+            negated = True
+        else:
+            negated = False
+
         # If this is better than previous best, then this is now the new best:
 
         if acc > best_acc:
             best_acc = acc
             best_fi = fi
             best_t = t
-print('Best threshold is {0} on feature {1}, which achieves accuracy of {2:.1%}.'.format(
-    best_t, best_fi, best_acc))
+            best_is_negated = negated
+
+print('Best threshold is {0} on feature {1} (index {2}), which achieves accuracy of {3:.1%}.'.format(
+    best_t, data.feature_names[best_fi], best_fi, best_acc))

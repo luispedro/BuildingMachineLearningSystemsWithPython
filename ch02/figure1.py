@@ -22,7 +22,7 @@ for i, (p0, p1) in enumerate(pairs):
     # Use a different marker/color for each class `t`
     for t, marker, c in zip(range(3), ">ox", "rgb"):
         ax.scatter(features[target == t, p0], features[
-                    target == t, p1], marker=marker, c=c)
+                    target == t, p1], marker=marker, c=c, s=40)
     ax.set_xlabel(feature_names[p0])
     ax.set_ylabel(feature_names[p1])
     ax.set_xticks([])
