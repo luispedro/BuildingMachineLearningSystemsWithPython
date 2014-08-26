@@ -15,5 +15,8 @@ labels = target_names[target]
 
 plength = features[:, 2]
 is_setosa = (labels == 'setosa')
-print('Maximum of setosa: {0}.'.format(plength[is_setosa].max()))
-print('Minimum of others: {0}.'.format(plength[~is_setosa].min()))
+max_setosa = plength[is_setosa].max()
+min_non_setosa = plength[~is_setosa].min()
+
+print('Maximum of setosa: {0}.'.format(max_setosa))
+print('Minimum of others: {0}.'.format(min_non_setosa))
