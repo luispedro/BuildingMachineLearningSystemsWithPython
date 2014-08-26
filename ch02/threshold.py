@@ -22,21 +22,32 @@ def fit_model(features, labels):
 
             # Measure the accuracy of this 
             acc = (pred == labels).mean()
+
+            rev_acc = (pred == ~labels).mean()
+            if rev_acc > acc:
+                acc = rev_acc
+                reverse = True
+            else:
+                reverse = False
             if acc > best_acc:
                 best_acc = acc
                 best_fi = fi
                 best_t = t
+                best_reverse = reverse
 
     # A model is a threshold and an index
-    return best_t, best_fi
+    return best_t, best_fi, best_reverse
 
 
 # This function was called ``apply_model`` in the first edition
 def predict(features, model):
     '''Apply a learned model'''
     # A model is a pair as returned by fit_model
-    t, fi = model
-    return features[:, fi] > t
+    t, fi, reverse = model
+    if reverse:
+        return features[:, fi] <= t
+    else:
+        return features[:, fi] > t
 
 def accuracy(features, labels, model):
     '''Compute the accuracy of the model'''
