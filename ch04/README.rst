@@ -18,5 +18,7 @@ Run the following two commands inside the ``data/`` directory::
 
 As the filenames indicate, the first step will download the data and the second
 one will preprocess it. Preprocessing can take several hours, but it is
-feasible to run it on a modern laptop.
+feasible to run it on a modern laptop. Once the second step is finished, you
+may remove the input file if you want to save disk space
+(``data/enwiki-latest-pages-articles.xml.bz2``).
 

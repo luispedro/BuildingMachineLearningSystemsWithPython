@@ -13,7 +13,7 @@ logging.basicConfig(
     format='%(asctime)s : %(levelname)s : %(message)s',
     level=logging.INFO)
 id2word = gensim.corpora.Dictionary.load_from_text(
-    'data/wiki_en_output_wordids.txt')
+    'data/wiki_en_output_wordids.txt.bz2')
 mm = gensim.corpora.MmCorpus('data/wiki_en_output_tfidf.mm')
 model = gensim.models.ldamodel.LdaModel(
     corpus=mm,
@@ -30,7 +30,7 @@ print(np.mean(lens))
 
 counts = np.zeros(100)
 for doc_top in topics:
-    for ti, _ in doc_toc:
+    for ti, _ in doc_top:
         counts[ti] += 1
 
 for doc_top in topics:
