@@ -6,6 +6,7 @@
 # It is made available under the MIT License
 
 from __future__ import print_function
+from wordcloud import create_cloud
 try:
     from gensim import corpora, models
 except:
@@ -47,35 +48,24 @@ for ti in xrange(model.num_topics):
         output.write('\n'.join('{}:{}'.format(w, int(1000. * f / tf)) for f, w in words))
         output.write("\n\n\n")
 
-try:
-    from pytagcloud import create_tag_image, make_tags
+# We first identify the most discussed topic, i.e., the one with the
+# highest total weight
 
-    # We first identify the most discussed topic, i.e., the one with the
-    # highest total weight
+# First, we need to sum up the weights across all the documents
+weight = np.zeros(model.num_topics)
+for doc in corpus:
+    for col, val in model[doc]:
+        weight[col] += val
+        # As a reasonable alternative, we could have used the log of val:
+        # weight[col] += np.log(val)
+max_topic = weight.argmax()
 
-    # First, we need to sum up the weights across all the documents
-    weight = np.zeros(model.num_topics)
-    for doc in corpus:
-        for col, val in model[doc]:
-            weight[col] += val
-            # As a reasonable alternative, we could have used the log of val:
-            # weight[col] += np.log(val)
-    max_topic = weight.argmax()
+# Get the top 64 words for this topic
+# Without the argument, show_topic would return only 10 words
+words = model.show_topic(max_topic, 64)
 
-    # Get the top 64 words for this topic
-    # Without the argument, show_topic would return only 10 words
-    words = model.show_topic(max_topic, 64)
-
-    # gensim returns a weight between 0 and 1 for each word, while pytagcloud
-    # expects an integer word count. So, we multiply by a large number and
-    # round. For a visualization this is an adequate approximation.
-    # We also need to flip the order as gensim returns (value, word), whilst
-    # pytagcloud expects (word, value):
-    words = [(w,int(v*10000)) for v,w in words]
-    tags = make_tags(words, maxsize=120)
-    create_tag_image(tags, 'cloud_large.png', size=(1800, 1200), fontname='Lobster')
-except ImportError:
-    print("Could not import pytagcloud. Skipping clooud generation")
+# This function will actually check for the presence of pytagcloud and is otherwise a no-op
+create_cloud('cloud_blei_lda.png', words)
 
 num_topics_used = [len(model[doc]) for doc in corpus]
 plt.hist(num_topics_used, np.arange(42))

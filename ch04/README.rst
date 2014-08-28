@@ -4,6 +4,15 @@ Chapter 4
 
 Support code for *Chapter 4: Topic Modeling*
 
+Word cloud creation
+-------------------
+
+Word cloud creation requires that ``pytagcloud`` be installed (in turn, this
+requires ``pygame``). Since this is not an essential part of the chapter, the
+code will work even if you have not installed it (naturally, the cloud image
+will not be generated and a warning will be printed).
+
+
 Wikipedia processing
 --------------------
 
