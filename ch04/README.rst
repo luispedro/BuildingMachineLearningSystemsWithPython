@@ -31,3 +31,9 @@ feasible to run it on a modern laptop. Once the second step is finished, you
 may remove the input file if you want to save disk space
 (``data/enwiki-latest-pages-articles.xml.bz2``).
 
+You should not expect that your results will exactly match the results in the
+book, for two reasons:
+
+1. The LDA algorithm is a probabilistic algorithm and can give different
+   results every time it is run.
+2. Wikipedia keeps changing. Thus, even your input data will be different.
