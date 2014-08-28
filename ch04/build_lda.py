@@ -14,8 +14,7 @@ except ImportError:
     raise
 from scipy.spatial import distance
 import numpy as np
-import string
-from gensim import corpora, models, similarities
+from gensim import corpora, models
 import sklearn.datasets
 import nltk.stem
 from collections import defaultdict
