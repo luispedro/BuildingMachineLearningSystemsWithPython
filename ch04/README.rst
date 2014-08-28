@@ -31,6 +31,10 @@ feasible to run it on a modern laptop. Once the second step is finished, you
 may remove the input file if you want to save disk space
 (``data/enwiki-latest-pages-articles.xml.bz2``).
 
+To generate the model, you can run the ``wikitopics_create.py`` script, while
+the ``wikitopics_plot.py`` script will plot the most heavily discussed topic as
+well as the least heavily discussed one.
+
 You should not expect that your results will exactly match the results in the
 book, for two reasons:
 
