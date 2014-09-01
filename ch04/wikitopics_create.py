@@ -8,6 +8,9 @@
 from __future__ import print_function
 import logging
 import gensim
+import numpy as np
+
+NR_OF_TOPICS = 100
 
 # Set up logging in order to get progress information as the model is being built:
 logging.basicConfig(
@@ -24,10 +27,25 @@ mm = gensim.corpora.MmCorpus('data/wiki_en_output_tfidf.mm')
 model = gensim.models.ldamodel.LdaModel(
     corpus=mm,
     id2word=id2word,
-    num_topics=100,
+    num_topics=NR_OF_TOPICS,
     update_every=1,
     chunksize=10000,
     passes=1)
 
 # Save the model so we do not need to learn it again.
 model.save('wiki_lda.pkl')
+
+# Compute the document/topic matrix
+topics = np.zeros((len(mm), model.num_topics))
+for di,doc in enumerate(mm):
+    doc_top = model[doc]
+    for ti,tv in doc_top:
+        topics[di,ti] += tv
+np.save('topics.npy', topics)
+
+# Alternatively, we create a sparse matrix and save that. This alternative
+# saves disk space, at the cost of slightly more complex code:
+
+## from scipy import sparse, io
+## sp = sparse.csr_matrix(topics)
+## io.savemat('topics.mat', {'topics': sp})
