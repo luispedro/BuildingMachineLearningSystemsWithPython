@@ -28,29 +28,29 @@ mm = gensim.corpora.MmCorpus('data/wiki_en_output_tfidf.mm')
 # Load the precomputed model
 model = gensim.models.ldamodel.LdaModel.load('wiki_lda.pkl')
 
-# Compute topics for all elements of the model:
-topics = [model[doc] for doc in mm]
-lens = np.array([len(t) for t in topics])
+topics = np.load('topics.npy', mmap_mode='r')
+
+# Compute the number of topics mentioned in each document
+lens = (topics > 0).sum(1)
 print('Mean number of topics mentioned: {0:.3}'.format(np.mean(lens)))
 print('Percentage of articles mentioning less than 10 topics: {0:.1%}'.format(np.mean(lens <= 10)))
 
-
-counts = np.zeros(100)
-for doc_top in topics:
-    for ti,tv in doc_top:
-        counts[ti] += tv
+# Weights will be the total weight of each topic
+weights = topics.sum(0)
 
 # Retrieve the most heavily used topic and plot it as a word cloud:
-words = model.show_topic(counts.argmax(), 64)
-create_cloud('Wikipedia_most.png', words)
+words = model.show_topic(weights.argmax(), 64)
+
+# The parameter ``maxsize`` often needs some manual tuning to make it look nice.
+create_cloud('Wikipedia_most.png', words, maxsize=410, fontname='Neucha')
 print(words)
 print()
 print()
 print()
 
 # Retrieve the **least** heavily used topic and plot it as a word cloud:
-words = model.show_topic(counts.argmin(), 64)
-create_cloud('Wikipedia_least.png', words)
+words = model.show_topic(weights.argmin(), 64)
+create_cloud('Wikipedia_least.png', words, maxsize=180, fontname='Neucha')
 print(words)
 print()
 print()
