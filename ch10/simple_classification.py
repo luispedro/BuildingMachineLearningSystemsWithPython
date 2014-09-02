@@ -35,6 +35,7 @@ haralicks = []
 sobels = []
 labels = []
 
+print('This script will test (with cross-validation) classification of the simple 3 class dataset')
 print('Computing features...')
 # Use glob to get all the images
 images = glob('{}/*.jpg'.format(basedir))

@@ -5,15 +5,16 @@
 #
 # It is made available under the MIT License
 
+from __future__ import print_function
 import mahotas as mh
 from sklearn import cross_validation
 from sklearn.linear_model.logistic import LogisticRegression
-from mpltools import style
 from matplotlib import pyplot as plt
 import numpy as np
 from glob import glob
 
 basedir = 'AnimTransDistr'
+print('This script will test classification of the AnimTransDistr dataset')
 
 
 def features_for(images):
@@ -39,6 +40,7 @@ classes = [
     'Trans',
 ]
 
+print('Computing whole-image texture features...')
 features = []
 labels = []
 for ci, cl in enumerate(classes):
@@ -68,12 +70,14 @@ for ci, cl in enumerate(classes):
     labels.extend([ci for _ in curimages])
 labels = np.array(labels)
 
+print('Computing SURF descriptors...')
 alldescriptors = []
 for im in images:
     im = mh.imread(im, as_grey=1)
     im = im.astype(np.uint8)
 
-    #alldescriptors.append(surf.dense(im, spacing=max(im.shape)//32))
+    # To use dense sampling, you can try the following line:
+    # alldescriptors.append(surf.dense(im, spacing=max(im.shape)//32))
     alldescriptors.append(surf.surf(im, descriptor_only=True))
 
 print('Descriptors done')
@@ -82,7 +86,7 @@ km = KMeans(k)
 
 concatenated = np.concatenate(alldescriptors)
 concatenated = concatenated[::64]
-print('k-meaning...')
+print('Clustering with K-means...')
 km.fit(concatenated)
 features = []
 for d in alldescriptors:
@@ -97,7 +101,7 @@ scoreSURFlr = cross_validation.cross_val_score(
 print('Accuracy (5 fold x-val) with Log. Reg [SURF features]: %s%%' % (
     0.1 * round(1000 * scoreSURFlr.mean())))
 
-print('combined...')
+print('Attemping classification with all features combined...')
 allfeatures = np.hstack([features, tfeatures])
 scoreSURFplr = cross_validation.cross_val_score(
     LogisticRegression(), allfeatures, labels, cv=5).mean()
@@ -105,7 +109,6 @@ scoreSURFplr = cross_validation.cross_val_score(
 print('Accuracy (5 fold x-val) with Log. Reg [All features]: %s%%' % (
     0.1 * round(1000 * scoreSURFplr.mean())))
 
-style.use('ggplot')
 plt.plot([0, 1, 2], 100 *
          np.array([scores0.mean(), scoreSURFlr, scoreSURFplr]), 'k-', lw=8)
 plt.plot(
@@ -113,6 +116,6 @@ plt.plot(
     'o', mec='#cccccc', mew=12, mfc='white')
 plt.xlim(-.5, 2.5)
 plt.ylim(scores0.mean() * 90., scoreSURFplr * 110)
-plt.xticks([0, 1, 2], ["baseline", "SURF", "combined"])
+plt.xticks([0, 1, 2], ["Texture", "SURF", "combined"])
 plt.ylabel('Accuracy (%)')
 plt.savefig('../1400OS_10_18+.png')
