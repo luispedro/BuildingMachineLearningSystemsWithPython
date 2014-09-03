@@ -14,6 +14,9 @@ from jug import TaskGenerator
 from sys import path
 path.append('../ch10')
 
+
+# This is the jug-enabled version of the script ``figure18.py`` in Chapter 10
+
 basedir = '../SimpleImageDataset/'
 
 @TaskGenerator
@@ -72,7 +75,7 @@ images = glob('{}/*.jpg'.format(basedir))
 for fname in images:
     haralicks.append(features_for(fname))
     sobels.append(edginess_sobel_from_fname(fname))
-    labels.append(fname[:-len('00.jpg')])
+    labels.append(fname[:-len('00.jpg')]) # The class is encoded in the filename as xxxx00.jpg
 
 haralicks = to_array(haralicks)
 sobels = to_array(sobels)
