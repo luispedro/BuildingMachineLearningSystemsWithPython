@@ -42,16 +42,23 @@ weights = topics.sum(0)
 words = model.show_topic(weights.argmax(), 64)
 
 # The parameter ``maxsize`` often needs some manual tuning to make it look nice.
-create_cloud('Wikipedia_most.png', words, maxsize=410, fontname='Neucha')
-print(words)
+create_cloud('Wikipedia_most.png', words, maxsize=250, fontname='Cardo')
+
+fraction_mention = np.mean(topics[:,weights.argmax()] > 0)
+print("The most mentioned topics is mentioned in {:.1%} of documents.".format(fraction_mention))
+total_weight = np.mean(topics[:,weights.argmax()])
+print("It represents {:.1%} of the total number of words.".format(total_weight))
 print()
 print()
 print()
 
 # Retrieve the **least** heavily used topic and plot it as a word cloud:
 words = model.show_topic(weights.argmin(), 64)
-create_cloud('Wikipedia_least.png', words, maxsize=180, fontname='Neucha')
-print(words)
+create_cloud('Wikipedia_least.png', words, maxsize=150, fontname='Cardo')
+fraction_mention = np.mean(topics[:,weights.argmin()] > 0)
+print("The least mentioned topics is mentioned in {:.1%} of documents.".format(fraction_mention))
+total_weight = np.mean(topics[:,weights.argmin()])
+print("It represents {:.1%} of the total number of words.".format(total_weight))
 print()
 print()
 print()
