@@ -33,7 +33,9 @@ may remove the input file if you want to save disk space
 
 To generate the model, you can run the ``wikitopics_create.py`` script, while
 the ``wikitopics_plot.py`` script will plot the most heavily discussed topic as
-well as the least heavily discussed one.
+well as the least heavily discussed one. The code is split into steps as the
+first one can take a very long time. Then it saves the results so that you can
+later explore them at leisure.
 
 You should not expect that your results will exactly match the results in the
 book, for two reasons:
@@ -41,3 +43,9 @@ book, for two reasons:
 1. The LDA algorithm is a probabilistic algorithm and can give different
    results every time it is run.
 2. Wikipedia keeps changing. Thus, even your input data will be different.
+
+Scripts
+-------
+
+blei_lda.py
+    Computes LDA using the AP Corpus.

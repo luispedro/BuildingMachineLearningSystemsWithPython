@@ -75,10 +75,12 @@ plt.savefig('../1400OS_04_01+.png')
 plt.clf()
 
 
-# Now, repeat the same exercise using alpha=1:
+# Now, repeat the same exercise using alpha=1.0
+# You can edit the constant below to play around with this parameter
+ALPHA = 1.0
 
 model1 = models.ldamodel.LdaModel(
-    corpus, num_topics=NUM_TOPICS, id2word=corpus.id2word, alpha=1.)
+    corpus, num_topics=NUM_TOPICS, id2word=corpus.id2word, alpha=ALPHA)
 num_topics_used1 = [len(model1[doc]) for doc in corpus]
 
 plt.hist([num_topics_used, num_topics_used1], np.arange(42))
