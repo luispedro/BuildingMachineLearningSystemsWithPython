@@ -29,8 +29,9 @@ figure10.py
     Just paste two images next to each others
 figure13.py
     Demonstrate salt&pepper effect
-edginess.py
-    Contains the ``edginess_sobel`` function from the book
+features.py
+    Contains the ``edginess_sobel`` function from the book as well as a simple
+    wrapper around ``mahotas.texture.haralick``
 simple_classification.py
     Classify SimpleImageDataset with texture features + sobel feature
 figure18.py

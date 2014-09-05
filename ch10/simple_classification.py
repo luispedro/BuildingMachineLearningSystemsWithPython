@@ -10,26 +10,10 @@ from sklearn import cross_validation
 from sklearn.linear_model.logistic import LogisticRegression
 import numpy as np
 from glob import glob
-from edginess import edginess_sobel
+from features import texture, edginess_sobel
 
 basedir = '../SimpleImageDataset/'
 
-
-def features_for(im):
-    '''Compute features for an image
-
-    Parameters
-    ----------
-    im : str
-        filepath for image to process
-
-    Returns
-    -------
-    fs : ndarray
-        1-D array of features
-    '''
-    im = mh.imread(im, as_grey=True).astype(np.uint8)
-    return mh.features.haralick(im).mean(0)
 
 haralicks = []
 sobels = []
@@ -40,8 +24,9 @@ print('Computing features...')
 # Use glob to get all the images
 images = glob('{}/*.jpg'.format(basedir))
 for fname in images:
-    haralicks.append(features_for(fname))
-    sobels.append(edginess_sobel(mh.imread(fname, as_grey=True)))
+    im = mh.imread(fname, as_grey=True)
+    haralicks.append(texture(im))
+    sobels.append(edginess_sobel(im))
 
     # Files are named like building00.jpg, scene23.jpg...
     labels.append(fname[:-len('xx.jpg')])

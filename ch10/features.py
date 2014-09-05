@@ -20,3 +20,20 @@ def edginess_sobel(image):
     edges = mh.sobel(image, just_filter=True)
     edges = edges.ravel()
     return np.sqrt(np.dot(edges, edges))
+
+def texture(im):
+    '''Compute features for an image
+
+    Parameters
+    ----------
+    im : ndarray
+
+    Returns
+    -------
+    fs : ndarray
+        1-D array of features
+    '''
+    im = im.astype(np.uint8)
+    return mh.features.haralick(im).mean(0)
+
+
