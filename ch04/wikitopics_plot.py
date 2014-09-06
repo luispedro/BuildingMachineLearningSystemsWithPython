@@ -31,7 +31,7 @@ model = gensim.models.ldamodel.LdaModel.load('wiki_lda.pkl')
 topics = np.load('topics.npy', mmap_mode='r')
 
 # Compute the number of topics mentioned in each document
-lens = (topics > 0).sum(1)
+lens = (topics > 0).sum(axis=1)
 print('Mean number of topics mentioned: {0:.3}'.format(np.mean(lens)))
 print('Percentage of articles mentioning less than 10 topics: {0:.1%}'.format(np.mean(lens <= 10)))
 
