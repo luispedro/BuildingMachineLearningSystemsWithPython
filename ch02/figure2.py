@@ -10,14 +10,18 @@ COLOUR_FIGURE = False
 from matplotlib import pyplot as plt
 from sklearn.datasets import load_iris
 data = load_iris()
-features = data['data']
-feature_names = data['feature_names']
-species = data['target_names'][data['target']]
+features = data.data
+feature_names = data.feature_names
+target = data.target
+target_names = data.target_names
 
-is_setosa = (species == 'setosa')
+# We use NumPy fancy indexing to get an array of strings:
+labels = target_names[target]
+
+is_setosa = (labels == 'setosa')
 features = features[~is_setosa]
-species = species[~is_setosa]
-is_virginica = (species == 'virginica')
+labels = labels[~is_setosa]
+is_virginica = (labels == 'virginica')
 
 # Hand fixed threshold:
 t = 1.75

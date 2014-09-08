@@ -12,9 +12,12 @@ features = data['data']
 target = data['target']
 target_names = data['target_names']
 labels = target_names[target]
-
 plength = features[:, 2]
+
+# To use numpy operations to get setosa features,
+# we build a boolean array
 is_setosa = (labels == 'setosa')
+
 max_setosa = plength[is_setosa].max()
 min_non_setosa = plength[~is_setosa].min()
 

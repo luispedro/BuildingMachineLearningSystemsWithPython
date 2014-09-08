@@ -5,9 +5,12 @@
 #
 # It is made available under the MIT License
 
-from sklearn.datasets import load_iris
 from matplotlib import pyplot as plt
 
+# We load the data with load_iris from sklearn
+from sklearn.datasets import load_iris
+
+# load_iris returns an object with several fields
 data = load_iris()
 features = data.data
 feature_names = data.feature_names
