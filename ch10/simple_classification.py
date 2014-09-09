@@ -23,7 +23,11 @@ print('This script will test (with cross-validation) classification of the simpl
 print('Computing features...')
 # Use glob to get all the images
 images = glob('{}/*.jpg'.format(basedir))
-for fname in images:
+
+# We sort the images to ensure that they are always processed in the same order
+# Otherwise, this would introduce some variation just based on the random
+# ordering that the filesystem uses
+for fname in sorted(images):
     im = mh.imread(fname, as_grey=True)
     haralicks.append(texture(im))
     sobels.append(edginess_sobel(im))

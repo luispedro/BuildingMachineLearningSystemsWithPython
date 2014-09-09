@@ -72,7 +72,7 @@ labels = []
 
 # Use glob to get all the images
 images = glob('{}/*.jpg'.format(basedir))
-for fname in images:
+for fname in sorted(images):
     haralicks.append(features_for(fname))
     sobels.append(edginess_sobel_from_fname(fname))
     labels.append(fname[:-len('00.jpg')]) # The class is encoded in the filename as xxxx00.jpg
