@@ -24,13 +24,13 @@ reg = ElasticNetCV(fit_intercept=True, alphas=[
 def movie_norm(xc):
     '''Normalize per movie'''
     xc = xc.copy().toarray()
-    # x1 is the mean of the positive items
-    x1 = np.array([xi[xi > 0].mean() for xi in xc])
-    x1 = np.nan_to_num(x1)
+    # xpos is the mean of the positive items
+    xpos = np.array([xi[xi > 0].mean() for xi in xc])
+    xpos = np.nan_to_num(xpos)
 
     for i in range(xc.shape[0]):
-        xc[i] -= (xc[i] > 0) * x1[i]
-    return xc, x1
+        xc[i] -= (xc[i] > 0) * xpos[i]
+    return xc, xpos
 
 
 def learn_for(i):
@@ -43,12 +43,12 @@ def learn_for(i):
     eb = 0
     kf = KFold(len(y), n_folds=4)
     for train, test in kf:
-        xc, x1 = movie_norm(x[train])
-        reg.fit(xc, y[train] - x1)
+        xc, xpos = movie_norm(x[train])
+        reg.fit(xc, y[train] - xpos)
 
-        xc, x1 = movie_norm(x[test])
+        xc, xpos = movie_norm(x[test])
         p = reg.predict(xc).ravel()
-        e = (p + x1) - y[test]
+        e = (p + xpos) - y[test]
         err += np.sum(e * e)
         eb += np.sum((y[train].mean() - y[test]) ** 2)
     return np.sqrt(err / float(len(y))), np.sqrt(eb / float(len(y)))
