@@ -71,7 +71,7 @@ num_topics_used = [len(model[doc]) for doc in corpus]
 plt.hist(num_topics_used, np.arange(42))
 plt.ylabel('Nr of documents')
 plt.xlabel('Nr of topics')
-plt.savefig('../1400OS_04_01+.png')
+plt.savefig('Figure_04_01.png')
 plt.clf()
 
 
@@ -90,4 +90,5 @@ plt.xlabel('Nr of topics')
 # The coordinates below were fit by trial and error to look good
 plt.text(9, 223, r'default alpha')
 plt.text(26, 156, 'alpha=1.0')
-plt.savefig('../1400OS_04_02+.png')
+plt.savefig('Figure_04_02.png')
+
