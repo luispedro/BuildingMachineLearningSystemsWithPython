@@ -19,6 +19,7 @@ boston = load_boston()
 x = boston.data
 y = boston.target
 
+# Fitting a model is trivial: call the ``fit`` method in LinearRegression:
 lr = LinearRegression()
 lr.fit(x, y)
 
@@ -27,10 +28,10 @@ rmse = np.sqrt(lr.residues_/len(x))
 print('RMSE: {}'.format(rmse))
 
 # Plot the prediction versus real:
-plt.plot(lr.predict(x), boston.target, 'ro')
+plt.scatter(lr.predict(x), boston.target)
 
 # Plot a diagonal (for reference):
-plt.plot([0, 50], [0, 50], 'g-')
+plt.plot([0, 50], [0, 50], '-', color=(.9,.3,.3), lw=4)
 plt.xlabel('predicted')
 plt.ylabel('real')
-plt.show()
+plt.savefig('Figure_07_08.png')
