@@ -9,8 +9,6 @@ import numpy as np
 from sklearn.datasets import load_boston
 from sklearn.linear_model import LinearRegression
 from matplotlib import pyplot as plt
-from mpltools import style
-style.use('ggplot')
 
 boston = load_boston()
 
@@ -28,7 +26,6 @@ x = np.transpose(np.atleast_2d(x))
 y = boston.target
 
 lr = LinearRegression(fit_intercept=False)
-
 lr.fit(x, y)
 
 plt.plot([0, boston.data[:, 5].max() + 1],
@@ -37,4 +34,17 @@ plt.savefig('Figure1.png', dpi=150)
 
 # The instance member `residues_` contains the sum of the squared residues
 rmse = np.sqrt(lr.residues_ / len(x))
-print('RMSE: {}'.format(rmse))
+print('RMSE (no intercept): {}'.format(rmse))
+
+# Repeat, but fitting an intercept this time:
+lr = LinearRegression(fit_intercept=True)
+
+lr.fit(x, y)
+
+plt.plot([0, boston.data[:, 5].max() + 1],
+         [0, lr.predict(boston.data[:, 5].max() + 1)], '-', lw=4)
+plt.savefig('Figure2.png', dpi=150)
+
+# The instance member `residues_` contains the sum of the squared residues
+rmse = np.sqrt(lr.residues_ / len(x))
+print('RMSE intercept: {}'.format(rmse))
