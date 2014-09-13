@@ -5,31 +5,28 @@
 #
 # It is made available under the MIT License
 
-from sklearn.linear_model import Lasso
+from sklearn.linear_model import LinearRegression, Lasso
 import numpy as np
 from sklearn.datasets import load_boston
 import pylab as plt
-from mpltools import style
-style.use('ggplot')
 
 boston = load_boston()
 plt.scatter(boston.data[:, 5], boston.target)
-plt.xlabel("RM")
+plt.xlabel("Number of rooms (RM)")
 plt.ylabel("House Price")
 
 
 x = boston.data[:, 5]
 xmin = x.min()
 xmax = x.max()
-x = np.array([[v, 1] for v in x])
+x = np.transpose(np.atleast_2d(x))
 y = boston.target
 
-(slope, bias), res, _, _ = np.linalg.lstsq(x, y)
-plt.plot([xmin, xmax], [slope * xmin + bias, slope * xmax + bias], ':', lw=4)
+lr = LinearRegression()
+lr.fit(x, y)
+plt.plot([xmin, xmax], lr.predict([[xmin], [xmax]]), ':', lw=4, label='OLS model')
 
 las = Lasso()
 las.fit(x, y)
-y0 = las.predict([xmin, 1])
-y1 = las.predict([xmax, 1])
-plt.plot([xmin, xmax], [y0, y1], '-', lw=4)
+plt.plot([xmin, xmax], las.predict([ [xmin], [xmax] ]), '-', lw=4, label='Lasso model')
 plt.savefig('Figure3.png', dpi=150)
