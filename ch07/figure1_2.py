@@ -8,6 +8,7 @@
 import numpy as np
 from sklearn.datasets import load_boston
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 from matplotlib import pyplot as plt
 
 boston = load_boston()
@@ -32,8 +33,8 @@ plt.plot([0, boston.data[:, 5].max() + 1],
          [0, lr.predict(boston.data[:, 5].max() + 1)], '-', lw=4)
 plt.savefig('Figure1.png', dpi=150)
 
-# The instance member `residues_` contains the sum of the squared residues
-rmse = np.sqrt(lr.residues_ / len(x))
+mse = mean_squared_error(y, lr.predict(x))
+rmse = np.sqrt(mse)
 print('RMSE (no intercept): {}'.format(rmse))
 
 # Repeat, but fitting an intercept this time:
@@ -45,6 +46,12 @@ plt.plot([0, boston.data[:, 5].max() + 1],
          [0, lr.predict(boston.data[:, 5].max() + 1)], '-', lw=4)
 plt.savefig('Figure2.png', dpi=150)
 
-# The instance member `residues_` contains the sum of the squared residues
-rmse = np.sqrt(lr.residues_ / len(x))
-print('RMSE intercept: {}'.format(rmse))
+mse = mean_squared_error(y, lr.predict(x))
+print("Mean squared error (of training data): {:.3}".format(mse))
+
+rmse = np.sqrt(mse)
+print("Root mean squared error (of training data): {:.3}".format(mse))
+
+cod = r2_score(y, lr.predict(x))
+print('COD (on training data): {:.2}'.format(cod))
+

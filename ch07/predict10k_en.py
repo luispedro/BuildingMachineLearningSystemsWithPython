@@ -8,7 +8,8 @@
 import numpy as np
 from sklearn.datasets import load_svmlight_file
 from sklearn.cross_validation import KFold
-from sklearn.linear_model import ElasticNet, LinearRegression
+from sklearn.linear_model import ElasticNet
+from sklearn.metrics import mean_squared_error, r2_score
 
 data, target = load_svmlight_file('data/E2006.train')
 
@@ -16,25 +17,19 @@ data, target = load_svmlight_file('data/E2006.train')
 # met = LinearRegression(fit_intercept=True)
 met = ElasticNet(fit_intercept=True, alpha=.1)
 
-kf = KFold(len(target), n_folds=10)
-err = 0
+kf = KFold(len(target), n_folds=5)
+pred = np.zeros_like(target)
 for train, test in kf:
     met.fit(data[train], target[train])
-    p = met.predict(data[test])
-    p = np.array(p).ravel()
-    e = p - target[test]
-    err += np.dot(e, e)
+    pred[test] = met.predict(data[test])
 
-rmse_10cv = np.sqrt(err / len(target))
-
+print('[EN 0.1] RMSE on testing (5 fold), {:.2}'.format(np.sqrt(mean_squared_error(target, pred))))
+print('[EN 0.1] R2 on testing (5 fold), {:.2}'.format(r2_score(target, pred)))
+print('')
 
 met.fit(data, target)
-p = met.predict(data)
-p = p.ravel()
-e = p - target
-total_error = np.dot(e, e)
-rmse_train = np.sqrt(total_error / len(p))
+pred = met.predict(data)
+print('[EN 0.1] RMSE on training, {:.2}'.format(np.sqrt(mean_squared_error(target, pred))))
+print('[EN 0.1] R2 on training, {:.2}'.format(r2_score(target, pred)))
 
 
-print('RMSE on training: {}'.format(rmse_train))
-print('RMSE on 10-fold CV: {}'.format(rmse_10cv))
