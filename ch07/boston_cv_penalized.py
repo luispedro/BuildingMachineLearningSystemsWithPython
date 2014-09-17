@@ -10,7 +10,7 @@
 from __future__ import print_function
 import numpy as np
 from sklearn.cross_validation import KFold
-from sklearn.linear_model import ElasticNet, Lasso, Ridge
+from sklearn.linear_model import LinearRegression, ElasticNet, Lasso, Ridge
 from sklearn.metrics import r2_score
 from sklearn.datasets import load_boston
 boston = load_boston()
@@ -18,9 +18,10 @@ x = boston.data
 y = boston.target
 
 for name, met in [
-        ('elastic-net(.5)', ElasticNet(fit_intercept=True, alpha=0.5)),
-        ('lasso(.5)', Lasso(fit_intercept=True, alpha=0.5)),
-        ('ridge(.5)', Ridge(fit_intercept=True, alpha=0.5)),
+        ('linear regression', LinearRegression()),
+        ('elastic-net(.5)', ElasticNet(alpha=0.5)),
+        ('lasso(.5)', Lasso(alpha=0.5)),
+        ('ridge(.5)', Ridge(alpha=0.5)),
 ]:
     # Fit on the whole data:
     met.fit(x, y)

@@ -16,8 +16,7 @@ boston1.py
 boston1numpy.py
     Version of above script using numpy operations for linear regression
 boston_cv_penalized.py
-    Test different penalized regression schemes on the Boston dataset
-cv10_lr.py
+    Test different penalized (and OLS) regression schemes on the Boston dataset
 figure1_2.py
     Show the regression line for Boston data
 figure3.py
