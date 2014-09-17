@@ -11,6 +11,7 @@ from __future__ import print_function
 import numpy as np
 from sklearn.cross_validation import KFold
 from sklearn.linear_model import ElasticNet, Lasso, Ridge
+from sklearn.metrics import r2_score
 from sklearn.datasets import load_boston
 boston = load_boston()
 x = boston.data
@@ -26,24 +27,18 @@ for name, met in [
 
     # Predict on the whole data:
     p = met.predict(x)
-
-    e = p - y
-    # np.dot(e, e) == sum(ei**2 for ei in e) but faster
-    total_error = np.dot(e, e)
-    rmse_train = np.sqrt(total_error / len(p))
+    r2_train = r2_score(y, p)
 
     # Now, we use 10 fold cross-validation to estimate generalization error
-    kf = KFold(len(x), n_folds=10)
-    err = 0
+    kf = KFold(len(x), n_folds=5)
+    p = np.zeros_like(y)
     for train, test in kf:
         met.fit(x[train], y[train])
-        p = met.predict(x[test])
-        e = p - y[test]
-        err += np.dot(e, e)
+        p[test] = met.predict(x[test])
 
-    rmse_10cv = np.sqrt(err / len(x))
+    r2_cv = r2_score(y, p)
     print('Method: {}'.format(name))
-    print('RMSE on training: {}'.format(rmse_train))
-    print('RMSE on 10-fold CV: {}'.format(rmse_10cv))
+    print('R2 on training: {}'.format(r2_train))
+    print('R2 on 5-fold CV: {}'.format(r2_cv))
     print()
     print()
