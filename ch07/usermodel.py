@@ -41,7 +41,7 @@ def learn_for(i):
     y = u.data
     err = 0
     eb = 0
-    kf = KFold(len(y), n_folds=4)
+    kf = KFold(len(y), n_folds=5)
     for train, test in kf:
         xc, xpos = movie_norm(x[train])
         reg.fit(xc, y[train] - xpos)
