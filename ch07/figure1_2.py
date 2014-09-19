@@ -42,8 +42,13 @@ lr = LinearRegression(fit_intercept=True)
 
 lr.fit(x, y)
 
-plt.plot([0, boston.data[:, 5].max() + 1],
-         [0, lr.predict(boston.data[:, 5].max() + 1)], '-', lw=4)
+plt.clf()
+plt.xlabel("Number of rooms (RM)")
+plt.ylabel("House Price")
+plt.scatter(boston.data[:, 5], boston.target)
+xmin = x.min()
+xmax = x.max()
+plt.plot([xmin, xmax], lr.predict([[xmin], [xmax]]) , '-', lw=4)
 plt.savefig('Figure2.png', dpi=150)
 
 mse = mean_squared_error(y, lr.predict(x))
