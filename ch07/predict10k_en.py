@@ -8,14 +8,14 @@
 import numpy as np
 from sklearn.datasets import load_svmlight_file
 from sklearn.cross_validation import KFold
-from sklearn.linear_model import ElasticNet
+from sklearn.linear_model import ElasticNetCV
 from sklearn.metrics import mean_squared_error, r2_score
 
 data, target = load_svmlight_file('data/E2006.train')
 
 # Edit the lines below if you want to switch method:
 # met = LinearRegression(fit_intercept=True)
-met = ElasticNet(fit_intercept=True, alpha=.1)
+met = ElasticNetCV()
 
 kf = KFold(len(target), n_folds=5)
 pred = np.zeros_like(target)
