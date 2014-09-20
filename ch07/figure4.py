@@ -24,6 +24,6 @@ p = lr.predict(x)
 plt.scatter(p, y)
 plt.xlabel('Predicted price')
 plt.ylabel('Actual price')
-plt.plot([y.min(), y.max()], [y.min(), y.max()])
+plt.plot([y.min(), y.max()], [y.min(), y.max()], lw=4)
 
 plt.savefig('Figure4.png', dpi=150)
