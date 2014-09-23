@@ -16,12 +16,13 @@ y = boston.target
 
 las = Lasso(normalize=1)
 alphas = np.logspace(-5, 2, 1000)
-_, coefs, _= las.path(x, y, alphas=alphas)
+alphas, coefs, _= las.path(x, y, alphas=alphas)
 
 fig,ax = plt.subplots()
 ax.plot(alphas, coefs.T)
 ax.set_xscale('log')
 ax.set_xlim(alphas.max(), alphas.min())
+ax.set_xlabel('Lasso coefficient path as a function of alpha')
 ax.set_xlabel('Alpha')
 ax.set_ylabel('Coefficient weight')
 fig.savefig('Figure_LassoPath.png', dpi=150)
