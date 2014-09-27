@@ -30,6 +30,8 @@ figure4.py
 lr10k.py
     Linear regression on 10K dataset, evaluation by cross-validation
 predict10k_en.py
+    Elastic nets (including with inner cross-validation for parameter
+    settings). Produces scatter plot.
 
 
 MovieLens data analysis
