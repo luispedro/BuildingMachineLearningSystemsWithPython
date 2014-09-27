@@ -55,7 +55,7 @@ mse = mean_squared_error(y, lr.predict(x))
 print("Mean squared error (of training data): {:.3}".format(mse))
 
 rmse = np.sqrt(mse)
-print("Root mean squared error (of training data): {:.3}".format(mse))
+print("Root mean squared error (of training data): {:.3}".format(rmse))
 
 cod = r2_score(y, lr.predict(x))
 print('COD (on training data): {:.2}'.format(cod))
