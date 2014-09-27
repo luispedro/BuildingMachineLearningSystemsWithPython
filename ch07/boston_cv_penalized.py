@@ -19,6 +19,7 @@ y = boston.target
 
 for name, met in [
         ('linear regression', LinearRegression()),
+        ('lasso()', Lasso()),
         ('elastic-net(.5)', ElasticNet(alpha=0.5)),
         ('lasso(.5)', Lasso(alpha=0.5)),
         ('ridge(.5)', Ridge(alpha=0.5)),
