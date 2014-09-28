@@ -6,12 +6,15 @@
 # It is made available under the MIT License
 
 def load():
-
     '''Load ML-100k data
 
-    Returns a sparse matrix'''
+    Returns the review matrix as a numpy array'''
     import numpy as np
     from scipy import sparse
+
+    # The input is in the form of a CSC sparse matrix, so it's a natural fit to
+    # load the data, but we then convert to a more traditional array before
+    # returning
     data = np.loadtxt('data/ml-100k/u.data')
     ij = data[:, :2]
     ij -= 1  # original data is in 1-based system
