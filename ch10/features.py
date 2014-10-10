@@ -37,3 +37,23 @@ def texture(im):
     return mh.features.haralick(im).mean(0)
 
 
+def color_histogram(im):
+    '''Compute color histogram of input image
+
+    Parameters
+    ----------
+    im : ndarray
+        should be an RGB image
+
+    Returns
+    -------
+    c : ndarray
+        1-D array of histogram values
+    '''
+    im = mh.stretch_rgb(im)
+    im = im // 64
+    pixels = (im * (1, 4, 16)).sum(2).ravel()
+    hist = np.bincount(pixels, minlength=64)
+    hist = hist.astype(float)
+    return np.log1p(hist)
+
