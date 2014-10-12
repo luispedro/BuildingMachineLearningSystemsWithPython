@@ -33,7 +33,7 @@ features.py
     Contains the ``edginess_sobel`` function from the book as well as a simple
     wrapper around ``mahotas.texture.haralick``
 simple_classification.py
-    Classify SimpleImageDataset with texture features + sobel feature
+    Classify SimpleImageDataset with texture features + color histogram features
 figure18.py
     Classify ``AnimTransDistr`` with both texture and SURF features.
 
