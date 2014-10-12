@@ -7,9 +7,14 @@
 
 import numpy as np
 
-# This is the version in the book:
+def all_correlations(y, X):
+    from scipy import spatial
+    y = np.atleast_2d(y)
+    sp = spatial.distance.cdist(X, y, 'correlation')
+    # The "correlation distance" is 1 - corr(x,y); so we invert that to obtain the correlation
+    return 1 - sp.ravel()
 
-
+# This is the version in the book (1st Edition):
 def all_correlations_book_version(bait, target):
     '''
     corrs = all_correlations(bait, target)
@@ -21,9 +26,7 @@ def all_correlations_book_version(bait, target):
          for c in target])
 
 # This is a faster, but harder to read, implementation:
-
-
-def all_correlations(y, X):
+def all_correlations_fast_no_scipy(y, X):
     '''
     Cs = all_correlations(y, X)
 
@@ -42,12 +45,4 @@ def all_correlations(y, X):
 
     return (xy - x_ * y_ * n) / n / xs_ / ys_
 
-# If you have scipy installed, then you can compute correlations with
-# scipy.spatial.cdist:
 
-def all_correlations_scipy(y, X):
-    from scipy import spatial
-    y = np.atleast_2d(y)
-    sp = spatial.distance.cdist(X, y, 'correlation')
-    # The "correlation distance" is 1 - corr(x,y); so we invert that to obtain the correlation
-    return 1 - sp.ravel()
