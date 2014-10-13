@@ -21,3 +21,25 @@ def load():
     values = data[:, 2]
     reviews = sparse.csc_matrix((values, ij.T)).astype(float)
     return reviews.toarray()
+
+
+def get_train_test():
+    import numpy as np
+    reviews = load()
+    U,M = np.where(reviews)
+    test_idxs = set()
+    while len(test_idxs) < len(U)//10:
+        test_idxs.add(np.random.randint(0,len(U)-1))
+    test_idxs = np.array(list(test_idxs))
+    train = reviews.copy()
+    train[U[test_idxs], M[test_idxs]] = 0
+
+    test = np.zeros_like(reviews)
+    test[U[test_idxs], M[test_idxs]] = reviews[U[test_idxs], M[test_idxs]]
+
+    valid_U = train.any(0)
+    valid_M = train.any(1)
+    train = train[valid_M].T[valid_U].T
+    test  = test [valid_M].T[valid_U].T
+    return train, test
+
