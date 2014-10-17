@@ -13,12 +13,7 @@ from sklearn import metrics
 
 from norm import NormalizePositive
 
-def main(transpose_inputs=False):
-    otrain, test = get_train_test()
-    if transpose_inputs:
-        otrain = otrain.T
-        test  = test.T
-
+def predict(otrain):
     binary = (otrain > 0)
     norm = NormalizePositive()
     train = norm.fit_transform(otrain.T).T
@@ -40,8 +35,16 @@ def main(transpose_inputs=False):
                 revs = revs[:len(revs)//2+1]
                 filled[u,m] = revs.mean()
 
-    ifilled = norm.inverse_transform(filled.T).T
-    r2 = metrics.r2_score(test[test > 0], ifilled[test > 0])
+    return norm.inverse_transform(filled.T).T
+
+def main(transpose_inputs=False):
+    train, test = get_train_test()
+    if transpose_inputs:
+        train = train.T
+        test  = test.T
+
+    predicted = predict(train)
+    r2 = metrics.r2_score(test[test > 0], predicted[test > 0])
     print('R2 score (binary neighbours): {:.1%}'.format(r2))
 
 if __name__ == '__main__':

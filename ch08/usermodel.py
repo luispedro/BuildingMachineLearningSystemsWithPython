@@ -12,27 +12,29 @@ from norm import NormalizePositive
 from sklearn import metrics
 
 
-def main(transpose_inputs=False):
-    train,test = get_train_test()
-    if transpose_inputs:
-        train = train.T
-        test = test.T
+def predict(train):
     binary = (train > 0)
     reg = ElasticNetCV(fit_intercept=True, alphas=[
                        0.0125, 0.025, 0.05, .125, .25, .5, 1., 2., 4.])
     norm = NormalizePositive()
     train = norm.fit_transform(train)
 
-    nusers,nmovies = train.shape
-
     filled = train.copy()
-    for u in range(nusers):
+    for u in range(train.shape[0]):
         curtrain = np.delete(train, u, axis=0)
         bu = binary[u]
         reg.fit(curtrain[:,bu].T, train[u, bu])
         filled[u, ~bu] = reg.predict(curtrain[:,~bu].T)
-    ifilled = norm.inverse_transform(filled)
-    r2 = metrics.r2_score(test[test > 0], ifilled[test > 0])
+    return norm.inverse_transform(filled)
+
+
+def main(transpose_inputs=False):
+    train,test = get_train_test()
+    if transpose_inputs:
+        train = train.T
+        test = test.T
+    filled = predict(train)
+    r2 = metrics.r2_score(test[test > 0], filled[test > 0])
     print('R2 score (user regression): {:.1%}'.format(r2))
 
 if __name__ == '__main__':
