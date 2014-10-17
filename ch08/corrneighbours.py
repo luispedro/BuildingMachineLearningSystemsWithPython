@@ -6,75 +6,43 @@
 # It is made available under the MIT License
 
 from __future__ import print_function
-from all_correlations import all_correlations
 import numpy as np
-from load_ml100k import load
+from load_ml100k import get_train_test
+from scipy.spatial import distance
+from sklearn import metrics
 
-def estimate_user(user, rest, num_neighbors=100):
-    '''Estimate ratings for user based on the binary rating matrix
+from norm import NormalizePositive
 
-    Returns
-    -------
-    estimates: ndarray
-        Returns a rating estimate for each movie
-    '''
+def main(transpose_inputs=False):
+    otrain, test = get_train_test()
+    if transpose_inputs:
+        otrain = otrain.T
+        test  = test.T
 
-    # Compute binary matrix correlations:
-    bu = user > 0
-    br = rest > 0
-    ws = all_correlations(bu, br)
+    binary = (otrain > 0)
+    norm = NormalizePositive()
+    train = norm.fit_transform(otrain.T).T
 
-    # Select top `num_neighbors`:
-    selected = ws.argsort()[-num_neighbors:]
+    proximity = distance.pdist(binary, 'correlation')
+    proximity = distance.squareform(proximity)
 
-    # Use these to compute estimates:
-    estimates = rest[selected].mean(0)
-    estimates /= (.1 + br[selected].mean(0))
-    return estimates
+    neighbors = proximity.argsort(axis=1)
+    filled = train.copy()
+    for u in range(filled.shape[0]):
+        n_u = neighbors[u, 1:]
+        t_u = train[n_u].T
+        b_u = binary[n_u].T
+        for m in range(filled.shape[1]):
+            revs = t_u[m]
+            brevs = b_u[m]
+            revs = revs[brevs]
+            if len(revs):
+                revs = revs[:len(revs)//2+1]
+                filled[u,m] = revs.mean()
 
-
-def train_test(user, rest):
-    '''Train & test on a single user
-
-    Returns both the prediction error and the null error
-    '''
-    estimates = estimate_user(user, rest)
-    bu = user > 0
-    br = rest > 0
-    err = estimates[bu] - user[bu]
-    null = rest.mean(0)
-    null /= (.1 + br.mean(0))
-    nerr = null[bu] - user[bu]
-    return np.dot(err, err), np.dot(nerr, nerr)
-
-
-def all_estimates(reviews):
-    estimates = np.zeros_like(reviews)
-    for i in range(reviews.shape[0]):
-        estimates[i] = estimate_user(reviews[i], np.delete(reviews, i, 0))
-    return estimates
-
-def main():
-    reviews = load()
-
-    err = []
-    for i in range(reviews.shape[0]):
-        err.append(
-            train_test(reviews[i], np.delete(reviews, i, 0))
-        )
-    revs = (reviews > 0).sum(1)
-    err = np.array(err)
-    rmse = np.sqrt(err / revs[:, None])
-
-    rmse_model, rmse_null = np.mean(rmse, 0)
-
-    print("Average of RMSE / Null-model RMSE")
-    print("{:.2}\t{:.2} (improvement: {:.1%}".format(rmse_model, rmse_null, (rmse_null-rmse_model)/rmse_null))
-    print()
-
-    rmse_model, rmse_null = np.mean(rmse[revs > 60], 0)
-    print("Average of RMSE / Null-model RMSE (users with more than 60 reviewed movies)")
-    print("{:.2}\t{:.2} (improvement: {:.1%}".format(rmse_model, rmse_null, (rmse_null-rmse_model)/rmse_null))
+    ifilled = norm.inverse_transform(filled.T).T
+    r2 = metrics.r2_score(test[test > 0], ifilled[test > 0])
+    print('R2 score (binary neighbours): {:.1%}'.format(r2))
 
 if __name__ == '__main__':
     main()
