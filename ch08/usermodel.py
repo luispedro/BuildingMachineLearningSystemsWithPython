@@ -7,48 +7,33 @@
 
 import numpy as np
 from sklearn.linear_model import ElasticNetCV
-from sklearn.cross_validation import KFold
+from load_ml100k import get_train_test
+from norm import NormalizePositive
+from sklearn import metrics
 
 
-def learn_for(reviews, i):
+def main(transpose_inputs=False):
+    train,test = get_train_test()
+    if transpose_inputs:
+        train = train.T
+        test = test.T
+    binary = (train > 0)
     reg = ElasticNetCV(fit_intercept=True, alphas=[
                        0.0125, 0.025, 0.05, .125, .25, .5, 1., 2., 4.])
-    nusers,nmovies = reviews.shape
-    u = reviews[i]
-    us = np.arange(reviews.shape[0])
-    us = np.delete(us, i)
-    ps, = np.where(u.ravel() > 0)
-    x = reviews[us][:, ps].T
-    kf = KFold(len(ps), n_folds=4)
-    predictions = np.zeros(len(ps))
-    for train, test in kf:
-        xc = x[train].copy()
-        x1 = np.array([xi[xi > 0].mean() for xi in xc])
-        x1 = np.nan_to_num(x1)
+    norm = NormalizePositive()
+    train = norm.fit_transform(train)
 
-        for i in range(xc.shape[0]):
-            xc[i] -= (xc[i] > 0) * x1[i]
+    nusers,nmovies = train.shape
 
-        reg.fit(xc, u[train] - x1)
+    filled = train.copy()
+    for u in range(nusers):
+        curtrain = np.delete(train, u, axis=0)
+        bu = binary[u]
+        reg.fit(curtrain[:,bu].T, train[u, bu])
+        filled[u, ~bu] = reg.predict(curtrain[:,~bu].T)
+    ifilled = norm.inverse_transform(filled)
+    r2 = metrics.r2_score(test[test > 0], ifilled[test > 0])
+    print('R2 score (user regression): {:.1%}'.format(r2))
 
-        xc = x[test].copy()
-        x1 = np.array([xi[xi > 0].mean() for xi in xc])
-        x1 = np.nan_to_num(x1)
-
-        for i in range(xc.shape[0]):
-            xc[i] -= (xc[i] > 0) * x1[i]
-
-        p = reg.predict(xc).ravel()
-        predictions[test] = p
-    fill_preds = np.zeros(nmovies)
-    fill_preds[ps] = predictions
-    return fill_preds
-
-
-def all_estimates(reviews):
-    whole_data = []
-    for i in range(reviews.shape[0]):
-        s = learn_for(reviews, i)
-        whole_data.append(s)
-    return np.array(whole_data)
-
+if __name__ == '__main__':
+    main()
