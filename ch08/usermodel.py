@@ -20,10 +20,14 @@ def predict(train):
     train = norm.fit_transform(train)
 
     filled = train.copy()
+    # iterate over all users
     for u in range(train.shape[0]):
+        # remove the current user for training
         curtrain = np.delete(train, u, axis=0)
         bu = binary[u]
         reg.fit(curtrain[:,bu].T, train[u, bu])
+
+	# Fill the values that were not there already
         filled[u, ~bu] = reg.predict(curtrain[:,~bu].T)
     return norm.inverse_transform(filled)
 
