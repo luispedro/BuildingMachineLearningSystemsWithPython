@@ -7,7 +7,6 @@
 
 import numpy as np
 from sklearn.linear_model import ElasticNetCV
-from load_ml100k import get_train_test
 from norm import NormalizePositive
 from sklearn import metrics
 
@@ -25,21 +24,27 @@ def predict(train):
         # remove the current user for training
         curtrain = np.delete(train, u, axis=0)
         bu = binary[u]
-        reg.fit(curtrain[:,bu].T, train[u, bu])
+        if np.sum(bu) > 5:
+            reg.fit(curtrain[:,bu].T, train[u, bu])
 
-	# Fill the values that were not there already
-        filled[u, ~bu] = reg.predict(curtrain[:,~bu].T)
+            # Fill the values that were not there already
+            filled[u, ~bu] = reg.predict(curtrain[:,~bu].T)
     return norm.inverse_transform(filled)
 
 
 def main(transpose_inputs=False):
-    train,test = get_train_test()
+    from load_ml100k import get_train_test
+    train,test = get_train_test(random_state=12)
     if transpose_inputs:
         train = train.T
         test = test.T
     filled = predict(train)
     r2 = metrics.r2_score(test[test > 0], filled[test > 0])
-    print('R2 score (user regression): {:.1%}'.format(r2))
+
+    print('R2 score ({} regression): {:.1%}'.format(
+        ('movie' if transpose_inputs else 'user'),
+        r2))
 
 if __name__ == '__main__':
     main()
+    main(transpose_inputs=True)

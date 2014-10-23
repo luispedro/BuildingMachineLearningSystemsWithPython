@@ -38,14 +38,17 @@ def predict(otrain):
     return norm.inverse_transform(filled.T).T
 
 def main(transpose_inputs=False):
-    train, test = get_train_test()
+    train, test = get_train_test(random_state=12)
     if transpose_inputs:
         train = train.T
         test  = test.T
 
     predicted = predict(train)
     r2 = metrics.r2_score(test[test > 0], predicted[test > 0])
-    print('R2 score (binary neighbours): {:.1%}'.format(r2))
+    print('R2 score (binary {} neighbours): {:.1%}'.format(
+        ('movie' if transpose_inputs else 'user'),
+        r2))
 
 if __name__ == '__main__':
     main()
+    main(transpose_inputs=True)
