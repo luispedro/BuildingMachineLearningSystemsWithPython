@@ -22,7 +22,7 @@ def load():
     reviews = sparse.csc_matrix((values, ij.T)).astype(float)
     return reviews.toarray()
 
-def get_train_test(reviews=None, return_valid=False, random_state=None):
+def get_train_test(reviews=None, random_state=None):
     '''Split data into training & testing
 
     Parameters
@@ -51,11 +51,5 @@ def get_train_test(reviews=None, return_valid=False, random_state=None):
     test = np.zeros_like(reviews)
     test[U[test_idxs], M[test_idxs]] = reviews[U[test_idxs], M[test_idxs]]
 
-    valid_U = train.any(0)
-    valid_M = train.any(1)
-    train = train[valid_M].T[valid_U].T
-    test  = test [valid_M].T[valid_U].T
-    if return_valid:
-        return train, test, valid_M, valid_U
     return train, test
 
