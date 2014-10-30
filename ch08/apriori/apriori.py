@@ -43,7 +43,6 @@ def apriori(dataset, minsupport, maxsize):
     itemsets = [frozenset([v]) for v in valid]
     freqsets = []
     for i in range(maxsize - 1):
-        print(len(itemsets))
         newsets = []
         for i, ell in enumerate(itemsets):
             ccounts = baskets[ell]
