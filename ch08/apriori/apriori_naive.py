@@ -5,7 +5,6 @@
 #
 # It is made available under the MIT License
 
-import numpy as np
 from collections import defaultdict
 from itertools import chain
 from gzip import GzipFile
