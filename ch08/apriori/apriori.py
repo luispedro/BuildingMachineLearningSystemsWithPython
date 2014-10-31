@@ -5,6 +5,9 @@
 #
 # It is made available under the MIT License
 
+from collections import namedtuple
+
+
 def apriori(dataset, minsupport, maxsize):
     '''
     freqsets, baskets = apriori(dataset, minsupport, maxsize)
@@ -59,9 +62,12 @@ def apriori(dataset, minsupport, maxsize):
     return freqsets, baskets
 
 
+# A namedtuple to collect all values that may be interesting
+AssociationRule = namedtuple('AssociationRule', ['antecendent', 'consequent', 'base', 'py_x', 'lift'])
+
 def association_rules(dataset, freqsets, baskets, minlift):
     '''
-    for (antecendent, consequent, base, py_x, lift) in association_rules(dataset, freqsets, baskets, minlift):
+    for assoc_rule in association_rules(dataset, freqsets, baskets, minlift):
         ...
 
     This function takes the returns from ``apriori``.
@@ -74,6 +80,10 @@ def association_rules(dataset, freqsets, baskets, minlift):
     baskets : dictionary
     minlift : int
         minimal lift of yielded rules
+
+    Returns
+    -------
+    assoc_rule : sequence of AssociationRule objects
     '''
     nr_transactions = float(len(dataset))
     freqsets = [f for f in freqsets if len(f) > 1]
@@ -81,8 +91,8 @@ def association_rules(dataset, freqsets, baskets, minlift):
         for f in fset:
             consequent = frozenset([f])
             antecendent = fset - consequent
-            base = len(baskets[consequent]) / nr_transactions
             py_x = len(baskets[fset]) / float(len(baskets[antecendent]))
+            base = len(baskets[consequent]) / nr_transactions
             lift = py_x / base
             if lift > minlift:
-                yield (antecendent, consequent, base, py_x, lift)
+                yield AssociationRule(antecendent, consequent, base, py_x, lift)

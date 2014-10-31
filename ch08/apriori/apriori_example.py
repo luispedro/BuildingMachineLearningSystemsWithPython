@@ -7,10 +7,15 @@
 
 from apriori import apriori, association_rules
 from gzip import GzipFile
+
+# Load dataset
 dataset = [[int(tok) for tok in line.strip().split()]
            for line in GzipFile('retail.dat.gz')]
+
 freqsets, baskets = apriori(dataset, 80, maxsize=5)
-nr_transactions = float(len(dataset))
-for ant, con, base, pyx, lift in association_rules(dataset, freqsets, baskets, 30):
-    print('{} | {} | {} ({:%}) | {} | {} | {}'
-          .format(ant, con, len(baskets[con]), len(baskets[con]) / nr_transactions, len(baskets[ant]), len(baskets[con | ant]), int(lift)))
+
+for ar in association_rules(dataset, freqsets, baskets, 30):
+    print('{} -> {} (lift = {:.4})'
+          .format(set(ar.antecendent),
+                    set(ar.consequent),
+                    ar.lift))
