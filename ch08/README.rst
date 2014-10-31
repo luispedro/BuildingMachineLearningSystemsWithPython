@@ -22,3 +22,16 @@ stacked.py
     Stacked predictions
 averaged.py
     Averaging of predictions
+
+Association Rule Mining
+-----------------------
+
+Check the folder ``apriori/``
+
+apriori/histogram.py
+    Print a histogram of how many times each product was bought
+apriori/apriori.py
+    Implementation of Apriori algorithm and association rule building
+apriori/apriori_example.py
+    Example of Apriori algorithm in retail dataset
+
