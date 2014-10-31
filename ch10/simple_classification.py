@@ -45,13 +45,13 @@ labels = np.array(labels)
 # Feel free to experiment with other classifiers
 scores = cross_validation.cross_val_score(
     LogisticRegression(), haralicks, labels, cv=5)
-print('Accuracy (5 fold x-val) with Logistic Regrssion [std features]: {}%'.format(
+print('Accuracy (5 fold x-val) with Logistic Regression [std features]: {}%'.format(
     0.1 * round(1000 * scores.mean())))
 
 haralick_plus_sobel = np.hstack([np.atleast_2d(sobels).T, haralicks])
 scores = cross_validation.cross_val_score(
     LogisticRegression(), haralick_plus_sobel, labels, cv=5).mean()
-print('Accuracy (5 fold x-val) with Logistic Regrssion [std features + sobel]: {}%'.format(
+print('Accuracy (5 fold x-val) with Logistic Regression [std features + sobel]: {}%'.format(
     0.1 * round(1000 * scores.mean())))
 
 
@@ -59,6 +59,6 @@ print('Accuracy (5 fold x-val) with Logistic Regrssion [std features + sobel]: {
 # random.
 scores = cross_validation.cross_val_score(
     LogisticRegression(), np.atleast_2d(sobels).T, labels, cv=5).mean()
-print('Accuracy (5 fold x-val) with Logistic Regrssion [only using sobel feature]: {}%'.format(
+print('Accuracy (5 fold x-val) with Logistic Regression [only using sobel feature]: {}%'.format(
     0.1 * round(1000 * scores.mean())))
 
