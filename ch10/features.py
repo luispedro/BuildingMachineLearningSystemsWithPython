@@ -50,10 +50,15 @@ def color_histogram(im):
     c : ndarray
         1-D array of histogram values
     '''
-    im = mh.stretch_rgb(im)
+
+    # Downsample pixel values:
     im = im // 64
-    pixels = (im * (1, 4, 16)).sum(2).ravel()
-    hist = np.bincount(pixels, minlength=64)
+
+    # Separate RGB channels:
+    r,g,b = im.transpose((2,0,1))
+
+    pixels = 1 * r + 4 * g + 16 * b
+    hist = np.bincount(pixels.ravel(), minlength=64)
     hist = hist.astype(float)
     return np.log1p(hist)
 
