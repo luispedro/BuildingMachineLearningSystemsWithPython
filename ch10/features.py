@@ -54,6 +54,12 @@ def color_histogram(im):
     # Downsample pixel values:
     im = im // 64
 
+    # We can also implement the following by using np.histogramdd
+    # im = im.reshape((-1,3))
+    # bins = [np.arange(5), np.arange(5), np.arange(5)]
+    # hist = np.histogramdd(im, bins=bins)[0]
+    # hist = hist.ravel()
+
     # Separate RGB channels:
     r,g,b = im.transpose((2,0,1))
 
