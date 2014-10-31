@@ -11,6 +11,10 @@ def load():
     Returns the review matrix as a numpy array'''
     import numpy as np
     from scipy import sparse
+    from os import path
+
+    if not path.exists('data/ml-100k/u.data'):
+        raise IOError("Data has not been downloaded.\nTry the following:\n\n\tcd data\n\t./download.sh")
 
     # The input is in the form of a CSC sparse matrix, so it's a natural fit to
     # load the data, but we then convert to a more traditional array before
