@@ -29,31 +29,42 @@ def apriori(dataset, minsupport, maxsize):
     from collections import defaultdict
 
     baskets = defaultdict(list)
+
     pointers = defaultdict(list)
     for i, ds in enumerate(dataset):
         for ell in ds:
             pointers[ell].append(i)
             baskets[frozenset([ell])].append(i)
-    pointers = dict([(k, frozenset(v)) for k, v in pointers.items()])
-    baskets = dict([(k, frozenset(v)) for k, v in baskets.items()])
 
-    valid = set(list(el)[0]
-                for el, c in baskets.items() if (len(c) >= minsupport))
-    dataset = [[el for el in ds if (el in valid)] for ds in dataset]
-    dataset = [ds for ds in dataset if len(ds) > 1]
-    dataset = map(frozenset, dataset)
+    # Convert pointer items to frozensets to speed up operations later
+    new_pointers = dict()
+    for k in pointers:
+        if len(pointers[k]) >= minsupport:
+            new_pointers[k] = frozenset(pointers[k])
+    pointers = new_pointers
+    for k in baskets:
+        baskets[k] = frozenset(baskets[k])
 
+
+    # Valid are all elements whose support is >= minsupport
+    valid = set()
+    for el, c in baskets.items():
+        if len(c) >= minsupport:
+            valid.update(el)
+
+    # Itemsets at first iteration are simply all singleton with valid elements:
     itemsets = [frozenset([v]) for v in valid]
     freqsets = []
     for i in range(maxsize - 1):
         newsets = []
-        for i, ell in enumerate(itemsets):
-            ccounts = baskets[ell]
-            for v_, pv in pointers.items():
-                if v_ not in ell:
+        for it in itemsets:
+            ccounts = baskets[it]
+
+            for v, pv in pointers.items():
+                if v not in it:
                     csup = (ccounts & pv)
                     if len(csup) >= minsupport:
-                        new = frozenset(ell | set([v_]))
+                        new = frozenset(it | frozenset([v]))
                         if new not in baskets:
                             newsets.append(new)
                             baskets[new] = csup
@@ -96,3 +107,4 @@ def association_rules(dataset, freqsets, baskets, minlift):
             lift = py_x / base
             if lift > minlift:
                 yield AssociationRule(antecendent, consequent, base, py_x, lift)
+
