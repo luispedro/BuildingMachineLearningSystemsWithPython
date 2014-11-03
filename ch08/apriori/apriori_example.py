@@ -12,9 +12,11 @@ from gzip import GzipFile
 dataset = [[int(tok) for tok in line.strip().split()]
            for line in GzipFile('retail.dat.gz')]
 
-freqsets, baskets = apriori(dataset, 80, maxsize=5)
+freqsets, support = apriori(dataset, 80, maxsize=16)
+rules = list(association_rules(dataset, freqsets, support, minlift=30.0))
 
-for ar in association_rules(dataset, freqsets, baskets, 30):
+rules.sort(key=(lambda ar: -ar.lift))
+for ar in rules:
     print('{} -> {} (lift = {:.4})'
           .format(set(ar.antecendent),
                     set(ar.consequent),

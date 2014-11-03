@@ -10,7 +10,7 @@ from collections import namedtuple
 
 def apriori(dataset, minsupport, maxsize):
     '''
-    freqsets, baskets = apriori(dataset, minsupport, maxsize)
+    freqsets, support = apriori(dataset, minsupport, maxsize)
 
     Parameters
     ----------
@@ -24,13 +24,15 @@ def apriori(dataset, minsupport, maxsize):
     Returns
     -------
     freqsets : sequence of sequences
-    baskets : dictionary
+    support : dictionary
+        This associates each itemset (represented as a frozenset) with a float
+        (the support of that itemset)
     '''
     from collections import defaultdict
 
     baskets = defaultdict(list)
-
     pointers = defaultdict(list)
+
     for i, ds in enumerate(dataset):
         for ell in ds:
             pointers[ell].append(i)
@@ -56,6 +58,8 @@ def apriori(dataset, minsupport, maxsize):
     itemsets = [frozenset([v]) for v in valid]
     freqsets = []
     for i in range(maxsize - 1):
+        print("At iteration {}, number of frequent baskets: {}".format(
+            i, len(itemsets)))
         newsets = []
         for it in itemsets:
             ccounts = baskets[it]
@@ -70,15 +74,20 @@ def apriori(dataset, minsupport, maxsize):
                             baskets[new] = csup
         freqsets.extend(itemsets)
         itemsets = newsets
-    return freqsets, baskets
+        if not len(itemsets):
+            break
+    support = {}
+    for k in baskets:
+        support[k] = float(len(baskets[k]))
+    return freqsets, support
 
 
 # A namedtuple to collect all values that may be interesting
 AssociationRule = namedtuple('AssociationRule', ['antecendent', 'consequent', 'base', 'py_x', 'lift'])
 
-def association_rules(dataset, freqsets, baskets, minlift):
+def association_rules(dataset, freqsets, support, minlift):
     '''
-    for assoc_rule in association_rules(dataset, freqsets, baskets, minlift):
+    for assoc_rule in association_rules(dataset, freqsets, support, minlift):
         ...
 
     This function takes the returns from ``apriori``.
@@ -88,7 +97,7 @@ def association_rules(dataset, freqsets, baskets, minlift):
     dataset : sequence of sequences
         input dataset
     freqsets : sequence of sequences
-    baskets : dictionary
+    support : dictionary
     minlift : int
         minimal lift of yielded rules
 
@@ -102,8 +111,8 @@ def association_rules(dataset, freqsets, baskets, minlift):
         for f in fset:
             consequent = frozenset([f])
             antecendent = fset - consequent
-            py_x = len(baskets[fset]) / float(len(baskets[antecendent]))
-            base = len(baskets[consequent]) / nr_transactions
+            py_x = support[fset] / support[antecendent]
+            base = support[consequent] / nr_transactions
             lift = py_x / base
             if lift > minlift:
                 yield AssociationRule(antecendent, consequent, base, py_x, lift)
