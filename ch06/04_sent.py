@@ -153,7 +153,7 @@ emo_repl = {
 }
 
 emo_repl_order = [k for (k_len, k) in reversed(
-    sorted([(len(k), k) for k in emo_repl.keys()]))]
+    sorted([(len(k), k) for k in list(emo_repl.keys())]))]
 
 re_repl = {
     r"\br\b": "are",
@@ -179,7 +179,7 @@ def create_union_model(params=None):
 
         for k in emo_repl_order:
             tweet = tweet.replace(k, emo_repl[k])
-        for r, repl in re_repl.iteritems():
+        for r, repl in re_repl.items():
             tweet = re.sub(r, repl, tweet)
 
         return tweet.replace("-", " ").replace("_", " ")
@@ -220,7 +220,7 @@ def __grid_search_model(clf_factory, X, Y):
                                verbose=10)
     grid_search.fit(X, Y)
     clf = grid_search.best_estimator_
-    print clf
+    print(clf)
 
     return clf
 
@@ -275,7 +275,7 @@ def train_model(clf, X, Y, name="NB ngram", plot=False):
 
     summary = (np.mean(scores), np.std(scores),
                np.mean(pr_scores), np.std(pr_scores))
-    print "%.3f\t%.3f\t%.3f\t%.3f\t" % summary
+    print("%.3f\t%.3f\t%.3f\t%.3f\t" % summary)
 
     return np.mean(train_errors), np.mean(test_errors)
 
@@ -286,9 +286,9 @@ def print_incorrect(clf, X, Y):
     X_wrong = X[wrong_idx]
     Y_wrong = Y[wrong_idx]
     Y_hat_wrong = Y_hat[wrong_idx]
-    for idx in xrange(len(X_wrong)):
-        print "clf.predict('%s')=%i instead of %i" %\
-            (X_wrong[idx], Y_hat_wrong[idx], Y_wrong[idx])
+    for idx in range(len(X_wrong)):
+        print("clf.predict('%s')=%i instead of %i" %
+              (X_wrong[idx], Y_hat_wrong[idx], Y_wrong[idx]))
 
 
 def get_best_model():
@@ -315,16 +315,16 @@ if __name__ == "__main__":
     #Y_orig = Y_orig[:100,]
     classes = np.unique(Y_orig)
     for c in classes:
-        print "#%s: %i" % (c, sum(Y_orig == c))
+        print("#%s: %i" % (c, sum(Y_orig == c)))
 
-    print "== Pos vs. neg =="
+    print("== Pos vs. neg ==")
     pos_neg = np.logical_or(Y_orig == "positive", Y_orig == "negative")
     X = X_orig[pos_neg]
     Y = Y_orig[pos_neg]
     Y = tweak_labels(Y, ["positive"])
     train_model(get_best_model(), X, Y, name="pos vs neg", plot=True)
 
-    print "== Pos/neg vs. irrelevant/neutral =="
+    print("== Pos/neg vs. irrelevant/neutral ==")
     X = X_orig
     Y = tweak_labels(Y_orig, ["positive", "negative"])
 
@@ -332,18 +332,18 @@ if __name__ == "__main__":
     # rest", plot=True)
     train_model(get_best_model(), X, Y, name="pos+neg vs rest", plot=True)
 
-    print "== Pos vs. rest =="
+    print("== Pos vs. rest ==")
     X = X_orig
     Y = tweak_labels(Y_orig, ["positive"])
     train_model(get_best_model(), X, Y, name="pos vs rest",
                 plot=True)
 
-    print "== Neg vs. rest =="
+    print("== Neg vs. rest ==")
     X = X_orig
     Y = tweak_labels(Y_orig, ["negative"])
     train_model(get_best_model(), X, Y, name="neg vs rest",
                 plot=True)
 
-    print "time spent:", time.time() - start_time
+    print("time spent:", time.time() - start_time)
 
     json.dump(poscache, open(poscache_filename, "w"))
