@@ -11,22 +11,18 @@
 #
 # Pulls tweet data from Twitter because ToS prevents distributing it directly.
 #
-# Right now we use unauthenticated requests, which are rate-limited to 150/hr.
-# We use 125/hr to stay safe.
-#
-#
 #   - Niek Sanders
 #     njs@sananalytics.com
 #     October 20, 2011
 #
 #
-# Excuse the ugly code.  I threw this together as quickly as possible and I
-# don't normally code in Python.
-#
 
 # In Sanders' original form, the code was using Twitter API 1.0.
 # Now that Twitter moved to 1.1, we had to make a few changes.
 # Cf. twitterauth.py for the details.
+
+# Regarding rate limiting, please check
+# https://dev.twitter.com/rest/public/rate-limiting
 
 import sys
 import csv
@@ -38,24 +34,21 @@ try:
     import twitter
 except ImportError:
     print("""\
-You need to install python-twitter:
-    pip install python-twitter
+You need to ...
+    pip install twitter
 If pip is not found you might have to install it using easy_install.
 If it does not work on your system, you might want to follow instructions
-at https://github.com/bear/python-twitter, most likely:
-  $ git clone https://github.com/bear/python-twitter
-  $ cd python-twitter
+at https://github.com/sixohsix/twitter, most likely:
+  $ git clone https://github.com/sixohsix/twitter
+  $ cd twitter
   $ sudo python setup.py install
 """)
 
     sys.exit(1)
 
 from twitterauth import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET
-api = twitter.Api(consumer_key=CONSUMER_KEY, consumer_secret=CONSUMER_SECRET,
-                  access_token_key=ACCESS_TOKEN_KEY, access_token_secret=ACCESS_TOKEN_SECRET)
-
-
-MAX_TWEETS_PER_HR = 350
+api = twitter.Twitter(auth=twitter.OAuth(consumer_key=CONSUMER_KEY, consumer_secret=CONSUMER_SECRET,
+                                         token=ACCESS_TOKEN_KEY, token_secret=ACCESS_TOKEN_SECRET))
 
 DATA_PATH = "data"
 
@@ -87,16 +80,15 @@ def get_user_params(DATA_PATH):
 def dump_user_params(user_params):
 
     # dump user params for confirmation
-    print 'Input:    ' + user_params['inList']
-    print 'Output:   ' + user_params['outList']
-    print 'Raw data: ' + user_params['rawDir']
-    return
+    print('Input:    ' + user_params['inList'])
+    print('Output:   ' + user_params['outList'])
+    print('Raw data: ' + user_params['rawDir'])
 
 
 def read_total_list(in_filename):
 
     # read total fetch list csv
-    fp = open(in_filename, 'rb')
+    fp = open(in_filename, 'rt')
     reader = csv.reader(fp, delimiter=',', quotechar='"')
 
     if os.path.exists(MISSING_ID_FILE):
@@ -111,10 +103,12 @@ def read_total_list(in_filename):
     else:
         not_authed_ids = []
 
-    print "We will skip %i tweets that are not available/visible any more on twitter" % (len(missing_ids) + len(not_authed_ids))
+    print("We will skip %i tweets that are not available or visible any more on twitter" % (
+        len(missing_ids) + len(not_authed_ids)))
 
     ignore_ids = set(missing_ids + not_authed_ids)
     total_list = []
+
     for row in reader:
         if row[2] not in ignore_ids:
             total_list.append(row)
@@ -140,12 +134,12 @@ def purge_already_fetched(fetch_list, raw_dir):
                 parse_tweet_json(tweet_file)
                 count_done += 1
             except RuntimeError:
-                print "Error parsing", item
+                print("Error parsing", item)
                 rem_list.append(item)
         else:
             rem_list.append(item)
 
-    print "We have already downloaded %i tweets." % count_done
+    print("We have already downloaded %i tweets." % count_done)
 
     return rem_list
 
@@ -156,66 +150,50 @@ def download_tweets(fetch_list, raw_dir):
     if not os.path.exists(raw_dir):
         os.mkdir(raw_dir)
 
-    # stay within rate limits
-    download_pause_sec = 3600 / MAX_TWEETS_PER_HR
-
     # download tweets
     for idx in range(0, len(fetch_list)):
-        # stay in Twitter API rate limits
-        print 'Pausing %d sec to obey Twitter API rate limits' % \
-              (download_pause_sec)
-        time.sleep(download_pause_sec)
-
         # current item
         item = fetch_list[idx]
-        print item
+        print(item)
 
-        # print status
-        print '--> downloading tweet #%s (%d of %d)' % \
-              (item[2], idx + 1, len(fetch_list))
+        print('--> downloading tweet #%s (%d of %d)' %
+              (item[2], idx + 1, len(fetch_list)))
 
-        # Old Twitter API 1.0
-        # pull data
-        # url = 'https://api.twitter.com/1/statuses/show.json?id=' + item[2]
-        # print url
-        # urllib.urlretrieve(url, raw_dir + item[2] + '.json')
-
-        # New Twitter API 1.1
         try:
-            sec = api.GetSleepTime('/statuses/show/:id')
-            if sec > 0:
-                print "Sleeping %i seconds to conform to Twitter's rate limiting" % sec
-                time.sleep(sec)
+            #import pdb;pdb.set_trace()
+            response = api.statuses.show(_id=item[2])
 
-            result = api.GetStatus(item[2])
-            json_data = result.AsJsonString()
+            if response.rate_limit_remaining <= 0:
+                wait_seconds = response.rate_limit_reset - time.time()
+                print("Rate limiting requests us to wait %f seconds" %
+                      wait_seconds)
+                time.sleep(wait_seconds)
 
-        except twitter.TwitterError, e:
+        except twitter.TwitterError as e:
             fatal = True
-            for m in e.message:
+            print(e)
+            for m in json.loads(e.response_data.decode())['errors']:
                 if m['code'] == 34:
-                    print "Tweet missing: ", item
-                    # [{u'message': u'Sorry, that page does not exist', u'code': 34}]
-                    with open(MISSING_ID_FILE, "a") as f:
+                    print("Tweet missing: ", item)
+                    with open(MISSING_ID_FILE, "at") as f:
                         f.write(item[2] + "\n")
 
                     fatal = False
                     break
                 elif m['code'] == 63:
-                    print "User of tweet '%s' has been suspended." % item
-                    # [{u'message': u'Sorry, that page does not exist', u'code': 34}]
-                    with open(MISSING_ID_FILE, "a") as f:
+                    print("User of tweet '%s' has been suspended." % item)
+                    with open(MISSING_ID_FILE, "at") as f:
                         f.write(item[2] + "\n")
 
                     fatal = False
                     break
                 elif m['code'] == 88:
-                    print "Rate limit exceeded. Please lower max_tweets_per_hr."
+                    print("Rate limit exceeded.")
                     fatal = True
                     break
                 elif m['code'] == 179:
-                    print "Not authorized to view this tweet."
-                    with open(NOT_AUTHORIZED_ID_FILE, "a") as f:
+                    print("Not authorized to view this tweet.")
+                    with open(NOT_AUTHORIZED_ID_FILE, "at") as f:
                         f.write(item[2] + "\n")
                     fatal = False
                     break
@@ -225,8 +203,8 @@ def download_tweets(fetch_list, raw_dir):
             else:
                 continue
 
-        with open(raw_dir + item[2] + '.json', "w") as f:
-            f.write(json_data + "\n")
+        with open(raw_dir + item[2] + '.json', "wt") as f:
+            f.write(json.dumps(dict(response)) + "\n")
 
     return
 
@@ -234,12 +212,13 @@ def download_tweets(fetch_list, raw_dir):
 def parse_tweet_json(filename):
 
     # read tweet
-    fp = open(filename, 'rb')
+    fp = open(filename, 'r')
 
     # parse json
     try:
         tweet_json = json.load(fp)
-    except ValueError:
+    except ValueError as e:
+        print(e)
         raise RuntimeError('error parsing json')
 
     # look for twitter api error msgs
@@ -281,20 +260,20 @@ def build_output_corpus(out_filename, raw_dir, total_list):
                 writer.writerow(full_row)
 
             except RuntimeError:
-                print '--> bad data in tweet #' + item[2]
+                print('--> bad data in tweet #' + item[2])
                 missing_count += 1
 
         else:
-            print '--> missing tweet #' + item[2]
+            print('--> missing tweet #' + item[2])
             missing_count += 1
 
     # indicate success
     if missing_count == 0:
-        print '\nSuccessfully downloaded corpus!'
-        print 'Output in: ' + out_filename + '\n'
+        print('\nSuccessfully downloaded corpus!')
+        print('Output in: ' + out_filename + '\n')
     else:
-        print '\nMissing %d of %d tweets!' % (missing_count, len(total_list))
-        print 'Partial output in: ' + out_filename + '\n'
+        print('\nMissing %d of %d tweets!' % (missing_count, len(total_list)))
+        print('Partial output in: ' + out_filename + '\n')
 
     return
 
@@ -302,7 +281,7 @@ def build_output_corpus(out_filename, raw_dir, total_list):
 def main():
     # get user parameters
     user_params = get_user_params(DATA_PATH)
-    print user_params
+    print(user_params)
     dump_user_params(user_params)
 
     # get fetch list
@@ -310,7 +289,7 @@ def main():
 
     # remove already fetched or missing tweets
     fetch_list = purge_already_fetched(total_list, user_params['rawDir'])
-    print "Fetching %i tweets..." % len(fetch_list)
+    print("Fetching %i tweets..." % len(fetch_list))
 
     if fetch_list:
         # start fetching data from twitter
@@ -319,10 +298,11 @@ def main():
         # second pass for any failed downloads
         fetch_list = purge_already_fetched(total_list, user_params['rawDir'])
         if fetch_list:
-            print '\nStarting second pass to retry %i failed downloads...' % len(fetch_list)
+            print('\nStarting second pass to retry %i failed downloads...' %
+                  len(fetch_list))
             download_tweets(fetch_list, user_params['rawDir'])
     else:
-        print "Nothing to fetch any more."
+        print("Nothing to fetch any more.")
 
     # build output corpus
     build_output_corpus(user_params['outList'], user_params['rawDir'],
