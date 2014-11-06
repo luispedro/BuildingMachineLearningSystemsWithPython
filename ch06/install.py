@@ -167,7 +167,7 @@ def download_tweets(fetch_list, raw_dir):
                 wait_seconds = response.rate_limit_reset - time.time()
                 print("Rate limiting requests us to wait %f seconds" %
                       wait_seconds)
-                time.sleep(wait_seconds)
+                time.sleep(wait_seconds+5)
 
         except twitter.TwitterError as e:
             fatal = True
