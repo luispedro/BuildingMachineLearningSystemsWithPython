@@ -45,7 +45,7 @@ def create_ngram_model(params=None):
 
 def grid_search_model(clf_factory, X, Y):
     cv = ShuffleSplit(
-        n=len(X), n_iter=10, test_size=0.3, indices=True, random_state=0)
+        n=len(X), n_iter=10, test_size=0.3, random_state=0)
 
     param_grid = dict(vect__ngram_range=[(1, 1), (1, 2), (1, 3)],
                       vect__min_df=[1, 2],
