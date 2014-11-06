@@ -40,7 +40,7 @@ def create_ngram_model():
 
 def train_model(clf_factory, X, Y, name="NB ngram", plot=False):
     cv = ShuffleSplit(
-        n=len(X), n_iter=10, test_size=0.3, indices=True, random_state=0)
+        n=len(X), n_iter=10, test_size=0.3, random_state=0)
 
     train_errors = []
     test_errors = []
