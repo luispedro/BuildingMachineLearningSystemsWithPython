@@ -6,6 +6,7 @@
 # It is made available under the MIT License
 
 import os
+import sys
 import collections
 import csv
 import json
@@ -57,7 +58,7 @@ def load_sanders_data(dirname=".", line_count=-1):
             try:
                 tweet = json.load(open(tweet_fn, "r"))
             except IOError:
-                print("Tweet '%s' not found. Skip."%tweet_fn)
+                print(("Tweet '%s' not found. Skip." % tweet_fn))
                 continue
 
             if 'text' in tweet and tweet['user']['lang'] == "en":
@@ -84,14 +85,14 @@ def plot_pr(auc_score, name, phase, precision, recall, label=None):
     pylab.title('P/R curve (AUC=%0.2f) / %s' % (auc_score, label))
     filename = name.replace(" ", "_")
     pylab.savefig(os.path.join(CHART_DIR, "pr_%s_%s.png" %
-                  (filename, phase)), bbox_inches="tight")
+                               (filename, phase)), bbox_inches="tight")
 
 
 def show_most_informative_features(vectorizer, clf, n=20):
     c_f = sorted(zip(clf.coef_[0], vectorizer.get_feature_names()))
-    top = zip(c_f[:n], c_f[:-(n + 1):-1])
+    top = list(zip(c_f[:n], c_f[:-(n + 1):-1]))
     for (c1, f1), (c2, f2) in top:
-        print "\t%.4f\t%-15s\t\t%.4f\t%-15s" % (c1, f1, c2, f2)
+        print("\t%.4f\t%-15s\t\t%.4f\t%-15s" % (c1, f1, c2, f2))
 
 
 def plot_log():
@@ -119,7 +120,7 @@ def plot_feat_importance(feature_names, clf, name):
     inds = np.argsort(coef)
     f_imp = f_imp[inds]
     coef = coef[inds]
-    xpos = np.array(range(len(coef)))
+    xpos = np.array(list(range(len(coef))))
     pylab.bar(xpos, coef, width=1)
 
     pylab.title('Feature importance for %s' % (name))
@@ -181,8 +182,13 @@ def plot_bias_variance(data_sizes, train_errors, test_errors, name):
 def load_sent_word_net():
 
     sent_scores = collections.defaultdict(list)
+    sentiwordnet_path = os.path.join(DATA_DIR, "SentiWordNet_3.0.0_20130122.txt")
 
-    with open(os.path.join(DATA_DIR, "SentiWordNet_3.0.0_20130122.txt"), "r") as csvfile:
+    if not os.path.exists(sentiwordnet_path):
+        print("Please download SentiWordNet_3.0.0 from http://sentiwordnet.isti.cnr.it/download.php, extract it and put it into the data directory")
+        sys.exit(1)
+
+    with open(sentiwordnet_path, 'r') as csvfile:
         reader = csv.reader(csvfile, delimiter='\t', quotechar='"')
         for line in reader:
             if line[0].startswith("#"):
@@ -200,7 +206,7 @@ def load_sent_word_net():
                 term = term.replace("-", " ").replace("_", " ")
                 key = "%s/%s" % (POS, term.split("#")[0])
                 sent_scores[key].append((float(PosScore), float(NegScore)))
-    for key, value in sent_scores.iteritems():
+    for key, value in sent_scores.items():
         sent_scores[key] = np.mean(value, axis=0)
 
     return sent_scores
