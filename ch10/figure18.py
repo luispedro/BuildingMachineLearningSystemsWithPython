@@ -80,11 +80,13 @@ for im in images:
     # alldescriptors.append(surf.dense(im, spacing=max(im.shape)//32))
     alldescriptors.append(surf.surf(im, descriptor_only=True))
 
-print('Descriptors done')
+print('Descriptor computation complete.')
 k = 256
 km = KMeans(k)
 
 concatenated = np.concatenate(alldescriptors)
+print('Number of descriptors: {}'.format(
+        len(concatenated)))
 concatenated = concatenated[::64]
 print('Clustering with K-means...')
 km.fit(concatenated)
@@ -92,7 +94,7 @@ features = []
 for d in alldescriptors:
     c = km.predict(d)
     features.append(
-        np.array([np.sum(c == i) for i in xrange(k)])
+        np.array([np.sum(c == i) for i in range(k)])
     )
 features = np.array(features)
 print('predicting...')
