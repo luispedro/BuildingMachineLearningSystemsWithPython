@@ -34,12 +34,15 @@ for i in range(16):
     print("At iteration {}, number of frequent baskets: {}".format(
         i, len(itemsets)))
     nextsets = []
+
     tested = set()
     for it in itemsets:
         for v in valid:
             if v not in it:
                 # Create a new candidate set by adding v to it
                 c = (it | frozenset([v]))
+
+                # Check if we have tested it already:
                 if c in tested:
                     continue
                 tested.add(c)
