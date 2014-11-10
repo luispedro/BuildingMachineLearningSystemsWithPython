@@ -34,12 +34,14 @@ def features_for(im):
         1-D array of features
     '''
     im = mh.imread(im, as_grey=True).astype(np.uint8)
-    return mh.features.haralick(im).mean(0)
+    return mh.features.haralick(im).ravel()
 
 @TaskGenerator
-def edginess_sobel_from_fname(fname):
-    from edginess import edginess_sobel
-    return edginess_sobel(mh.imread(fname, as_grey=True))
+def chist(fname):
+    from features import color_histogram
+    im = mh.imread(fname)
+    return color_histogram(im)
+
 
 @TaskGenerator
 def accuracy(features, labels):
@@ -51,8 +53,8 @@ def accuracy(features, labels):
 
 
 @TaskGenerator
-def stack_features(sobels, haralicks):
-    return np.hstack([np.atleast_2d(sobels).T, haralicks])
+def stack_features(chists, haralicks):
+    return np.hstack([np.atleast_2d(chists), haralicks])
 
 @TaskGenerator
 def print_results(scores_base, scores_combined):
@@ -67,22 +69,22 @@ def print_results(scores_base, scores_combined):
 to_array = TaskGenerator(np.array)
 
 haralicks = []
-sobels = []
+chists = []
 labels = []
 
 # Use glob to get all the images
 images = glob('{}/*.jpg'.format(basedir))
 for fname in sorted(images):
     haralicks.append(features_for(fname))
-    sobels.append(edginess_sobel_from_fname(fname))
+    chists.append(chist(fname))
     labels.append(fname[:-len('00.jpg')]) # The class is encoded in the filename as xxxx00.jpg
 
 haralicks = to_array(haralicks)
-sobels = to_array(sobels)
+chists = to_array(chists)
 labels = to_array(labels)
 
 scores_base = accuracy(haralicks, labels)
-haralick_plus_sobel = stack_features(sobels, haralicks)
+haralick_plus_sobel = stack_features(chists, haralicks)
 scores_combined  = accuracy(haralick_plus_sobel, labels)
 
 print_results(scores_base, scores_combined)
