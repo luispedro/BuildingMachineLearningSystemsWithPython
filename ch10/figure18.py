@@ -92,7 +92,7 @@ features = []
 for d in alldescriptors:
     c = km.predict(d)
     features.append(
-        np.array([np.sum(c == i) for i in xrange(k)])
+        np.array([np.sum(c == i) for i in range(k)])
     )
 features = np.array(features)
 print('predicting...')
