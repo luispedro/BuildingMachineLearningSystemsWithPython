@@ -34,7 +34,7 @@ def texture(im):
         1-D array of features
     '''
     im = im.astype(np.uint8)
-    return mh.features.haralick(im).mean(0)
+    return mh.features.haralick(im).ravel()
 
 
 def color_histogram(im):
