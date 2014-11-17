@@ -17,23 +17,15 @@ Running ``download.sh`` will retrieve the other dataset into a directory
 Scripts
 -------
 
-threshold.py
-    Threshold building image with both Otsu and Ridley-Calvard threshold
-lena-ring.py
-    Show Lena in a sharp ring around a soft focus image
-figure5_6.py
-    Computes figures 5 and 6 in the book
-figure9.py
-    Compute Sobel images
 figure10.py
     Just paste two images next to each others
-figure13.py
-    Demonstrate salt&pepper effect
 features.py
-    Contains the ``edginess_sobel`` function from the book as well as a simple
+    Contains the color histogram function from the book as well as a simple
     wrapper around ``mahotas.texture.haralick``
 simple_classification.py
     Classify SimpleImageDataset with texture features + color histogram features
-figure18.py
+large_classification.py
     Classify ``AnimTransDistr`` with both texture and SURF features.
+neighbors.py
+    Computes image neighbors as well as the neighbor figure from the book.
 
