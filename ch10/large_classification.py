@@ -91,9 +91,7 @@ km.fit(concatenated)
 sfeatures = []
 for d in alldescriptors:
     c = km.predict(d)
-    sfeatures.append(
-        np.array([np.sum(c == i) for i in range(k)])
-    )
+    sfeatures.append(np.bincount(c, minlength=k))
 sfeatures = np.array(sfeatures, dtype=float)
 print('predicting...')
 score_SURF = cross_validation.cross_val_score(
