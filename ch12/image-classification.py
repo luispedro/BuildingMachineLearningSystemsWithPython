@@ -6,11 +6,11 @@
 # It is made available under the MIT License
 
 import mahotas as mh
-from sklearn import cross_validation
-from sklearn.linear_model.logistic import LogisticRegression
 import numpy as np
 from glob import glob
 from jug import TaskGenerator
+
+# We need to use the `features` module from chapter 10.
 from sys import path
 path.append('../ch10')
 
@@ -45,25 +45,30 @@ def chist(fname):
 
 @TaskGenerator
 def accuracy(features, labels):
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn import cross_validation
     # We use logistic regression because it is very fast.
     # Feel free to experiment with other classifiers
+    clf = Pipeline([('preproc', StandardScaler()),
+                ('classifier', LogisticRegression())])
+    cv = cross_validation.LeaveOneOut(len(features))
     scores = cross_validation.cross_val_score(
-        LogisticRegression(), features, labels, cv=5)
+        clf, features, labels, cv=cv)
     return scores.mean()
 
 
 @TaskGenerator
 def stack_features(chists, haralicks):
-    return np.hstack([np.atleast_2d(chists), haralicks])
+    return np.hstack([chists, haralicks])
 
 @TaskGenerator
-def print_results(scores_base, scores_combined):
-    output = open('results.image.txt', 'w')
-    output.write('Accuracy (5 fold x-val) with Logistic Regrssion [std features]: {}%\n'.format(
-            0.1 * round(1000 * scores_base.mean())))
-    output.write('Accuracy (5 fold x-val) with Logistic Regrssion [std features + sobel]: {}%\n'.format(
-        0.1 * round(1000 * scores_combined.mean())))
-    output.close()
+def print_results(scores):
+    with open('results.image.txt', 'w') as output:
+        for k in scores:
+            output.write('Accuracy (LOO x-val) with Logistic Regression [{}]: {:.1%}\n'.format(
+                k, scores[k].mean()))
 
 
 to_array = TaskGenerator(np.array)
@@ -84,8 +89,14 @@ chists = to_array(chists)
 labels = to_array(labels)
 
 scores_base = accuracy(haralicks, labels)
-haralick_plus_sobel = stack_features(chists, haralicks)
-scores_combined  = accuracy(haralick_plus_sobel, labels)
+scores_chist = accuracy(chists, labels)
 
-print_results(scores_base, scores_combined)
+combined = stack_features(chists, haralicks)
+scores_combined  = accuracy(combined, labels)
+
+print_results({
+        'base': scores_base,
+        'chists': scores_chist,
+        'combined' : scores_combined,
+        })
 
