@@ -1,0 +1,7 @@
+sudo yum update
+sudo yum -y install python-devel python-pip numpy scipy python-matplotlib
+sudo yum -y install gcc-c++
+sudo yum -y install git
+sudo pip-python install -U pip
+sudo pip install scikit-learn jug mahotas
+
