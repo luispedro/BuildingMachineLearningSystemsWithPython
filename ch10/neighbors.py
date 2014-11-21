@@ -37,6 +37,7 @@ features = np.hstack([chists, haralicks])
 
 print('Computing neighbors...')
 sc = StandardScaler()
+features = sc.fit_transform(features)
 dists = distance.squareform(distance.pdist(features))
 
 print('Plotting...')
@@ -51,6 +52,7 @@ for ci,i in enumerate(range(0,90,10)):
     left = images[i]
     dists_left = dists[i]
     right = dists_left.argsort()
+    # right[0] is the same as left[i], so pick the next closest element
     right = right[1]
     right = images[right]
     left = mh.imread(left)
