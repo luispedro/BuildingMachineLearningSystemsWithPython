@@ -20,7 +20,7 @@ path.append('../ch10')
 basedir = '../SimpleImageDataset/'
 
 @TaskGenerator
-def features_for(im):
+def compute_texture(im):
     '''Compute features for an image
 
     Parameters
@@ -33,8 +33,9 @@ def features_for(im):
     fs : ndarray
         1-D array of features
     '''
-    im = mh.imread(im, as_grey=True).astype(np.uint8)
-    return mh.features.haralick(im).ravel()
+    from features import texture
+    imc = mh.imread(im)
+    return texture(mh.colors.rgb2grey(imc))
 
 @TaskGenerator
 def chist(fname):
@@ -60,18 +61,15 @@ def accuracy(features, labels):
 
 
 @TaskGenerator
-def stack_features(chists, haralicks):
-    return np.hstack([chists, haralicks])
-
-@TaskGenerator
 def print_results(scores):
     with open('results.image.txt', 'w') as output:
-        for k in scores:
+        for k,v in scores:
             output.write('Accuracy (LOO x-val) with Logistic Regression [{}]: {:.1%}\n'.format(
-                k, scores[k].mean()))
+                k, v.mean()))
 
 
 to_array = TaskGenerator(np.array)
+hstack = TaskGenerator(np.hstack)
 
 haralicks = []
 chists = []
@@ -80,7 +78,7 @@ labels = []
 # Use glob to get all the images
 images = glob('{}/*.jpg'.format(basedir))
 for fname in sorted(images):
-    haralicks.append(features_for(fname))
+    haralicks.append(compute_texture(fname))
     chists.append(chist(fname))
     labels.append(fname[:-len('00.jpg')]) # The class is encoded in the filename as xxxx00.jpg
 
@@ -91,12 +89,12 @@ labels = to_array(labels)
 scores_base = accuracy(haralicks, labels)
 scores_chist = accuracy(chists, labels)
 
-combined = stack_features(chists, haralicks)
+combined = hstack([chists, haralicks])
 scores_combined  = accuracy(combined, labels)
 
-print_results({
-        'base': scores_base,
-        'chists': scores_chist,
-        'combined' : scores_combined,
-        })
+print_results([
+        ('base', scores_base),
+        ('chists', scores_chist),
+        ('combined' , scores_combined),
+        ])
 
