@@ -43,6 +43,13 @@ def chist(fname):
     im = mh.imread(fname)
     return color_histogram(im)
 
+@TaskGenerator
+def compute_lbp(fname):
+    from mahotas.features import lbp
+    imc = mh.imread(fname)
+    im = mh.colors.rgb2grey(imc)
+    return lbp(im, radius=8, points=6)
+
 
 @TaskGenerator
 def accuracy(features, labels):
@@ -73,6 +80,7 @@ hstack = TaskGenerator(np.hstack)
 
 haralicks = []
 chists = []
+lbps = []
 labels = []
 
 # Use glob to get all the images
@@ -80,21 +88,29 @@ images = glob('{}/*.jpg'.format(basedir))
 for fname in sorted(images):
     haralicks.append(compute_texture(fname))
     chists.append(chist(fname))
+    lbps.append(compute_lbp(fname))
     labels.append(fname[:-len('00.jpg')]) # The class is encoded in the filename as xxxx00.jpg
 
 haralicks = to_array(haralicks)
 chists = to_array(chists)
+lbps = to_array(lbps)
 labels = to_array(labels)
 
 scores_base = accuracy(haralicks, labels)
 scores_chist = accuracy(chists, labels)
+scores_lbps = accuracy(lbps, labels)
 
 combined = hstack([chists, haralicks])
-scores_combined  = accuracy(combined, labels)
+scores_combined = accuracy(combined, labels)
+
+combined_all = hstack([chists, haralicks, lbps])
+scores_combined_all = accuracy(combined_all, labels)
 
 print_results([
         ('base', scores_base),
         ('chists', scores_chist),
+        ('lbps', scores_lbps),
         ('combined' , scores_combined),
+        ('combined_all' , scores_combined_all),
         ])
 
