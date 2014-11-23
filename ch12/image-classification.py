@@ -71,7 +71,7 @@ def accuracy(features, labels):
 def print_results(scores):
     with open('results.image.txt', 'w') as output:
         for k,v in scores:
-            output.write('Accuracy (LOO x-val) with Logistic Regression [{}]: {:.1%}\n'.format(
+            output.write('Accuracy (LOO x-val) with Logistic Regression [{0}]: {1:.1%}\n'.format(
                 k, v.mean()))
 
 
@@ -84,7 +84,7 @@ lbps = []
 labels = []
 
 # Use glob to get all the images
-images = glob('{}/*.jpg'.format(basedir))
+images = glob('{0}/*.jpg'.format(basedir))
 for fname in sorted(images):
     haralicks.append(compute_texture(fname))
     chists.append(chist(fname))
