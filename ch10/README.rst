@@ -17,6 +17,10 @@ Running ``download.sh`` will retrieve the other dataset into a directory
 Scripts
 -------
 
+thresholded_figure.py
+    Computes the thresholded figures, including after Gaussian blurring
+lena-ring.py
+    Lena image with center in focus and blurred edges
 figure10.py
     Just paste two images next to each others
 features.py
