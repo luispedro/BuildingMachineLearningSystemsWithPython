@@ -23,8 +23,9 @@ features = features[~is_setosa]
 labels = labels[~is_setosa]
 is_virginica = (labels == 'virginica')
 
-# Hand fixed threshold:
-t = 1.75
+# Hand fixed thresholds:
+t = 1.65
+t2 = 1.75
 
 # Features to use: 3 & 2
 f0, f1 = 3, 2
@@ -49,7 +50,7 @@ fig,ax = plt.subplots()
 ax.fill_between([t, x1], [y0, y0], [y1, y1], color=area2c)
 ax.fill_between([x0, t], [y0, y0], [y1, y1], color=area1c)
 ax.plot([t, t], [y0, y1], 'k--', lw=2)
-ax.plot([t - .1, t - .1], [y0, y1], 'k:', lw=2)
+ax.plot([t2, t2], [y0, y1], 'k:', lw=2)
 ax.scatter(features[is_virginica, f0],
             features[is_virginica, f1], c='b', marker='o', s=40)
 ax.scatter(features[~is_virginica, f0],
