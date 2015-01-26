@@ -26,7 +26,7 @@ def plurality(xs):
             return k
 
 # This function was called ``apply_model`` in the first edition
-def predict(features, model):
+def predict(model, features):
     '''Apply k-nn model'''
     k, train_feats, labels = model
     results = []
@@ -42,5 +42,5 @@ def predict(features, model):
 
 
 def accuracy(features, labels, model):
-    preds = predict(features, model)
+    preds = predict(model, features)
     return np.mean(preds == labels)

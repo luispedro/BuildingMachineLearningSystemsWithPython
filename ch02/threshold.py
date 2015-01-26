@@ -40,7 +40,7 @@ def fit_model(features, labels):
 
 
 # This function was called ``apply_model`` in the first edition
-def predict(features, model):
+def predict(model, features):
     '''Apply a learned model'''
     # A model is a pair as returned by fit_model
     t, fi, reverse = model
@@ -51,5 +51,5 @@ def predict(features, model):
 
 def accuracy(features, labels, model):
     '''Compute the accuracy of the model'''
-    preds = predict(features, model)
+    preds = predict(model, features)
     return np.mean(preds == labels)
