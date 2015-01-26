@@ -58,11 +58,11 @@ def plot_decision(features, labels, num_neighbors=1):
     ax.pcolormesh(X, Y, C, cmap=cmap)
     if COLOUR_FIGURE:
         cmap = ListedColormap([(1., .0, .0), (.1, .6, .1), (.0, .0, 1.)])
-        ax.scatter(features[:, 0], features[:, 2], c=labels, cmap=cmap, s=40)
+        ax.scatter(features[:, 0], features[:, 2], c=labels, cmap=cmap)
     else:
         for lab, ma in zip(range(3), "Do^"):
             ax.plot(features[labels == lab, 0], features[
-                     labels == lab, 2], ma, c=(1., 1., 1.), ms=8)
+                     labels == lab, 2], ma, c=(1., 1., 1.), ms=6)
     return fig,ax
 
 
