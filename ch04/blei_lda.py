@@ -15,12 +15,6 @@ except:
     print("Please install it")
     raise
 
-try:
-    from mpltools import style
-    style.use('ggplot')
-except:
-    print("Could not import mpltools: plots will not be styled correctly")
-
 import matplotlib.pyplot as plt
 import numpy as np
 from os import path
@@ -39,9 +33,8 @@ corpus = corpora.BleiCorpus('./data/ap/ap.dat', './data/ap/vocab.txt')
 model = models.ldamodel.LdaModel(
     corpus, num_topics=NUM_TOPICS, id2word=corpus.id2word, alpha=None)
 
-ti = 0
 # Iterate over all the topics in the model
-for ti in xrange(model.num_topics):
+for ti in range(model.num_topics):
     words = model.show_topic(ti, 64)
     tf = sum(f for f, w in words)
     with open('topics.txt', 'w') as output:
@@ -68,11 +61,12 @@ words = model.show_topic(max_topic, 64)
 create_cloud('cloud_blei_lda.png', words)
 
 num_topics_used = [len(model[doc]) for doc in corpus]
-plt.hist(num_topics_used, np.arange(42))
-plt.ylabel('Nr of documents')
-plt.xlabel('Nr of topics')
-plt.savefig('Figure_04_01.png')
-plt.clf()
+fig,ax = plt.subplots()
+ax.hist(num_topics_used, np.arange(42))
+ax.set_ylabel('Nr of documents')
+ax.set_xlabel('Nr of topics')
+fig.tight_layout()
+fig.savefig('Figure_04_01.png')
 
 
 # Now, repeat the same exercise using alpha=1.0
@@ -83,12 +77,14 @@ model1 = models.ldamodel.LdaModel(
     corpus, num_topics=NUM_TOPICS, id2word=corpus.id2word, alpha=ALPHA)
 num_topics_used1 = [len(model1[doc]) for doc in corpus]
 
-plt.hist([num_topics_used, num_topics_used1], np.arange(42))
-plt.ylabel('Nr of documents')
-plt.xlabel('Nr of topics')
+fig,ax = plt.subplots()
+ax.hist([num_topics_used, num_topics_used1], np.arange(42))
+ax.set_ylabel('Nr of documents')
+ax.set_xlabel('Nr of topics')
 
 # The coordinates below were fit by trial and error to look good
-plt.text(9, 223, r'default alpha')
-plt.text(26, 156, 'alpha=1.0')
-plt.savefig('Figure_04_02.png')
+ax.text(9, 223, r'default alpha')
+ax.text(26, 156, 'alpha=1.0')
+fig.tight_layout()
+fig.savefig('Figure_04_02.png')
 

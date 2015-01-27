@@ -79,7 +79,7 @@ for i, c in enumerate(corpus):
 
 distances = distance.squareform(distance.pdist(thetas))
 large = distances.max() + 1
-for i in xrange(len(distances)):
+for i in range(len(distances)):
     distances[i, i] = large
 
 print(otexts[1])
