@@ -12,7 +12,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.datasets import load_boston
 from sklearn.metrics import mean_squared_error
-import pylab as plt
+from matplotlib import pyplot as plt
 
 boston = load_boston()
 
@@ -24,9 +24,10 @@ lr.fit(x, y)
 p = lr.predict(x)
 print("RMSE: {:.2}.".format(np.sqrt(mean_squared_error(y, p))))
 print("R2: {:.2}.".format(lr.score(x, y)))
-plt.scatter(p, y)
-plt.xlabel('Predicted price')
-plt.ylabel('Actual price')
-plt.plot([y.min(), y.max()], [y.min(), y.max()], lw=4)
+fig,ax = plt.subplots()
+ax.scatter(p, y)
+ax.set_xlabel('Predicted price')
+ax.set_ylabel('Actual price')
+ax.plot([y.min(), y.max()], [y.min(), y.max()], lw=4)
 
-plt.savefig('Figure4.png', dpi=150)
+fig.savefig('Figure4.png')

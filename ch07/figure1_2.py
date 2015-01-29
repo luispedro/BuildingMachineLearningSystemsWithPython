@@ -14,9 +14,10 @@ from matplotlib import pyplot as plt
 boston = load_boston()
 
 # Index number five in the number of rooms
-plt.scatter(boston.data[:, 5], boston.target)
-plt.xlabel("Number of rooms (RM)")
-plt.ylabel("House Price")
+fig,ax = plt.subplots()
+ax.scatter(boston.data[:, 5], boston.target)
+ax.set_xlabel("Number of rooms (RM)")
+ax.set_ylabel("House Price")
 
 x = boston.data[:, 5]
 # fit (used below) takes a two-dimensional array as input. We use np.atleast_2d
@@ -29,9 +30,9 @@ y = boston.target
 lr = LinearRegression(fit_intercept=False)
 lr.fit(x, y)
 
-plt.plot([0, boston.data[:, 5].max() + 1],
+ax.plot([0, boston.data[:, 5].max() + 1],
          [0, lr.predict(boston.data[:, 5].max() + 1)], '-', lw=4)
-plt.savefig('Figure1.png', dpi=150)
+fig.savefig('Figure1.png')
 
 mse = mean_squared_error(y, lr.predict(x))
 rmse = np.sqrt(mse)
@@ -42,14 +43,14 @@ lr = LinearRegression(fit_intercept=True)
 
 lr.fit(x, y)
 
-plt.clf()
-plt.xlabel("Number of rooms (RM)")
-plt.ylabel("House Price")
-plt.scatter(boston.data[:, 5], boston.target)
+fig,ax = plt.subplots()
+ax.set_xlabel("Number of rooms (RM)")
+ax.set_ylabel("House Price")
+ax.scatter(boston.data[:, 5], boston.target)
 xmin = x.min()
 xmax = x.max()
-plt.plot([xmin, xmax], lr.predict([[xmin], [xmax]]) , '-', lw=4)
-plt.savefig('Figure2.png', dpi=150)
+ax.plot([xmin, xmax], lr.predict([[xmin], [xmax]]) , '-', lw=4)
+fig.savefig('Figure2.png')
 
 mse = mean_squared_error(y, lr.predict(x))
 print("Mean squared error (of training data): {:.3}".format(mse))

@@ -27,11 +27,13 @@ lr.fit(x, y)
 rmse = np.sqrt(lr.residues_/len(x))
 print('RMSE: {}'.format(rmse))
 
-# Plot the prediction versus real:
-plt.scatter(lr.predict(x), boston.target)
-
+fig, ax = plt.subplots()
 # Plot a diagonal (for reference):
-plt.plot([0, 50], [0, 50], '-', color=(.9,.3,.3), lw=4)
-plt.xlabel('predicted')
-plt.ylabel('real')
-plt.savefig('Figure_07_08.png')
+ax.plot([0, 50], [0, 50], '-', color=(.9,.3,.3), lw=4)
+
+# Plot the prediction versus real:
+ax.scatter(lr.predict(x), boston.target)
+
+ax.set_xlabel('predicted')
+ax.set_ylabel('real')
+fig.savefig('Figure_07_08.png')

@@ -8,12 +8,13 @@
 from sklearn.linear_model import LinearRegression, Lasso
 import numpy as np
 from sklearn.datasets import load_boston
-import pylab as plt
+from matplotlib import pyplot as plt
 
 boston = load_boston()
-plt.scatter(boston.data[:, 5], boston.target)
-plt.xlabel("Number of rooms (RM)")
-plt.ylabel("House Price")
+fig, ax = plt.subplots()
+ax.scatter(boston.data[:, 5], boston.target)
+ax.set_xlabel("Number of rooms (RM)")
+ax.set_ylabel("House Price")
 
 
 x = boston.data[:, 5]
@@ -24,9 +25,9 @@ y = boston.target
 
 lr = LinearRegression()
 lr.fit(x, y)
-plt.plot([xmin, xmax], lr.predict([[xmin], [xmax]]), ':', lw=4, label='OLS model')
+ax.plot([xmin, xmax], lr.predict([[xmin], [xmax]]), ':', lw=4, label='OLS model')
 
 las = Lasso()
 las.fit(x, y)
-plt.plot([xmin, xmax], las.predict([ [xmin], [xmax] ]), '-', lw=4, label='Lasso model')
-plt.savefig('Figure3.png', dpi=150)
+ax.plot([xmin, xmax], las.predict([ [xmin], [xmax] ]), '-', lw=4, label='Lasso model')
+fig.savefig('Figure3.png')

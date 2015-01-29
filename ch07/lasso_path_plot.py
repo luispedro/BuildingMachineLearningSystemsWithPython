@@ -25,5 +25,5 @@ ax.set_xlim(alphas.max(), alphas.min())
 ax.set_xlabel('Lasso coefficient path as a function of alpha')
 ax.set_xlabel('Alpha')
 ax.set_ylabel('Coefficient weight')
-fig.savefig('Figure_LassoPath.png', dpi=150)
+fig.savefig('Figure_LassoPath.png')
 
