@@ -54,6 +54,9 @@ def prepare_sent_features():
         if not text:
             meta[pid]['AvgSentLen'] = meta[pid]['AvgWordLen'] = 0
         else:
+            from platform import python_version
+            if python_version().startswith('2'):
+                text = text.decode('utf-8')
             sent_lens = [len(nltk.word_tokenize(
                 sent)) for sent in nltk.sent_tokenize(text)]
             meta[pid]['AvgSentLen'] = np.mean(sent_lens)
