@@ -16,7 +16,7 @@ boston = load_boston()
 # Index number five in the number of rooms
 fig,ax = plt.subplots()
 ax.scatter(boston.data[:, 5], boston.target)
-ax.set_xlabel("Number of rooms (RM)")
+ax.set_xlabel("Average number of rooms (RM)")
 ax.set_ylabel("House Price")
 
 x = boston.data[:, 5]
@@ -44,7 +44,7 @@ lr = LinearRegression(fit_intercept=True)
 lr.fit(x, y)
 
 fig,ax = plt.subplots()
-ax.set_xlabel("Number of rooms (RM)")
+ax.set_xlabel("Average number of rooms (RM)")
 ax.set_ylabel("House Price")
 ax.scatter(boston.data[:, 5], boston.target)
 xmin = x.min()
