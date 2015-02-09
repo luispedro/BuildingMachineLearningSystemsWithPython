@@ -5,19 +5,19 @@ class NormalizePositive(object):
     def fit(self, X, y=None):
         # count features that are greater than zero in axis 0:
         binary = (X > 0)
-        count0 = binary.sum(0)
+        count0 = binary.sum(axis=0)
 
         # to avoid division by zero, set zero counts to one:
         count0 += (count0 == 0)
 
-        self.mean = X.sum(0)/count0
+        self.mean = X.sum(axis=0)/count0
 
         # Compute variance by average squared difference to the mean, but only
         # consider differences where binary is True (i.e., where there was a
         # true rating):
         diff = (X - self.mean) * binary
         diff **= 2
-        self.std = np.sqrt(0.1 + diff.sum(0)/count0)
+        self.std = np.sqrt(0.1 + diff.sum(axis=0)/count0)
         return self
 
     def fit_transform(self, X):
