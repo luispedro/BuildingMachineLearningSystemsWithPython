@@ -18,21 +18,25 @@ def predict(otrain):
     norm = NormalizePositive()
     train = norm.fit_transform(otrain.T).T
 
-    proximity = distance.pdist(binary, 'correlation')
-    proximity = distance.squareform(proximity)
+    dists = distance.pdist(binary, 'correlation')
+    dists = distance.squareform(dists)
 
-    neighbors = proximity.argsort(axis=1)
+    neighbors = dists.argsort(axis=1)
     filled = train.copy()
     for u in range(filled.shape[0]):
+        # n_u are the neighbors of user
         n_u = neighbors[u, 1:]
-        t_u = train[n_u].T
-        b_u = binary[n_u].T
         for m in range(filled.shape[1]):
-            revs = t_u[m]
-            brevs = b_u[m]
-            revs = revs[brevs]
+            # This code could be faster using numpy indexing trickery as the
+            # cost of readibility (this is left as an exercise to the reader):
+            revs = [train[neigh, m]
+                    for neigh in n_u
+                    if binary[neigh, m]]
             if len(revs):
-                revs = revs[:len(revs)//2+1]
+                n = len(revs)
+                n //= 2
+                n += 1
+                revs = revs[:n]
                 filled[u,m] = revs.mean()
 
     return norm.inverse_transform(filled.T).T
