@@ -2,40 +2,42 @@ import numpy as np
 
 class NormalizePositive(object):
 
-    def fit(self, X, y=None):
+    def fit(self, features, y=None):
         # count features that are greater than zero in axis 0:
-        binary = (X > 0)
+        binary = (features > 0)
         count0 = binary.sum(axis=0)
 
         # to avoid division by zero, set zero counts to one:
-        count0 += (count0 == 0)
+        count0[count0 == 0] = 1.
 
-        self.mean = X.sum(axis=0)/count0
+        self.mean = features.sum(axis=0)/count0
 
         # Compute variance by average squared difference to the mean, but only
         # consider differences where binary is True (i.e., where there was a
         # true rating):
-        diff = (X - self.mean) * binary
+        diff = (features - self.mean) * binary
         diff **= 2
+        # regularize the estimate of std by adding 0.1
         self.std = np.sqrt(0.1 + diff.sum(axis=0)/count0)
         return self
 
-    def fit_transform(self, X):
-        return self.fit(X).transform(X)
+    def transform(self, features):
+        binary = (features > 0)
+        features = features - self.mean
+        features /= self.std
+        features *= binary
+        return features
 
-    def transform(self, X):
-        binary = (X > 0)
-        X = X - self.mean
-        X /= self.std
-        X *= binary
-        return X
-
-    def inverse_transform(self, X, copy=True):
+    def inverse_transform(self, features, copy=True):
         if copy:
-            X = X.copy()
-        X *= self.std
-        X += self.mean
-        return X
+            features = features.copy()
+        features *= self.std
+        features += self.mean
+        return features
+
+    def fit_transform(self, features):
+        return self.fit(features).transform(features)
+
 
 def predict(train):
     norm = NormalizePositive()
