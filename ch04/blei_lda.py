@@ -8,7 +8,7 @@
 from __future__ import print_function
 from wordcloud import create_cloud
 try:
-    from gensim import corpora, models
+    from gensim import corpora, models, matutils
 except:
     print("import gensim failed.")
     print()
@@ -44,14 +44,10 @@ for ti in range(model.num_topics):
 # We first identify the most discussed topic, i.e., the one with the
 # highest total weight
 
-# First, we need to sum up the weights across all the documents
-weight = np.zeros(model.num_topics)
-for doc in corpus:
-    for col, val in model[doc]:
-        weight[col] += val
-        # As a reasonable alternative, we could have used the log of val:
-        # weight[col] += np.log(val)
+topics = matutils.corpus2dense(model[corpus], num_terms=model.num_topics)
+weight = topics.sum(1)
 max_topic = weight.argmax()
+
 
 # Get the top 64 words for this topic
 # Without the argument, show_topic would return only 10 words
