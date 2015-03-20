@@ -15,8 +15,8 @@ from norm import NormalizePositive
 
 def predict(otrain):
     binary = (otrain > 0)
-    norm = NormalizePositive()
-    train = norm.fit_transform(otrain.T).T
+    norm = NormalizePositive(axis=1)
+    train = norm.fit_transform(otrain)
 
     dists = distance.pdist(binary, 'correlation')
     dists = distance.squareform(dists)
@@ -37,9 +37,9 @@ def predict(otrain):
                 n //= 2
                 n += 1
                 revs = revs[:n]
-                filled[u,m] = revs.mean()
+                filled[u,m] = np.mean(revs)
 
-    return norm.inverse_transform(filled.T).T
+    return norm.inverse_transform(filled)
 
 def main(transpose_inputs=False):
     train, test = get_train_test(random_state=12)

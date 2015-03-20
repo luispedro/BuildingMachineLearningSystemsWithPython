@@ -2,15 +2,20 @@ import numpy as np
 
 class NormalizePositive(object):
 
+    def __init__(self, axis=0):
+        self.axis = axis
+
     def fit(self, features, y=None):
-        # count features that are greater than zero in axis 0:
+        # count features that are greater than zero in axis `self.axis`:
+        if self.axis == 1:
+            features = features.T
         binary = (features > 0)
-        count0 = binary.sum(axis=0)
+        count = binary.sum(axis=0)
 
         # to avoid division by zero, set zero counts to one:
-        count0[count0 == 0] = 1.
+        count[count == 0] = 1.
 
-        self.mean = features.sum(axis=0)/count0
+        self.mean = features.sum(axis=0)/count
 
         # Compute variance by average squared difference to the mean, but only
         # consider differences where binary is True (i.e., where there was a
@@ -18,21 +23,29 @@ class NormalizePositive(object):
         diff = (features - self.mean) * binary
         diff **= 2
         # regularize the estimate of std by adding 0.1
-        self.std = np.sqrt(0.1 + diff.sum(axis=0)/count0)
+        self.std = np.sqrt(0.1 + diff.sum(axis=0)/count)
         return self
 
     def transform(self, features):
+        if self.axis == 1:
+            features = features.T
         binary = (features > 0)
         features = features - self.mean
         features /= self.std
         features *= binary
+        if self.axis == 1:
+            features = features.T
         return features
 
     def inverse_transform(self, features, copy=True):
         if copy:
             features = features.copy()
+        if self.axis == 1:
+            features = features.T
         features *= self.std
         features += self.mean
+        if self.axis == 1:
+            features = features.T
         return features
 
     def fit_transform(self, features):
