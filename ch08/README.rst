@@ -10,6 +10,10 @@ significantly refactored when compared to the first one.
 Ratings Prediction
 ------------------
 
+Note that since the partition of the data into training and testing is random,
+everytime you run the code, the results will be different.
+
+
 load_ml100k.py
     Load data & partition into test/train
 norm.py
