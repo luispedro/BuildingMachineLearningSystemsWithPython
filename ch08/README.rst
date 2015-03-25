@@ -25,7 +25,7 @@ regression.py
 stacked.py
     Stacked predictions
 averaged.py
-    Averaging of predictions
+    Averaging of predictions (mentioned in book, but code is not shown there).
 
 Association Rule Mining
 -----------------------
