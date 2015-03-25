@@ -6,6 +6,9 @@ Support code for *Chapter 2: Learning How to Classify with Real-world
 Examples*. The directory data contains the seeds dataset, originally downloaded
 from https://archive.ics.uci.edu/ml/datasets/seeds
 
+chapter.py
+    The code as printed in the book.
+
 figure1.py
     Figure 1 in the book: all 2-by-2 scatter plots
 
