@@ -4,7 +4,9 @@ dataset-379-20news-18828_HJRZF.zip
 379/
 enwiki-latest-pages-articles.xml.bz2
 wiki_en_output_bow.mm
+wiki_en_output_bow.mm.gz
 wiki_en_output_bow.mm.index
 wiki_en_output_tfidf.mm
+wiki_en_output_tfidf.mm.gz
 wiki_en_output_tfidf.mm.index
 wiki_en_output_wordids.txt.bz2
