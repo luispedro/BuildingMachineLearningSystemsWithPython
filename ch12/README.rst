@@ -13,6 +13,8 @@ repository at ``../SimpleImageDataset/``.
 Scripts
 -------
 
+chapter.py
+    Code as written in the book
 jugfile.py
     Example jugfile
 image-classification.py

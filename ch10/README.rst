@@ -17,6 +17,8 @@ Running ``download.sh`` will retrieve the other dataset into a directory
 Scripts
 -------
 
+chapter.py
+    Code as written in the book.
 thresholded_figure.py
     Computes the thresholded figures, including after Gaussian blurring
 lena-ring.py
