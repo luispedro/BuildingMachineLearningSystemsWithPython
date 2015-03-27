@@ -49,3 +49,7 @@ Scripts
 
 blei_lda.py
     Computes LDA using the AP Corpus.
+wikitopics_create.py
+    Create the topic model for Wikipedia using LDA (must download wikipedia database first)
+wikitopics_create_hdp.py
+    Create the topic model for Wikipedia using HDP (must download wikipedia database first)
