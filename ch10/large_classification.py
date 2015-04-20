@@ -24,11 +24,11 @@ clf = Pipeline([('preproc', StandardScaler()),
                 ('classifier', grid)])
 
 def features_for(im):
-    from features import color_histogram
+    from features import chist
     im = mh.imread(im)
     img = mh.colors.rgb2grey(im).astype(np.uint8)
     return np.concatenate([mh.features.haralick(img).ravel(),
-                                color_histogram(im)])
+                                chist(im)])
 
 def images():
     '''Iterate over all (image,label) pairs
