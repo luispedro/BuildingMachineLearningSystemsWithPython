@@ -29,8 +29,8 @@ for t in range(3):
  elif t == 2:
      c = 'b'
      marker = 'x'
- plt.scatter(features[target == t,0], 
-            features[target == t,1],
+ plt.scatter(features[target == t, 0],
+            features[target == t, 1],
             marker=marker,
             c=c)
 # We use NumPy fancy indexing to get an array of strings:
@@ -151,17 +151,15 @@ from sklearn.preprocessing import StandardScaler
 classifier = KNeighborsClassifier(n_neighbors=1)
 classifier = Pipeline([('norm', StandardScaler()), ('knn', classifier)])
 
-
-
 means = []
 for training,testing in kf:
-   # We learn a model for this fold with `fit` and then apply it to the
-   # testing data with `predict`:
-   classifier.fit(features[training], labels[training])
-   prediction = classifier.predict(features[testing])
+    # We learn a model for this fold with `fit` and then apply it to the
+    # testing data with `predict`:
+    classifier.fit(features[training], labels[training])
+    prediction = classifier.predict(features[testing])
 
-   # np.mean on an array of booleans returns fraction
- # of correct decisions for this fold:
-   curmean = np.mean(prediction == labels[testing])
-   means.append(curmean)
+    # np.mean on an array of booleans returns fraction
+    # of correct decisions for this fold:
+    curmean = np.mean(prediction == labels[testing])
+    means.append(curmean)
 print('Mean accuracy: {:.1%}'.format(np.mean(means)))
