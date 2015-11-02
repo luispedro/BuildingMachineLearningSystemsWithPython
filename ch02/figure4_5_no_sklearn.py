@@ -45,7 +45,7 @@ def plot_decision(features, labels):
 
     model = fit_model(1, features[:, (0, 2)], np.array(labels))
     C = predict(
-        np.vstack([X.ravel(), Y.ravel()]).T, model).reshape(X.shape)
+        model, np.vstack([X.ravel(), Y.ravel()]).T).reshape(X.shape)
     if COLOUR_FIGURE:
         cmap = ListedColormap([(1., .6, .6), (.6, 1., .6), (.6, .6, 1.)])
     else:
