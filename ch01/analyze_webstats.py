@@ -26,8 +26,9 @@ print("Number of invalid entries:", sp.sum(sp.isnan(y)))
 x = x[~sp.isnan(y)]
 y = y[~sp.isnan(y)]
 
-# plot input data
+
 def plot_models(x, y, models, fname, mx=None, ymax=None, xmin=None):
+    ''' plot input data '''
 
     plt.figure(num=None, figsize=(8, 6))
     plt.clf()
@@ -138,8 +139,8 @@ test = sorted(shuffled[:split_idx])
 train = sorted(shuffled[split_idx:])
 fbt1 = sp.poly1d(sp.polyfit(xb[train], yb[train], 1))
 fbt2 = sp.poly1d(sp.polyfit(xb[train], yb[train], 2))
-print("fbt2(x)= \n%s"%fbt2)
-print("fbt2(x)-100,000= \n%s"%(fbt2-100000))
+print("fbt2(x)= \n%s" % fbt2)
+print("fbt2(x)-100,000= \n%s" % (fbt2-100000))
 fbt3 = sp.poly1d(sp.polyfit(xb[train], yb[train], 3))
 fbt10 = sp.poly1d(sp.polyfit(xb[train], yb[train], 10))
 fbt100 = sp.poly1d(sp.polyfit(xb[train], yb[train], 100))
