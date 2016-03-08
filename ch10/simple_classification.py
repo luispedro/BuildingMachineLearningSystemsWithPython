@@ -9,7 +9,7 @@ import mahotas as mh
 import numpy as np
 from glob import glob
 
-from features import texture, color_histogram
+from features import texture, chist
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -32,7 +32,7 @@ images = glob('{}/*.jpg'.format(basedir))
 for fname in sorted(images):
     imc = mh.imread(fname)
     haralicks.append(texture(mh.colors.rgb2grey(imc)))
-    chists.append(color_histogram(imc))
+    chists.append(chist(imc))
 
     # Files are named like building00.jpg, scene23.jpg...
     labels.append(fname[:-len('xx.jpg')])

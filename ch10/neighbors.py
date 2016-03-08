@@ -6,7 +6,7 @@
 import numpy as np
 import mahotas as mh
 from glob import glob
-from features import texture, color_histogram
+from features import texture, chist
 from matplotlib import pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from scipy.spatial import distance
@@ -29,7 +29,7 @@ for fname in images:
     imc = mh.imread(fname)
     imc = imc[200:-200,200:-200]
     haralicks.append(texture(mh.colors.rgb2grey(imc)))
-    chists.append(color_histogram(imc))
+    chists.append(chist(imc))
 
 haralicks = np.array(haralicks)
 chists = np.array(chists)
