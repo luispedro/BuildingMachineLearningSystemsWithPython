@@ -100,7 +100,6 @@ for ei in range(len(features)):
     training[ei] = False
     testing = ~training
     model = fit_model(features[training], is_virginica[training])
-    predict(model, features[testing])
     predictions = predict(model, features[testing])
     correct += np.sum(predictions == is_virginica[testing])
 acc = correct/float(len(features))
