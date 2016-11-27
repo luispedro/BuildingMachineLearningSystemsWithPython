@@ -4,6 +4,16 @@ Chapter 4
 
 Support code for *Chapter 4: Topic Modeling*
 
+
+AP Data
+-------
+
+To download the AP data, use the ``download_ap.sh`` script inside the ``data``
+directory::
+
+    cd data
+    ./download_ap.sh
+
 Word cloud creation
 -------------------
 
