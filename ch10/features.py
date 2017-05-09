@@ -37,7 +37,7 @@ def texture(im):
     return mh.features.haralick(im).ravel()
 
 
-def chist(im):
+def color_histogram(im):
     '''Compute color histogram of input image
 
     Parameters
