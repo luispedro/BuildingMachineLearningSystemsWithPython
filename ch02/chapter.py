@@ -84,7 +84,7 @@ print(best_fi, best_t, best_reverse, best_acc)
 
 def is_virginica_test(fi, t, reverse, example):
     'Apply threshold model to a new example'
-    test = example[fi] > t
+    test = example[:, fi] > t
     if reverse:
         test = not test
     return test
