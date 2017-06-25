@@ -24,8 +24,6 @@ def create_cloud(oname, words,maxsize=120, fontname='Lobster'):
     # gensim returns a weight between 0 and 1 for each word, while pytagcloud
     # expects an integer word count. So, we multiply by a large number and
     # round. For a visualization this is an adequate approximation.
-    # We also need to flip the order as gensim returns (value, word), whilst
-    # pytagcloud expects (word, value):
-    words = [(w,int(v*10000)) for v,w in words]
+    words = [(w,int(v*10000)) for w,v in words]
     tags = make_tags(words, maxsize=maxsize)
     create_tag_image(tags, oname, size=(1800, 1200), fontname=fontname)

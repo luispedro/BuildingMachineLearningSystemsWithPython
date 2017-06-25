@@ -36,9 +36,9 @@ model = models.ldamodel.LdaModel(
 # Iterate over all the topics in the model
 for ti in range(model.num_topics):
     words = model.show_topic(ti, 64)
-    tf = sum(f for f, w in words)
+    tf = sum(f for _, f in words)
     with open('topics.txt', 'w') as output:
-        output.write('\n'.join('{}:{}'.format(w, int(1000. * f / tf)) for f, w in words))
+        output.write('\n'.join('{}:{}'.format(w, int(1000. * f / tf)) for w, f in words))
         output.write("\n\n\n")
 
 # We first identify the most discussed topic, i.e., the one with the
