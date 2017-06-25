@@ -172,7 +172,7 @@ def download_tweets(fetch_list, raw_dir):
         except twitter.TwitterError as e:
             fatal = True
             print(e)
-            for m in json.loads(e.response_data.decode())['errors']:
+            for m in e.response_data['errors']:
                 if m['code'] == 34:
                     print("Tweet missing: ", item)
                     with open(MISSING_ID_FILE, "at") as f:
@@ -197,6 +197,11 @@ def download_tweets(fetch_list, raw_dir):
                         f.write(item[2] + "\n")
                     fatal = False
                     break
+                elif m['code']==144:
+                    print("Tweet missing: ", item)
+                    with open(MISSING_ID_FILE, "at") as f:
+                        f.write(item[2] + "\n")
+                    fatal = False
 
             if fatal:
                 raise
