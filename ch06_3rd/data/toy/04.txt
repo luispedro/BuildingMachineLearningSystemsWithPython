@@ -1,0 +1,1 @@
+Imaging databases store data.
