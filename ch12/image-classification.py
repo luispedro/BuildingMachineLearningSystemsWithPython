@@ -39,7 +39,7 @@ def compute_texture(im):
 
 @TaskGenerator
 def chist(fname):
-    from features import color_histogram
+    from features import chist as color_histogram
     im = mh.imread(fname)
     return color_histogram(im)
 
