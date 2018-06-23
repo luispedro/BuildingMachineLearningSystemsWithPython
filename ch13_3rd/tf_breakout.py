@@ -5,6 +5,7 @@
 import gym
 
 import os
+import six
 import numpy as np
 import tensorflow as tf
 import random
@@ -178,7 +179,6 @@ class Agent():
             # Save network
             if self.t % save_interval == 0:
                 save_path = self.saver.save(self.sess, network_path + '/' + env_name, global_step=self.t)
-                print('Successfully saved: ' + save_path)
 
         self.total_reward += reward
         self.total_q_max += np.max(self.q_values.eval(feed_dict={self.s: adapt_state(state)}))
@@ -281,7 +281,7 @@ if __name__ == "__main__":
 
             processed_frame = preprocess(frame)
             state = agent.run(state, action, reward, terminal, processed_frame)
-        env.env.ale.saveScreenPNG(b'%s/test_image_%05i.png' % (CHART_DIR, i))
+        env.env.ale.saveScreenPNG(six.b('%s/test_image_%05i.png' % (CHART_DIR, i))
 
     frame = env.reset()
     env.render()
