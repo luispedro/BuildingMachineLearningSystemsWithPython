@@ -22,6 +22,10 @@ def preprocess(img):
 def adapt_state(state):
     return [np.float32(np.transpose(state, (2, 1, 0)) / 255.0)]
 
+def adapt_batch_state(state):
+    return np.array(state) / 255.0
+
+
 env_name = "Breakout-v4"
 
 width = 80  # Resized frame width
@@ -90,13 +94,13 @@ class Agent():
 
         if not os.path.exists(network_path):
             os.makedirs(network_path)
-            
+
         # Initialize target network
         self.sess.run(self.update_target_network)
 
         if restore_network:
             self.load_network()
-            
+
     def build_network(self):
         model = tf.keras.Sequential()
         model.add(tf.keras.layers.Convolution2D(filters=32, kernel_size=8, strides=(4, 4), activation='relu', input_shape=(width, height, state_length), name="Layer1"))
@@ -197,8 +201,8 @@ class Agent():
                 mode = 'exploit'
             print('EPISODE: {0:6d} / TIMESTEP: {1:8d} / DURATION: {2:5d} / EPSILON: {3:.5f} / TOTAL_REWARD: {4:3.0f} / AVG_MAX_Q: {5:2.4f} / AVG_LOSS: {6:.5f} / MODE: {7}'.format(
                 self.episode + 1, self.t, self.duration, self.epsilon,
-                self.total_reward, self.total_q_max / float(self.duration),
-                self.total_loss / (float(self.duration) / float(train_skips)), mode))
+                self.total_reward, self.total_q_max / self.duration,
+                self.total_loss / (self.duration / train_skips), mode))
 
             self.total_reward = 0
             self.total_q_max = 0
@@ -230,11 +234,11 @@ class Agent():
         # Convert True to 1, False to 0
         terminal_batch = np.array(terminal_batch) + 0
 
-        target_q_values_batch = self.target_q_values.eval(feed_dict={self.st: np.float32(np.array(next_state_batch) / 255.0)})
+        target_q_values_batch = self.target_q_values.eval(feed_dict={self.st: adapt_batch_state(next_state_batch)})
         y_batch = reward_batch + (1 - terminal_batch) * gamma * np.max(target_q_values_batch, axis=1)
 
         loss, _ = self.sess.run([self.loss, self.grads_update], feed_dict={
-            self.s: np.float32(np.array(state_batch) / 255.0),
+            self.s: adapt_batch_state,
             self.a: action_batch,
             self.y: y_batch
         })
