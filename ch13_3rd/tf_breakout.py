@@ -92,8 +92,11 @@ class Agent():
         # Define loss and gradient update operation
         self.a, self.y, self.loss, self.grads_update = self.build_training_op(q_network_weights)
 
+        # Interactive session instead of the usual one just vecause it is simple to create
+        # Would need some refactoring otherwise of this constructor
         self.sess = tf.InteractiveSession()
         self.sess.run(tf.global_variables_initializer())
+        self.saver = tf.train.Saver(q_network_weights)
         self.summary_placeholders, self.update_ops, self.summary_op = self.setup_summary()
         self.summary_writer = tf.summary.FileWriter(tensorboard_path, self.sess.graph)
 
