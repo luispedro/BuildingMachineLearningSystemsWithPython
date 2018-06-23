@@ -10,6 +10,10 @@ import tensorflow as tf
 import random
 from collections import deque
 
+CHART_DIR = "charts"
+if not os.path.exists(CHART_DIR):
+    os.mkdir(CHART_DIR)
+
 def to_grayscale(img):
     return np.mean(img, axis=2).astype(np.uint8)
 
@@ -276,7 +280,7 @@ if __name__ == "__main__":
     env = gym.make(env_name)
     agent = Agent(num_actions=env.action_space.n)
 
-    for _ in range(n_episodes):
+    for i in range(n_episodes):
         terminal = False
         frame = env.reset()
         for _ in range(random.randint(1, initial_quiet_steps)):
@@ -288,6 +292,7 @@ if __name__ == "__main__":
 
             processed_frame = preprocess(frame)
             state = agent.run(state, action, reward, terminal, processed_frame)
+        env.env.ale.saveScreenPNG(b'%s/test_image_%05i.png' % (CHART_DIR, i))
 
     frame = env.reset()
     env.render()
