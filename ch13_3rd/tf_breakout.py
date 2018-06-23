@@ -262,13 +262,13 @@ class Agent():
         else:
             print('Training new network...')
 
-    def get_action_at_test(self, state):
+    def get_trained_action(self, state):
         action = np.argmax(self.q_values.eval(feed_dict={self.s: adapt_state(state)}))
         return action
 
 if __name__ == "__main__":
     from tqdm import tqdm
-    
+
     env = gym.make(env_name)
     agent = Agent(num_actions=env.action_space.n)
 
@@ -286,14 +286,3 @@ if __name__ == "__main__":
             state = agent.run(state, action, reward, terminal, processed_frame)
         env.env.ale.saveScreenPNG(six.b('%s/test_image_%05i.png' % (CHART_DIR, i))
 
-    frame = env.reset()
-    env.render()
-
-    frame, _, is_done, _ = env.step(0)  # Do nothing
-    state = agent.get_initial_state(frame)
-
-    while not is_done:
-        frame, reward, is_done, _ = env.step(agent.get_action_at_test(state))
-        env.render()
-        processed_frame = preprocess(frame)
-        next_state = np.append(state[1:, :, :], processed_frame, axis=0)
