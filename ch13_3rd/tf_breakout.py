@@ -121,7 +121,7 @@ class Agent():
 
         # Convert action to one hot vector
         a_one_hot = tf.one_hot(a, self.num_actions, 1.0, 0.0)
-        q_value = tf.reduce_sum(tf.matmul(self.q_values, a_one_hot), reduction_indices=1)
+        q_value = tf.reduce_sum(tf.multiply(self.q_values, a_one_hot), reduction_indices=1)
 
         # Clip the error, the loss is quadratic when the error is in (-1, 1), and linear outside of that region
         error = tf.abs(y - q_value)
