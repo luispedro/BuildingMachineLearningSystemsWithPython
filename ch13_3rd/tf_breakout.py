@@ -106,7 +106,7 @@ class Agent():
         model.add(tf.keras.layers.Convolution2D(filters=32, kernel_size=8, strides=(4, 4), activation='relu', input_shape=(width, height, state_length), name="Layer1" + name))
         model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=4, strides=(2, 2), activation='relu', name="Layer2" + name))
         model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=3, strides=(1, 1), activation='relu', name="Layer3" + name))
-        model.add(tf.keras.layers.Flatten())
+        model.add(tf.keras.layers.Flatten(name="Flatten" + name))
         model.add(tf.keras.layers.Dense(512, activation='relu', name="Layer4" + name))
         model.add(tf.keras.layers.Dense(self.num_actions, name="Output" + name))
 
