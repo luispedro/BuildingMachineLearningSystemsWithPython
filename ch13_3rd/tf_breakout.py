@@ -110,14 +110,14 @@ class Agent():
         model.add(tf.keras.layers.Dense(512, activation='relu', name="Layer4"))
         model.add(tf.keras.layers.Dense(self.num_actions, name="Output"))
 
-        s = tf.placeholder(tf.float32, [None, width, height, state_length])
+        s = tf.placeholder(tf.float32, [None, width, height, state_length], name="state")
         q_values = model(s)
 
         return s, q_values, model
 
     def build_training_op(self, q_network_weights):
-        a = tf.placeholder(tf.int64, [None])
-        y = tf.placeholder(tf.float32, [None])
+        a = tf.placeholder(tf.int64, [None], name="actions")
+        y = tf.placeholder(tf.float32, [None], name="qInput")
 
         # Convert action to one hot vector
         a_one_hot = tf.one_hot(a, self.num_actions, 1.0, 0.0)
