@@ -11,7 +11,7 @@ import tensorflow as tf
 import random
 from collections import deque
 
-CHART_DIR = b"charts"
+CHART_DIR = "charts"
 if not os.path.exists(CHART_DIR):
     os.mkdir(CHART_DIR)
 
