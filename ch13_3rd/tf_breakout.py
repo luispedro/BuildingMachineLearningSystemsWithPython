@@ -11,7 +11,7 @@ import tensorflow as tf
 import random
 from collections import deque
 
-CHART_DIR = "charts"
+CHART_DIR = b"charts"
 if not os.path.exists(CHART_DIR):
     os.mkdir(CHART_DIR)
 
@@ -58,7 +58,7 @@ min_gradient = 0.01  # Constant added to the squared gradient in the denominator
 network_path = 'saved_networks/' + env_name
 tensorboard_path = 'summary/' + env_name
 save_interval = 300000  # The frequency with which the network is saved
-initial_quiet_steps = 30  # Initial steps while the agent is not doing anything. We keep this to start populating the state
+initial_quiet_steps = 10  # Initial steps while the agent is not doing anything.
 
 
 class Agent():
@@ -150,7 +150,7 @@ class Agent():
         else:
             action = np.argmax(self.q_values.eval(feed_dict={self.s: adapt_state(state)}))
 
-        # Anneal epsilon linearly over time
+        # Decay epsilon over time
         if self.epsilon > final_epsilon and self.t >= initial_random_search:
             self.epsilon -= self.epsilon_step
 
@@ -285,7 +285,7 @@ if __name__ == "__main__":
 
     frame = env.reset()
     env.render()
-    
+
     frame, _, is_done, _ = env.step(0)  # Do nothing
     state = agent.get_initial_state(frame)
 
