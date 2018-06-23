@@ -186,27 +186,14 @@ class Agent():
 
         if terminal:
             # Write summary
-            if self.t >= initial_random_search:
-                stats = [self.total_reward, self.total_q_max / self.duration,
-                        self.duration, self.total_loss / (self.duration / train_skips)]
-                for i in range(len(stats)):
-                    self.sess.run(self.update_ops[i], feed_dict={
-                        self.summary_placeholders[i]: float(stats[i])
-                    })
-                summary_str = self.sess.run(self.summary_op)
-                self.summary_writer.add_summary(summary_str, self.episode + 1)
-
-            # Debug
-            if self.t < initial_random_search:
-                mode = 'random'
-            elif initial_random_search <= self.t < initial_random_search + exploration_steps:
-                mode = 'explore'
-            else:
-                mode = 'exploit'
-            print('EPISODE: {0:6d} / TIMESTEP: {1:8d} / DURATION: {2:5d} / EPSILON: {3:.5f} / TOTAL_REWARD: {4:3.0f} / AVG_MAX_Q: {5:2.4f} / AVG_LOSS: {6:.5f} / MODE: {7}'.format(
-                self.episode + 1, self.t, self.duration, self.epsilon,
-                self.total_reward, self.total_q_max / self.duration,
-                self.total_loss / (self.duration / train_skips), mode))
+            stats = [self.total_reward, self.total_q_max / self.duration,
+                    self.duration, self.total_loss / (self.duration / train_skips)]
+            for i in range(len(stats)):
+                self.sess.run(self.update_ops[i], feed_dict={
+                    self.summary_placeholders[i]: float(stats[i])
+                })
+            summary_str = self.sess.run(self.summary_op)
+            self.summary_writer.add_summary(summary_str, self.episode + 1)
 
             self.total_reward = 0
             self.total_q_max = 0
@@ -250,13 +237,13 @@ class Agent():
         self.total_loss += loss
 
     def setup_summary(self):
-        episode_total_reward = tf.Variable(0.)
+        episode_total_reward = tf.Variable(0., name="EpisodeTotalReward")
         tf.summary.scalar(env_name + '/Total Reward/Episode', episode_total_reward)
-        episode_avg_max_q = tf.Variable(0.)
+        episode_avg_max_q = tf.Variable(0., name="EpisodeAvgMaxQ")
         tf.summary.scalar(env_name + '/Average Max Q/Episode', episode_avg_max_q)
-        episode_duration = tf.Variable(0.)
+        episode_duration = tf.Variable(0., name="EpisodeDuration")
         tf.summary.scalar(env_name + '/Duration/Episode', episode_duration)
-        episode_avg_loss = tf.Variable(0.)
+        episode_avg_loss = tf.Variable(0., name="EpisodeAverageLoss")
         tf.summary.scalar(env_name + '/Average Loss/Episode', episode_avg_loss)
         summary_vars = [episode_total_reward, episode_avg_max_q, episode_duration, episode_avg_loss]
         summary_placeholders = [tf.placeholder(tf.float32) for _ in range(len(summary_vars))]
@@ -277,10 +264,12 @@ class Agent():
         return action
 
 if __name__ == "__main__":
+    from tqdm import tqdm
+    
     env = gym.make(env_name)
     agent = Agent(num_actions=env.action_space.n)
 
-    for i in range(n_episodes):
+    for i in tqdm(range(n_episodes)):
         terminal = False
         frame = env.reset()
         for _ in range(random.randint(1, initial_quiet_steps)):
