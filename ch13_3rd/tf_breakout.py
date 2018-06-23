@@ -284,5 +284,4 @@ if __name__ == "__main__":
 
             processed_frame = preprocess(frame)
             state = agent.run(state, action, reward, terminal, processed_frame)
-        env.env.ale.saveScreenPNG(six.b('%s/test_image_%05i.png' % (CHART_DIR, i))
-
+        env.env.ale.saveScreenPNG(six.b('%s/test_image_%05i.png' % (CHART_DIR, i)))
