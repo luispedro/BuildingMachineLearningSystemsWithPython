@@ -74,11 +74,11 @@ class Agent():
         self.replay_memory = deque()
 
         # Create q network
-        self.s, self.q_values, q_network = self.build_network()
+        self.s, self.q_values, q_network = self.build_network("Q")
         q_network_weights = q_network.trainable_weights
 
         # Create target network
-        self.st, self.target_q_values, target_network = self.build_network()
+        self.st, self.target_q_values, target_network = self.build_network("Target")
         target_network_weights = target_network.trainable_weights
 
         # Define target network update operation
@@ -101,16 +101,16 @@ class Agent():
         if restore_network:
             self.load_network()
 
-    def build_network(self):
+    def build_network(self, name):
         model = tf.keras.Sequential()
-        model.add(tf.keras.layers.Convolution2D(filters=32, kernel_size=8, strides=(4, 4), activation='relu', input_shape=(width, height, state_length), name="Layer1"))
-        model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=4, strides=(2, 2), activation='relu', name="Layer2"))
-        model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=3, strides=(1, 1), activation='relu', name="Layer3"))
+        model.add(tf.keras.layers.Convolution2D(filters=32, kernel_size=8, strides=(4, 4), activation='relu', input_shape=(width, height, state_length), name="Layer1" + name))
+        model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=4, strides=(2, 2), activation='relu', name="Layer2" + name))
+        model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=3, strides=(1, 1), activation='relu', name="Layer3" + name))
         model.add(tf.keras.layers.Flatten())
-        model.add(tf.keras.layers.Dense(512, activation='relu', name="Layer4"))
-        model.add(tf.keras.layers.Dense(self.num_actions, name="Output"))
+        model.add(tf.keras.layers.Dense(512, activation='relu', name="Layer4" + name))
+        model.add(tf.keras.layers.Dense(self.num_actions, name="Output" + name))
 
-        s = tf.placeholder(tf.float32, [None, width, height, state_length], name="state")
+        s = tf.placeholder(tf.float32, [None, width, height, state_length], name="state" + name)
         q_values = model(s)
 
         return s, q_values, model
