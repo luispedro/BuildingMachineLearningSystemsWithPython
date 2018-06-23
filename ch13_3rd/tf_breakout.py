@@ -238,7 +238,7 @@ class Agent():
         y_batch = reward_batch + (1 - terminal_batch) * gamma * np.max(target_q_values_batch, axis=1)
 
         loss, _ = self.sess.run([self.loss, self.grads_update], feed_dict={
-            self.s: adapt_batch_state,
+            self.s: adapt_batch_state(next_state_batch),
             self.a: action_batch,
             self.y: y_batch
         })
