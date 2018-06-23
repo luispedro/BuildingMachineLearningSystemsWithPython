@@ -23,7 +23,7 @@ def adapt_state(state):
     return [np.float32(np.transpose(state, (2, 1, 0)) / 255.0)]
 
 def adapt_batch_state(state):
-    return np.array(state) / 255.0
+    return np.transpose(np.array(state), (0, 3, 2, 1)) / 255.0
 
 
 env_name = "Breakout-v4"
