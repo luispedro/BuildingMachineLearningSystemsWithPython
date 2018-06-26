@@ -9,11 +9,43 @@ import six
 import numpy as np
 import tensorflow as tf
 import random
-from collections import deque
+import itertools
+from collections import deque, namedtuple
 
 CHART_DIR = "charts"
 if not os.path.exists(CHART_DIR):
     os.mkdir(CHART_DIR)
+
+env_name = "Breakout-v4"
+
+width = 80  # Resized frame width
+height = 105  # Resized frame height
+
+n_episodes = 12000  # Number of runs for the agent
+state_length = 4  # Number of most frames we input to the network
+
+gamma = 0.99  # Discount factor
+
+exploration_steps = 1000000  # During all these steps, we progressively lower epsilon
+initial_epsilon = 1.0  # Initial value of epsilon in epsilon-greedy
+final_epsilon = 0.1  # Final value of epsilon in epsilon-greedy
+
+replay_memory_init_size = 1000  # Number of steps to populate the replay memory before training starts
+replay_memory_size = 400000  # Number of states we keep for training
+batch_size = 32  # Batch size
+network_update_interval = 10000  # The frequency with which the target network is updated
+train_skips = 4  # The agent selects 4 actions between successive updates
+
+learning_rate = 0.00025  # Learning rate used by RMSProp
+momentum = 0.95  # momentum used by RMSProp
+min_gradient = 0.01  # Constant added to the squared gradient in the denominator of the RMSProp update
+
+network_path = 'saved_networks/' + env_name
+tensorboard_path = 'summary/' + env_name
+save_interval = 300000  # The frequency with which the network is saved
+initial_quiet_steps = 10  # Initial steps while the agent is not doing anything.
+
+Transition = namedtuple("Transition", ["state", "action", "reward", "next_state", "done"])
 
 def to_grayscale(img):
     return np.mean(img, axis=2).astype(np.uint8)
@@ -30,258 +62,228 @@ def adapt_state(state):
 def adapt_batch_state(state):
     return np.transpose(np.array(state), (0, 3, 2, 1)) / 255.0
 
+def get_initial_state(frame):
+    processed_frame = preprocess(frame)
+    state = [processed_frame for _ in range(state_length)]
+    return np.concatenate(state)
 
-env_name = "Breakout-v4"
+class Estimator():
+    """Q-Value Estimator neural network.
+    This network is used for both the Q-Network and the Target Network.
+    """
 
-width = 80  # Resized frame width
-height = 105  # Resized frame height
-
-n_episodes = 12000  # Number of runs for the agent
-state_length = 4  # Number of most frames we input to the network
-
-gamma = 0.99  # Discount factor
-
-exploration_steps = 1000000  # During all these steps, we progressively lower epsilon
-initial_epsilon = 1.0  # Initial value of epsilon in epsilon-greedy
-final_epsilon = 0.1  # Final value of epsilon in epsilon-greedy
-
-initial_random_search = 20000  # Number of steps to populate the replay memory before training starts
-replay_memory_size = 400000  # Number of states we keep for training
-batch_size = 32  # Batch size
-network_update_interval = 10000  # The frequency with which the target network is updated
-train_skips = 4  # The agent selects 4 actions between successive updates
-
-learning_rate = 0.00025  # Learning rate used by RMSProp
-momentum = 0.95  # momentum used by RMSProp
-min_gradient = 0.01  # Constant added to the squared gradient in the denominator of the RMSProp update
-
-network_path = 'saved_networks/' + env_name
-tensorboard_path = 'summary/' + env_name
-save_interval = 300000  # The frequency with which the network is saved
-initial_quiet_steps = 10  # Initial steps while the agent is not doing anything.
-
-
-class Agent():
-    def __init__(self, num_actions, restore_network=False):
-        self.num_actions = num_actions
+    def __init__(self, env, scope="estimator", summaries_dir=None):
+        self.scope = scope
+        self.num_actions = env.action_space.n
         self.epsilon = initial_epsilon
         self.epsilon_step = (initial_epsilon - final_epsilon) / exploration_steps
-        self.t = 0
+        
+        # Writes Tensorboard summaries to disk
+        self.summary_writer = None
+        with tf.variable_scope(scope):
+            # Build the graph
+            self.build_model()
+            if summaries_dir:
+                summary_dir = os.path.join(summaries_dir, "summaries_%s" % scope)
+                if not os.path.exists(summary_dir):
+                    os.makedirs(summary_dir)
+                self.summary_writer = tf.summary.FileWriter(summary_dir)
 
-        # Parameters used for summary
-        self.total_reward = 0
-        self.total_q_max = 0
-        self.total_loss = 0
-        self.duration = 0
-        self.episode = 0
+    def build_model(self):
+        """
+        Builds the Tensorflow graph.
+        """
+        self.X = tf.placeholder(shape=[None, width, height, state_length], dtype=tf.float32, name="X")
+        # The TD target value
+        self.y = tf.placeholder(shape=[None], dtype=tf.float32, name="y")
+        # Integer id of which action was selected
+        self.actions = tf.placeholder(shape=[None], dtype=tf.int32, name="actions")
 
-        # Create replay memory
-        self.replay_memory = deque()
+        model = tf.keras.Sequential()
+        model.add(tf.keras.layers.Convolution2D(filters=32, kernel_size=8, strides=(4, 4), activation='relu', input_shape=(width, height, state_length), name="Layer1"))
+        model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=4, strides=(2, 2), activation='relu', name="Layer2"))
+        model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=3, strides=(1, 1), activation='relu', name="Layer3"))
+        model.add(tf.keras.layers.Flatten(name="Flatten"))
+        model.add(tf.keras.layers.Dense(512, activation='relu', name="Layer4"))
+        model.add(tf.keras.layers.Dense(self.num_actions, name="Output"))
 
-        # Create q network
-        self.s, self.q_values, q_network = self.build_network("Q")
-        q_network_weights = q_network.trainable_weights
+        self.predictions = model(self.X)
 
-        # Create target network
-        self.st, self.target_q_values, target_network = self.build_network("Target")
-        target_network_weights = target_network.trainable_weights
+        a_one_hot = tf.one_hot(self.actions, self.num_actions, 1.0, 0.0)
+        q_value = tf.reduce_sum(tf.multiply(self.predictions, a_one_hot), reduction_indices=1)
+        
+        # Calculate the loss
+        self.losses = tf.squared_difference(self.y, q_value)
+        self.loss = tf.reduce_mean(self.losses)
 
-        # Define target network update operation
-        self.update_target_network = [target_network_weights[i].assign(q_network_weights[i]) for i in range(len(target_network_weights))]
+        # Optimizer Parameters from original paper
+        self.optimizer = tf.train.RMSPropOptimizer(learning_rate, momentum=momentum, epsilon=min_gradient)
+        self.train_op = self.optimizer.minimize(self.loss, global_step=tf.train.get_global_step())
 
-        # Define loss and gradient update operation
-        self.a, self.y, self.loss, self.grads_update = self.build_training_op(q_network_weights)
+        # Summaries for Tensorboard
+        self.summaries = tf.summary.merge([
+            tf.summary.scalar("loss", self.loss),
+            tf.summary.histogram("loss_hist", self.losses),
+            tf.summary.histogram("q_values_hist", self.predictions),
+            tf.summary.scalar("max_q_value", tf.reduce_max(self.predictions))
+        ])
 
-        # Interactive session instead of the usual one just vecause it is simple to create
-        # Would need some refactoring otherwise of this constructor
-        self.sess = tf.InteractiveSession()
-        self.sess.run(tf.global_variables_initializer())
-        self.saver = tf.train.Saver(q_network_weights)
-        self.summary_placeholders, self.update_ops, self.summary_op = self.setup_summary()
-        self.summary_writer = tf.summary.FileWriter(tensorboard_path, self.sess.graph)
 
-        if not os.path.exists(network_path):
-            os.makedirs(network_path)
+    def predict(self, sess, s):
+        return sess.run(self.predictions, { self.X: s })
 
-        # Initialize target network
-        self.sess.run(self.update_target_network)
+    def update(self, sess, s, a, y):
+        feed_dict = { self.X: s, self.y: y, self.actions: a }
+        summaries, global_step, _, loss = sess.run(
+            [self.summaries, tf.train.get_global_step(), self.train_op, self.loss],
+            feed_dict)
+        if self.summary_writer:
+            self.summary_writer.add_summary(summaries, global_step)
+        return loss
 
-        if restore_network:
-            self.load_network()
-
-    def build_network(self, name):
-        model = tf.keras.Sequential(name=name)
-        model.add(tf.keras.layers.Convolution2D(filters=32, kernel_size=8, strides=(4, 4), activation='relu', input_shape=(width, height, state_length), name="Layer1" + name))
-        model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=4, strides=(2, 2), activation='relu', name="Layer2" + name))
-        model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=3, strides=(1, 1), activation='relu', name="Layer3" + name))
-        model.add(tf.keras.layers.Flatten(name="Flatten" + name))
-        model.add(tf.keras.layers.Dense(512, activation='relu', name="Layer4" + name))
-        model.add(tf.keras.layers.Dense(self.num_actions, name="Output" + name))
-
-        s = tf.placeholder(tf.float32, [None, width, height, state_length], name="state" + name)
-        q_values = model(s)
-
-        return s, q_values, model
-
-    def build_training_op(self, q_network_weights):
-        a = tf.placeholder(tf.int64, [None], name="actions")
-        y = tf.placeholder(tf.float32, [None], name="qInput")
-
-        # Convert action to one hot vector
-        a_one_hot = tf.one_hot(a, self.num_actions, 1.0, 0.0)
-        q_value = tf.reduce_sum(tf.multiply(self.q_values, a_one_hot), reduction_indices=1)
-
-        # Clip the error, the loss is quadratic when the error is in (-1, 1), and linear outside of that region
-        error = tf.abs(y - q_value)
-        quadratic_part = tf.clip_by_value(error, 0.0, 1.0)
-        linear_part = error - quadratic_part
-        loss = tf.reduce_mean(0.5 * tf.square(quadratic_part) + linear_part)
-
-        optimizer = tf.train.RMSPropOptimizer(learning_rate, momentum=momentum, epsilon=min_gradient)
-        grads_update = optimizer.minimize(loss, var_list=q_network_weights)
-
-        return a, y, loss, grads_update
-
-    def get_initial_state(self, frame):
-        processed_frame = preprocess(frame)
-        state = [processed_frame for _ in range(state_length)]
-        return np.concatenate(state)
-
-    def get_action(self, state):
-        if self.epsilon >= random.random() or self.t < initial_random_search:
+    def get_action(self, sess, state):
+        if self.epsilon >= random.random():
             action = random.randrange(self.num_actions)
         else:
-            action = np.argmax(self.q_values.eval(feed_dict={self.s: adapt_state(state)}))
+            action = np.argmax(self.predict(sess, adapt_state(state)))
 
         # Decay epsilon over time
-        if self.epsilon > final_epsilon and self.t >= initial_random_search:
+        if self.epsilon > final_epsilon:
             self.epsilon -= self.epsilon_step
 
         return action
 
-    def run(self, state, action, reward, terminal, frame):
-        next_state = np.append(state[1:, :, :], frame, axis=0)
-
-        # Clip all positive rewards at 1 and all negative rewards at -1, leaving 0 rewards unchanged
-        reward = np.clip(reward, -1, 1)
-
-        # Store transition in replay memory
-        self.replay_memory.append((state, action, reward, next_state, terminal))
-        if len(self.replay_memory) > replay_memory_size:
-            self.replay_memory.popleft()
-
-        if self.t >= initial_random_search:
-            # Train network
-            if self.t % train_skips == 0:
-                self.train_network()
-
-            # Update target network
-            if self.t % network_update_interval == 0:
-                self.sess.run(self.update_target_network)
-
-            # Save network
-            if self.t % save_interval == 0:
-                save_path = self.saver.save(self.sess, network_path + '/' + env_name, global_step=self.t)
-
-        self.total_reward += reward
-        self.total_q_max += np.max(self.q_values.eval(feed_dict={self.s: adapt_state(state)}))
-        self.duration += 1
-
-        if terminal:
-            # Write summary
-            stats = [self.total_reward, self.total_q_max / self.duration,
-                    self.duration, self.total_loss / (self.duration / train_skips)]
-            for i in range(len(stats)):
-                self.sess.run(self.update_ops[i], feed_dict={
-                    self.summary_placeholders[i]: float(stats[i])
-                })
-            summary_str = self.sess.run(self.summary_op)
-            self.summary_writer.add_summary(summary_str, self.episode + 1)
-
-            self.total_reward = 0
-            self.total_q_max = 0
-            self.total_loss = 0
-            self.duration = 0
-            self.episode += 1
-
-        self.t += 1
-
-        return next_state
-
-    def train_network(self):
-        state_batch = []
-        action_batch = []
-        reward_batch = []
-        next_state_batch = []
-        terminal_batch = []
-        y_batch = []
-
-        # Sample random minibatch of transition from replay memory
-        minibatch = random.sample(self.replay_memory, batch_size)
-        for data in minibatch:
-            state_batch.append(data[0])
-            action_batch.append(data[1])
-            reward_batch.append(data[2])
-            next_state_batch.append(data[3])
-            terminal_batch.append(data[4])
-
-        # Convert True to 1, False to 0
-        terminal_batch = np.array(terminal_batch) + 0
-
-        target_q_values_batch = self.target_q_values.eval(feed_dict={self.st: adapt_batch_state(next_state_batch)})
-        y_batch = reward_batch + (1 - terminal_batch) * gamma * np.max(target_q_values_batch, axis=1)
-
-        loss, _ = self.sess.run([self.loss, self.grads_update], feed_dict={
-            self.s: adapt_batch_state(next_state_batch),
-            self.a: action_batch,
-            self.y: y_batch
-        })
-
-        self.total_loss += loss
-
-    def setup_summary(self):
-        episode_total_reward = tf.Variable(0., name="EpisodeTotalReward")
-        tf.summary.scalar(env_name + '/Total Reward/Episode', episode_total_reward)
-        episode_avg_max_q = tf.Variable(0., name="EpisodeAvgMaxQ")
-        tf.summary.scalar(env_name + '/Average Max Q/Episode', episode_avg_max_q)
-        episode_duration = tf.Variable(0., name="EpisodeDuration")
-        tf.summary.scalar(env_name + '/Duration/Episode', episode_duration)
-        episode_avg_loss = tf.Variable(0., name="EpisodeAverageLoss")
-        tf.summary.scalar(env_name + '/Average Loss/Episode', episode_avg_loss)
-        summary_vars = [episode_total_reward, episode_avg_max_q, episode_duration, episode_avg_loss]
-        summary_placeholders = [tf.placeholder(tf.float32) for _ in range(len(summary_vars))]
-        update_ops = [summary_vars[i].assign(summary_placeholders[i]) for i in range(len(summary_vars))]
-        summary_op = tf.summary.merge_all()
-        return summary_placeholders, update_ops, summary_op
-
-    def load_network(self):
-        checkpoint = tf.train.get_checkpoint_state(network_path)
-        if checkpoint and checkpoint.model_checkpoint_path:
-            self.saver.restore(self.sess, checkpoint.model_checkpoint_path)
-            print('Successfully loaded: ' + checkpoint.model_checkpoint_path)
-        else:
-            print('Training new network...')
-
     def get_trained_action(self, state):
-        action = np.argmax(self.q_values.eval(feed_dict={self.s: adapt_state(state)}))
+        action = np.argmax(self.predict(sess, adapt_state(state)))
         return action
+
+def copy_model_parameters(estimator1, estimator2):
+    """
+    Copies the model parameters of one estimator to another.
+    Args:
+      estimator1: Estimator to copy the paramters from
+      estimator2: Estimator to copy the parameters to
+    """
+    e1_params = [t for t in tf.trainable_variables() if t.name.startswith(estimator1.scope)]
+    e1_params = sorted(e1_params, key=lambda v: v.name)
+    e2_params = [t for t in tf.trainable_variables() if t.name.startswith(estimator2.scope)]
+    e2_params = sorted(e2_params, key=lambda v: v.name)
+
+    update_ops = []
+    for e1_v, e2_v in zip(e1_params, e2_params):
+        op = e2_v.assign(e1_v)
+        update_ops.append(op)
+
+    return update_ops
+
+def create_memory(env):
+    # Populate the replay memory with initial experience    
+    replay_memory = []
+    
+    frame = env.reset()
+    state = get_initial_state(frame)
+
+    for i in range(replay_memory_init_size):
+        action = np.random.choice(np.arange(env.action_space.n))
+        frame, reward, done, _ = env.step(action)
+        
+        next_state = np.append(state[1:, :, :], preprocess(frame), axis=0)
+        replay_memory.append(Transition(state, action, reward, next_state, done))
+        if done:
+            frame = env.reset()
+            state = get_initial_state(frame)
+        else:
+            state = next_state
+            
+    return replay_memory
+
+
+def setup_summary():
+    episode_total_reward = tf.Variable(0., name="EpisodeTotalReward")
+    tf.summary.scalar(env_name + '/Total Reward/Episode', episode_total_reward)
+    episode_avg_max_q = tf.Variable(0., name="EpisodeAvgMaxQ")
+    tf.summary.scalar(env_name + '/Average Max Q/Episode', episode_avg_max_q)
+    episode_duration = tf.Variable(0., name="EpisodeDuration")
+    tf.summary.scalar(env_name + '/Duration/Episode', episode_duration)
+    episode_avg_loss = tf.Variable(0., name="EpisodeAverageLoss")
+    tf.summary.scalar(env_name + '/Average Loss/Episode', episode_avg_loss)
+    summary_vars = [episode_total_reward, episode_avg_max_q, episode_duration, episode_avg_loss]
+    summary_placeholders = [tf.placeholder(tf.float32) for _ in range(len(summary_vars))]
+    update_ops = [summary_vars[i].assign(summary_placeholders[i]) for i in range(len(summary_vars))]
+    summary_op = tf.summary.merge_all()
+    return summary_placeholders, update_ops, summary_op
+
 
 if __name__ == "__main__":
     from tqdm import tqdm
 
     env = gym.make(env_name)
-    agent = Agent(num_actions=env.action_space.n)
+    tf.reset_default_graph()
 
-    for i in tqdm(range(n_episodes)):
-        terminal = False
-        frame = env.reset()
-        for _ in range(random.randint(1, initial_quiet_steps)):
-            frame, _, _, _ = env.step(0)  # Do nothing
-        state = agent.get_initial_state(frame)
-        while not terminal:
-            action = agent.get_action(state)
-            frame, reward, terminal, _ = env.step(action)
+    # Create a glboal step variable
+    global_step = tf.Variable(0, name='global_step', trainable=False)
+    
+    # Create estimators
+    q_estimator = Estimator(env, scope="q", summaries_dir=tensorboard_path)
+    target_estimator = Estimator(env, scope="target_q")
+    
+    copy_model = copy_model_parameters(q_estimator, target_estimator)
+    
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
 
-            processed_frame = preprocess(frame)
-            state = agent.run(state, action, reward, terminal, processed_frame)
-        env.env.ale.saveScreenPNG(six.b('%s/test_image_%05i.png' % (CHART_DIR, i)))
+        # The replay memory
+        replay_memory = create_memory(env)
+        
+        saver = tf.train.Saver()
+        # Load a previous checkpoint if we find one
+        latest_checkpoint = tf.train.latest_checkpoint(network_path)
+        if latest_checkpoint:
+            print("Loading model checkpoint %s...\n" % latest_checkpoint)
+            saver.restore(sess, latest_checkpoint)
+    
+        total_t = sess.run(tf.train.get_global_step())
+
+        for i in tqdm(range(n_episodes)):
+            # Save the current checkpoint
+            saver.save(tf.get_default_session(), network_path)
+
+            frame = env.reset()
+            state = get_initial_state(frame)
+
+            for t in itertools.count():    
+                # Maybe update the target estimator
+                if total_t % network_update_interval == 0:
+                    sess.run(copy_model)
+
+                action = q_estimator.get_action(sess, state)
+                frame, reward, terminal, _ = env.step(action)
+    
+                processed_frame = preprocess(frame)
+                next_state = np.append(state[1:, :, :], processed_frame, axis=0)
+                
+                reward = np.clip(reward, -1, 1)
+                replay_memory.append(Transition(state, action, reward, next_state, terminal))
+                if len(replay_memory) > replay_memory_size:
+                    replay_memory.popleft()
+            
+                samples = random.sample(replay_memory, batch_size)
+                states_batch, action_batch, reward_batch, next_states_batch, done_batch = map(np.array, zip(*samples))
+    
+                # Calculate q values and targets (Double DQN)
+                adapted_state = adapt_batch_state(next_states_batch)
+                
+                q_values_next = q_estimator.predict(sess, adapted_state)
+                best_actions = np.argmax(q_values_next, axis=1)
+                q_values_next_target = target_estimator.predict(sess, adapted_state)
+                targets_batch = reward_batch + np.invert(done_batch).astype(np.float32) * gamma * q_values_next_target[np.arange(batch_size), best_actions]
+    
+                # Perform gradient descent update
+                states_batch = adapt_batch_state(states_batch)
+                loss = q_estimator.update(sess, states_batch, action_batch, targets_batch)
+
+                total_t += 1
+                if terminal:
+                    break
+                
+            env.env.ale.saveScreenPNG(six.b('%s/test_image_%05i.png' % (CHART_DIR, i)))
