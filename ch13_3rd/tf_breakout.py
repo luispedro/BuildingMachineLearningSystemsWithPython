@@ -43,7 +43,6 @@ min_gradient = 0.01  # Constant added to the squared gradient in the denominator
 network_path = 'saved_networks/' + env_name
 tensorboard_path = 'summary/' + env_name
 save_interval = 300000  # The frequency with which the network is saved
-initial_quiet_steps = 10  # Initial steps while the agent is not doing anything.
 
 Transition = namedtuple("Transition", ["state", "action", "reward", "next_state", "done"])
 
@@ -248,8 +247,9 @@ if __name__ == "__main__":
         total_t = sess.run(tf.train.get_global_step())
 
         for episode in tqdm(range(n_episodes)):
-            # Save the current checkpoint
-            saver.save(tf.get_default_session(), network_path)
+            if total_t % save_interval == 0:
+                # Save the current checkpoint
+                saver.save(tf.get_default_session(), network_path)
 
             frame = env.reset()
             state = get_initial_state(frame)
@@ -305,3 +305,6 @@ if __name__ == "__main__":
             q_estimator.summary_writer.add_summary(summary_str, episode)
                 
             env.env.ale.saveScreenPNG(six.b('%s/test_image_%05i.png' % (CHART_DIR, i)))
+            
+        # Save the last checkpoint
+        saver.save(tf.get_default_session(), network_path)
