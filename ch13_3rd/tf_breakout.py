@@ -83,11 +83,11 @@ class Estimator():
         with tf.variable_scope(scope):
             # Build the graph
             self.build_model()
-            if summaries_dir:
-                summary_dir = os.path.join(summaries_dir, "summaries_%s" % scope)
-                if not os.path.exists(summary_dir):
-                    os.makedirs(summary_dir)
-                self.summary_writer = tf.summary.FileWriter(summary_dir)
+        if summaries_dir:
+            summary_dir = os.path.join(summaries_dir, "summaries_%s" % scope)
+            if not os.path.exists(summary_dir):
+                os.makedirs(summary_dir)
+            self.summary_writer = tf.summary.FileWriter(summary_dir)
 
     def build_model(self):
         """
@@ -199,18 +199,19 @@ def create_memory(env):
 
 
 def setup_summary():
-    episode_total_reward = tf.Variable(0., name="EpisodeTotalReward")
-    tf.summary.scalar(env_name + '/Total Reward/Episode', episode_total_reward)
-    episode_avg_max_q = tf.Variable(0., name="EpisodeAvgMaxQ")
-    tf.summary.scalar(env_name + '/Average Max Q/Episode', episode_avg_max_q)
-    episode_duration = tf.Variable(0., name="EpisodeDuration")
-    tf.summary.scalar(env_name + '/Duration/Episode', episode_duration)
-    episode_avg_loss = tf.Variable(0., name="EpisodeAverageLoss")
-    tf.summary.scalar(env_name + '/Average Loss/Episode', episode_avg_loss)
-    summary_vars = [episode_total_reward, episode_avg_max_q, episode_duration, episode_avg_loss]
-    summary_placeholders = [tf.placeholder(tf.float32) for _ in range(len(summary_vars))]
-    update_ops = [summary_vars[i].assign(summary_placeholders[i]) for i in range(len(summary_vars))]
-    summary_op = tf.summary.merge_all()
+    with tf.variable_scope("episode"):
+        episode_total_reward = tf.Variable(0., name="EpisodeTotalReward")
+        tf.summary.scalar(env_name + '/Total Reward/Episode', episode_total_reward)
+        episode_avg_max_q = tf.Variable(0., name="EpisodeAvgMaxQ")
+        tf.summary.scalar(env_name + '/Average Max Q/Episode', episode_avg_max_q)
+        episode_duration = tf.Variable(0., name="EpisodeDuration")
+        tf.summary.scalar(env_name + '/Duration/Episode', episode_duration)
+        episode_avg_loss = tf.Variable(0., name="EpisodeAverageLoss")
+        tf.summary.scalar(env_name + '/Average Loss/Episode', episode_avg_loss)
+        summary_vars = [episode_total_reward, episode_avg_max_q, episode_duration, episode_avg_loss]
+        summary_placeholders = [tf.placeholder(tf.float32) for _ in range(len(summary_vars))]
+        update_ops = [summary_vars[i].assign(summary_placeholders[i]) for i in range(len(summary_vars))]
+    summary_op = tf.summary.merge_all(scope="episode")
     return summary_placeholders, update_ops, summary_op
 
 
@@ -229,6 +230,8 @@ if __name__ == "__main__":
     
     copy_model = copy_model_parameters(q_estimator, target_estimator)
     
+    summary_placeholders, update_ops, summary_op = setup_summary()
+    
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
@@ -244,14 +247,18 @@ if __name__ == "__main__":
     
         total_t = sess.run(tf.train.get_global_step())
 
-        for i in tqdm(range(n_episodes)):
+        for episode in tqdm(range(n_episodes)):
             # Save the current checkpoint
             saver.save(tf.get_default_session(), network_path)
 
             frame = env.reset()
             state = get_initial_state(frame)
+            
+            total_reward = 0
+            total_loss = 0
+            total_q_max = 0
 
-            for t in itertools.count():    
+            for duration in itertools.count():    
                 # Maybe update the target estimator
                 if total_t % network_update_interval == 0:
                     sess.run(copy_model)
@@ -281,9 +288,20 @@ if __name__ == "__main__":
                 # Perform gradient descent update
                 states_batch = adapt_batch_state(states_batch)
                 loss = q_estimator.update(sess, states_batch, action_batch, targets_batch)
-
+                
+                total_q_max += np.max(q_values_next)
+                total_loss += loss
                 total_t += 1
+                total_reward += reward
                 if terminal:
                     break
+
+            stats = [total_reward, total_q_max / duration, duration, total_loss / duration]
+            for i in range(len(stats)):
+                sess.run(update_ops[i], feed_dict={
+                    summary_placeholders[i]: float(stats[i])
+                })
+            summary_str = sess.run(summary_op, )
+            q_estimator.summary_writer.add_summary(summary_str, episode)
                 
             env.env.ale.saveScreenPNG(six.b('%s/test_image_%05i.png' % (CHART_DIR, i)))
