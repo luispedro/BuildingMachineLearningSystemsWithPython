@@ -230,12 +230,13 @@ if __name__ == "__main__":
     copy_model = copy_model_parameters(q_estimator, target_estimator)
     
     summary_placeholders, update_ops, summary_op = setup_summary()
+
+    # The replay memory
+    replay_memory = create_memory(env)
     
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
-        # The replay memory
-        replay_memory = create_memory(env)
         
         saver = tf.train.Saver()
         # Load a previous checkpoint if we find one
@@ -304,7 +305,7 @@ if __name__ == "__main__":
             summary_str = sess.run(summary_op, )
             q_estimator.summary_writer.add_summary(summary_str, episode)
                 
-            env.env.ale.saveScreenPNG(six.b('%s/test_image_%05i.png' % (CHART_DIR, i)))
+            env.env.ale.saveScreenPNG(six.b('%s/test_image_%05i.png' % (CHART_DIR, episode)))
             
         # Save the last checkpoint
         saver.save(tf.get_default_session(), network_path)
