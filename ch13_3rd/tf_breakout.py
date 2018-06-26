@@ -200,13 +200,13 @@ def create_memory(env):
 def setup_summary():
     with tf.variable_scope("episode"):
         episode_total_reward = tf.Variable(0., name="EpisodeTotalReward")
-        tf.summary.scalar(env_name + '/Total Reward/Episode', episode_total_reward)
+        tf.summary.scalar('Total Reward', episode_total_reward)
         episode_avg_max_q = tf.Variable(0., name="EpisodeAvgMaxQ")
-        tf.summary.scalar(env_name + '/Average Max Q/Episode', episode_avg_max_q)
+        tf.summary.scalar('Average Max Q', episode_avg_max_q)
         episode_duration = tf.Variable(0., name="EpisodeDuration")
-        tf.summary.scalar(env_name + '/Duration/Episode', episode_duration)
+        tf.summary.scalar('Duration', episode_duration)
         episode_avg_loss = tf.Variable(0., name="EpisodeAverageLoss")
-        tf.summary.scalar(env_name + '/Average Loss/Episode', episode_avg_loss)
+        tf.summary.scalar('Average Loss', episode_avg_loss)
         summary_vars = [episode_total_reward, episode_avg_max_q, episode_duration, episode_avg_loss]
         summary_placeholders = [tf.placeholder(tf.float32) for _ in range(len(summary_vars))]
         update_ops = [summary_vars[i].assign(summary_placeholders[i]) for i in range(len(summary_vars))]
