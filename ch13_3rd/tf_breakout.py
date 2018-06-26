@@ -76,7 +76,7 @@ class Estimator():
         self.num_actions = env.action_space.n
         self.epsilon = initial_epsilon
         self.epsilon_step = (initial_epsilon - final_epsilon) / exploration_steps
-        
+
         # Writes Tensorboard summaries to disk
         self.summary_writer = None
         with tf.variable_scope(scope):
@@ -110,7 +110,7 @@ class Estimator():
 
         a_one_hot = tf.one_hot(self.actions, self.num_actions, 1.0, 0.0)
         q_value = tf.reduce_sum(tf.multiply(self.predictions, a_one_hot), reduction_indices=1)
-        
+
         # Calculate the loss
         self.losses = tf.squared_difference(self.y, q_value)
         self.loss = tf.reduce_mean(self.losses)
@@ -176,16 +176,16 @@ def copy_model_parameters(estimator1, estimator2):
     return update_ops
 
 def create_memory(env):
-    # Populate the replay memory with initial experience    
+    # Populate the replay memory with initial experience
     replay_memory = []
-    
+
     frame = env.reset()
     state = get_initial_state(frame)
 
     for i in range(replay_memory_init_size):
         action = np.random.choice(np.arange(env.action_space.n))
         frame, reward, done, _ = env.step(action)
-        
+
         next_state = np.append(state[1:, :, :], preprocess(frame), axis=0)
         replay_memory.append(Transition(state, action, reward, next_state, done))
         if done:
@@ -193,7 +193,7 @@ def create_memory(env):
             state = get_initial_state(frame)
         else:
             state = next_state
-            
+
     return replay_memory
 
 
@@ -222,29 +222,30 @@ if __name__ == "__main__":
 
     # Create a glboal step variable
     global_step = tf.Variable(0, name='global_step', trainable=False)
-    
+
     # Create estimators
     q_estimator = Estimator(env, scope="q", summaries_dir=tensorboard_path)
     target_estimator = Estimator(env, scope="target_q")
-    
+
     copy_model = copy_model_parameters(q_estimator, target_estimator)
-    
+
     summary_placeholders, update_ops, summary_op = setup_summary()
 
     # The replay memory
     replay_memory = create_memory(env)
-    
+
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
-        
+        q_estimator.summary_writer.add_graph(sess.graph)
+
         saver = tf.train.Saver()
         # Load a previous checkpoint if we find one
         latest_checkpoint = tf.train.latest_checkpoint(network_path)
         if latest_checkpoint:
             print("Loading model checkpoint %s...\n" % latest_checkpoint)
             saver.restore(sess, latest_checkpoint)
-    
+
         total_t = sess.run(tf.train.get_global_step())
 
         for episode in tqdm(range(n_episodes)):
@@ -254,7 +255,7 @@ if __name__ == "__main__":
 
             frame = env.reset()
             state = get_initial_state(frame)
-            
+
             total_reward = 0
             total_loss = 0
             total_q_max = 0
@@ -266,30 +267,30 @@ if __name__ == "__main__":
 
                 action = q_estimator.get_action(sess, state)
                 frame, reward, terminal, _ = env.step(action)
-    
+
                 processed_frame = preprocess(frame)
                 next_state = np.append(state[1:, :, :], processed_frame, axis=0)
-                
+
                 reward = np.clip(reward, -1, 1)
                 replay_memory.append(Transition(state, action, reward, next_state, terminal))
                 if len(replay_memory) > replay_memory_size:
                     replay_memory.popleft()
-            
+
                 samples = random.sample(replay_memory, batch_size)
                 states_batch, action_batch, reward_batch, next_states_batch, done_batch = map(np.array, zip(*samples))
-    
+
                 # Calculate q values and targets (Double DQN)
                 adapted_state = adapt_batch_state(next_states_batch)
-                
+
                 q_values_next = q_estimator.predict(sess, adapted_state)
                 best_actions = np.argmax(q_values_next, axis=1)
                 q_values_next_target = target_estimator.predict(sess, adapted_state)
                 targets_batch = reward_batch + np.invert(done_batch).astype(np.float32) * gamma * q_values_next_target[np.arange(batch_size), best_actions]
-    
+
                 # Perform gradient descent update
                 states_batch = adapt_batch_state(states_batch)
                 loss = q_estimator.update(sess, states_batch, action_batch, targets_batch)
-                
+
                 total_q_max += np.max(q_values_next)
                 total_loss += loss
                 total_t += 1
