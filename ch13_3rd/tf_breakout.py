@@ -98,7 +98,7 @@ class Estimator():
         # Integer id of which action was selected
         self.actions = tf.placeholder(shape=[None], dtype=tf.int32, name="actions")
 
-        model = tf.keras.Sequential()
+        model = tf.keras.Sequential(name=self.scope)
         model.add(tf.keras.layers.Convolution2D(filters=32, kernel_size=8, strides=(4, 4), activation='relu', input_shape=(width, height, state_length), name="Layer1"))
         model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=4, strides=(2, 2), activation='relu', name="Layer2"))
         model.add(tf.keras.layers.Convolution2D(filters=64, kernel_size=3, strides=(1, 1), activation='relu', name="Layer3"))
