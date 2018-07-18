@@ -1,1 +1,10 @@
-AnimTransDistr/
+wiki_lda.pkl
+wiki_lda.pkl.state
+*.png
+*.npy
+*.pkl
+topics.txt
+.ipynb_checkpoints
+data/dataset-379-20news-18828_EQZOQ.zip
+data/wiki_en_output.tfidf_model
+wiki_lda.pkl.id2word
