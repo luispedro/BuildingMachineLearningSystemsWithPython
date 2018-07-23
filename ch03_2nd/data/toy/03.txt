@@ -1,1 +1,0 @@
-Most imaging databases save images permanently.
