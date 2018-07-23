@@ -1,42 +1,41 @@
 =========
-Chapter 7
+Chapter 8
 =========
 
-Support code for *Chapter 7: Regression* 
+Support code for *Chapter 8: Recommendations*.
+
+The code refers to the second edition of the book and this code has been
+significantly refactored when compared to the first one.
+
+Ratings Prediction
+------------------
+
+Note that since the partition of the data into training and testing is random,
+everytime you run the code, the results will be different.
 
 
-Boston data analysis
---------------------
+load_ml100k.py
+    Load data & partition into test/train
+norm.py
+    Normalize the data
+corrneighbours.py
+    Neighbour models based on ncrroaltoin
+regression.py
+    Regression models
+stacked.py
+    Stacked predictions
+averaged.py
+    Averaging of predictions (mentioned in book, but code is not shown there).
 
-This dataset is shipped with sklearn. Thus, no extra download is required.
-
-
-boston1.py
-    Fit a linear regression model to the Boston house price data
-boston1numpy.py
-    Version of above script using numpy operations for linear regression
-boston_cv_penalized.py
-    Test different penalized (and OLS) regression schemes on the Boston dataset
-figure1_2.py
-    Show the regression line for Boston data
-figure3.py
-    Show the regression line for Boston data with OLS and Lasso
-figure4.py
-    Scatter plot of predicted-vs-actual for multidimensional regression
-
-10K data analysis
------------------
-
-lr10k.py
-    Linear regression on 10K dataset, evaluation by cross-validation
-predict10k_en.py
-    Elastic nets (including with inner cross-validation for parameter
-    settings). Produces scatter plot.
-
-
-MovieLens data analysis
+Association Rule Mining
 -----------------------
 
-In this chapter, we only consider a very simple approach, which is implemented
-in the ``usermodel.py`` script.
+Check the folder ``apriori/``
+
+apriori/histogram.py
+    Print a histogram of how many times each product was bought
+apriori/apriori.py
+    Implementation of Apriori algorithm and association rule building
+apriori/apriori_example.py
+    Example of Apriori algorithm in retail dataset
 
