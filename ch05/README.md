@@ -8,4 +8,4 @@ After publishing the book, StackExchange released the May 2014 version at
 
 Note that using the latest version, you will get slightly different results.
 
-The code is using pyenchant for spell correction. Pyenchent is only used to increase your pleasure of eperimenting with additional features. It is not used later on the chapter. So, if you find out that your platform poses too big problems to install it (e.g. on 64bit Windows), don't bother.
+The code is using pyenchant for spell correction. Pyenchent is only used to increase your pleasure of experimenting with additional features. It is not used later on the chapter. So, if you find out that your platform poses too big problems to install it (e.g. on 64bit Windows), don't bother.
